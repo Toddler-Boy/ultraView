@@ -1,0 +1,30 @@
+name: Build macOS
+on: [push]
+jobs:
+  build:
+    name: Build macOS
+    runs-on: [self-hosted, macOS, ARM64]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Init Homebrew
+        run: |
+          eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(/usr/local/bin/brew shellenv)"
+          echo "PATH=$PATH" >> $GITHUB_ENV       
+      - name: "Run script"
+        run: ./ci/build.sh
+        shell: bash
+        env:
+          APPLICATION: ${{ secrets.APPLICATION }}
+          INSTALLER: ${{ secrets.INSTALLER }}
+          APPLE_PASS: ${{ secrets.APPLE_PASS }}
+          APPLE_USER: ${{ secrets.APPLE_USER }}
+          APIKEY: ${{ secrets.APIKEY }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ultraSID-macos
+          path: ci/bin/ultraSID.app
+          retention-days: 1

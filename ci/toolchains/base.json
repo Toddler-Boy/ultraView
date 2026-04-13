@@ -1,0 +1,64 @@
+{
+	"cmakeMinimumRequired": {
+		"major": 4,
+		"minor": 2,
+		"patch": 0
+	},
+	"version": 10,
+	"configurePresets": [
+		{
+			"name": "base",
+			"binaryDir": "${sourceDir}/Builds/${presetName}",
+			"cacheVariables": {
+				"BUILD_EXTRAS": {
+					"type": "BOOL",
+					"value": "ON"
+				},
+				"BUILD_TESTING": {
+					"type": "BOOL",
+					"value": "ON"
+				}
+			},
+			"warnings": {
+				"deprecated": true,
+				"dev": true,
+				"uninitialized": false,
+				"unusedCli": false
+			},
+			"hidden": true,
+			"installDir": "${sourceDir}/deploy/${presetName}"
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "base",
+			"cleanFirst": false,
+			"configuration": "Debug",
+			"hidden": true,
+			"verbose": false
+		}
+	],
+	"testPresets": [
+		{
+			"name": "base",
+			"configuration": "Debug",
+			"execution": {
+				"noTestsAction": "error",
+				"scheduleRandom": true
+			},
+			"filter": {
+				"include": {
+					"name": "^refx.+"
+				}
+			},
+			"hidden": true,
+			"output": {
+				"labelSummary": true,
+				"outputLogFile": "${sourceDir}/logs/Testing.log",
+				"outputOnFailure": true,
+				"shortProgress": true,
+				"verbosity": "verbose"
+			}
+		}
+	]
+}

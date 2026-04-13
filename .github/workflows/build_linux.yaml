@@ -1,0 +1,31 @@
+name: Build Linux
+on: [push]
+jobs:
+  build:
+    name: Build Linux
+    runs-on: [self-hosted, Linux, x64]
+    timeout-minutes: 15
+    steps:
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
+        shell: bash
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install CMake 4.2.0
+        run: |
+          curl -L https://github.com/Kitware/CMake/releases/download/v4.2.0/cmake-4.2.0-linux-x86_64.tar.gz -o cmake.tar.gz
+          tar xzf cmake.tar.gz
+          echo "$PWD/cmake-4.2.0-linux-x86_64/bin" >> $GITHUB_PATH
+        shell: bash
+      - name: "Run script"
+        run: ./ci/build.sh
+        shell: bash
+        env:
+          APIKEY: ${{ secrets.APIKEY }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ultraSID-linux
+          path: ci/bin/ultraSID
+          retention-days: 1
