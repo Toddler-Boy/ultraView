@@ -40,7 +40,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 				return;
 
 			// Reload monitor profile
-			if ( parent.endsWithIgnoreCase ( ".ini" ) )
+			if ( parent.endsWithIgnoreCase ( ".yml" ) )
 				mainScreen.crt.reloadOverlayProfile ();
 
 			return;
@@ -54,7 +54,6 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 
 			strings->load ();
 			repaint ();
-//			mainScreen.footer.volume.qualitySelector.repaint ();
 		}
 
 		// UI icons
@@ -65,7 +64,6 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 
 			icons->load ();
 			repaint ();
-//			mainScreen.footer.volume.qualitySelector.repaint ();
 		}
 
 		return;

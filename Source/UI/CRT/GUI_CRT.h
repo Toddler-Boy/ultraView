@@ -34,6 +34,8 @@ public:
 	void showSettings ( const bool visible );
 	void setBackgroundColour ( const juce::Colour& bckCol );
 
+	void setStreamAddress ( const juce::String& address ) { overlay.setStreamAddress ( address ); }
+
 private:
 	// V-blank stuff
 	juce::VBlankAttachment	vBlankAttachment { this, [ this ] ( double time ) {	update ( time );	} };

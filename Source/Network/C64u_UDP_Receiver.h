@@ -25,7 +25,7 @@ public:
 	void setAudioBuffers ( float* buffer1, float* buffer2 );
 
 	// Start/Stop receiving data
-	void start ( const juce::String& address, int newPort );
+	[[ nodiscard ]] juce::String start ( const juce::String& address );
 	void stop ();
 
 	// UI Callbacks

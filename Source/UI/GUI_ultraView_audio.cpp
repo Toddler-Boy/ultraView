@@ -44,8 +44,8 @@ void GUI_ultraView::prepareToPlay ( int samplesPerBlockExpected, double sampleRa
 	const auto	streamRatio = internalSamplerate / sampleRate_;
 	const auto	streamBufferSize = int ( std::ceil ( samplesPerBlockExpected * streamRatio ) );
 
-	streamBuffer.setSize ( 2, streamBufferSize );
-	streamFifo.setSize ( 2, streamBufferSize * 2 );
+	streamBuffer.setSize ( 2, int ( streamBufferSize * 1.5 ) );
+	streamFifo.setSize ( 2, streamBufferSize * 4 );
 	streamResamplingFifo.setResamplingRatio ( internalSamplerate, sampleRate_ );
 }
 //-----------------------------------------------------------------------------
@@ -80,20 +80,17 @@ void GUI_ultraView::getNextAudioBlock ( const juce::AudioSourceChannelInfo& buff
 		else
 		{
 			const auto	numSamples = bufferToFill.buffer->getNumSamples ();
-
 			while ( streamResamplingFifo.samplesReady () < numSamples )
 			{
-				if ( streamFifo.getNumReady () >= streamBuffer.getNumSamples () )
-				{
-					streamFifo.read ( streamBuffer );
-					streamResamplingFifo.pushAudioBuffer ( streamBuffer );
-				}
-				else
+				if ( streamFifo.getNumReady () < streamBuffer.getNumSamples () )
 				{
 					bufferToFill.clearActiveBufferRegion ();
 					inAudio.exit ();
 					return;
 				}
+
+				streamFifo.read ( streamBuffer );
+				streamResamplingFifo.pushAudioBuffer ( streamBuffer );
 			}
 
 			streamResamplingFifo.popAudioBuffer ( *bufferToFill.buffer );

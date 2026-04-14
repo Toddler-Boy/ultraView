@@ -17,7 +17,8 @@
 #include "Globals/Strings.h"
 #include "Globals/Theme.h"
 
-#include "UI/CRT/C64u_UDP_Receiver.h"
+#include "Network/C64u_UDP_Receiver.h"
+#include "Network/AsyncNetwork.h"
 
 //-----------------------------------------------------------------------------
 
@@ -83,6 +84,8 @@ private:
 
 	void updateColors ();
 
+	void setupNetworking ();
+
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;
 	SmoothedValue			curOutVol;
@@ -113,6 +116,9 @@ private:
 	gin::AudioFifo				streamFifo;
 	juce::AudioBuffer<float>	streamBuffer;
 	gin::ResamplingFifo			streamResamplingFifo { 1024 * 5 };
+
+	// AsyncNetwork
+	AsyncNetwork				network;
 
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
 

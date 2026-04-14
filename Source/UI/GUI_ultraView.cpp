@@ -60,7 +60,10 @@ GUI_ultraView::GUI_ultraView ()
 			juce::Logger::writeToLog ( "[W]C64u UDP receiver stopped receiving data (audio)" );
 	};
 
-	c64uReceiver.start ( "239.0.1.65", 11001 );
+	// Setup network
+	network.setBaseAddress ( "http://" + preferences->get<juce::String> ( "network/base-address" ) );
+
+	setupNetworking ();
 }
 //-----------------------------------------------------------------------------
 

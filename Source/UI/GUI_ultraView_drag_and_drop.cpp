@@ -7,12 +7,12 @@ bool GUI_ultraView::isInterestedInFileDrag ( const juce::StringArray& files )
 	if ( files.size () != 1 )
 		return false;
 
-	return files[ 0 ].endsWithIgnoreCase ( ".crt" );
+	return files[ 0 ].endsWithIgnoreCase ( ".crt" ) || files[ 0 ].endsWithIgnoreCase ( ".prg" );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_ultraView::filesDropped ( const juce::StringArray& files, int /*x*/, int /*y*/ )
 {
-	Z_INFO ( files[ 0 ] );
+	UI::sendGlobalMessage ( "c64run {}", files[ 0 ].quoted () );
 }
 //-----------------------------------------------------------------------------

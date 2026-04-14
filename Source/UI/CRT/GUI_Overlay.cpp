@@ -49,15 +49,38 @@ void GUI_Overlay::newOpenGLContextCreated ()
 {
 	ShaderToyComponent::newOpenGLContextCreated ();
 
-	c64uReceiver.start ( "239.0.1.64", 11000 );
+	const juce::ScopedLock lock ( streamLock );
+	startVideoStream ();
 }
 //-----------------------------------------------------------------------------
 
 void GUI_Overlay::openGLContextClosing ()
 {
-	c64uReceiver.stop ();
+	{
+		const juce::ScopedLock lock ( streamLock );
+		c64uReceiver.stop ();
+	}
 
 	ShaderToyComponent::openGLContextClosing ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Overlay::setStreamAddress ( const juce::String& address )
+{
+	const juce::ScopedLock lock ( streamLock );
+
+	c64uReceiver.stop ();
+	c64uStreamAddress = address;
+
+	if ( isReady () )
+		startVideoStream ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Overlay::startVideoStream ()
+{
+	if ( c64uStreamAddress.isNotEmpty () )
+		UI::sendGlobalMessage ( "stream-status video {}", c64uReceiver.start ( c64uStreamAddress ).quoted () );
 }
 //-----------------------------------------------------------------------------
 

@@ -6,7 +6,8 @@
 bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 {
 	if ( (		key == juce::KeyPress ( juce::KeyPress::returnKey, juce::ModifierKeys::altModifier, 0 )
-			||	key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::noModifiers, 0 ) )
+//			||	key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::noModifiers, 0 )
+		 )
 			&&	mainScreen.crt.isVisible () )
 	{
 		toggleFullscreen ();

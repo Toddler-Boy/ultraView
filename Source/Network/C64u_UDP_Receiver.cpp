@@ -15,8 +15,25 @@ C64u_UDP_Receiver::~C64u_UDP_Receiver ()
 }
 //-----------------------------------------------------------------------------
 
-void C64u_UDP_Receiver::start ( const juce::String& address, int newPort )
+juce::String C64u_UDP_Receiver::start ( const juce::String& address )
 {
+	if ( address.isEmpty () )
+		return "Cannot start C64u UDP receiver: IP is empty";
+
+	// Extract port from address, default to 11000 for video and 11001 for audio if not specified
+	auto	newPort = address.fromFirstOccurrenceOf ( ":", false, false ).getIntValue ();
+	if ( ! newPort )
+		newPort = type == video ? 11000 : 11001;
+
+	const auto	addressOnly = address.upToFirstOccurrenceOf ( ":", false, false );
+
+	juce::IPAddress	ip ( addressOnly );
+	if ( ip.toString () != addressOnly )
+		return "Invalid IP address format: " + address.quoted ();
+
+	if ( ip.isIPv6 )
+		return "Invalid IP address format: " + addressOnly.quoted () + " is not IP4 format, but IPv6";
+
 	// Socket object already exists, call stop first
 	jassert ( ! socket.get () );
 
@@ -32,30 +49,30 @@ void C64u_UDP_Receiver::start ( const juce::String& address, int newPort )
 
 	socket = std::make_unique<juce::DatagramSocket> ( false );
 	if ( ! socket )
-	{
-		Z_ERR ( "Failed to create C64u UDP socket" );
-		return;
-	}
+		return "Failed to create C64u UDP socket";
 
 	if ( ! socket->bindToPort ( newPort ) )
-	{
-		Z_ERR ( "Failed to bind C64u UDP socket to port " << newPort );
-		return;
-	}
+		return "Failed to bind C64u UDP socket to port " + juce::String ( newPort );
+
 	socket->setEnablePortReuse ( true );
 
-	if ( ! socket->joinMulticast ( address ) )
+	currentMulticastAddress = {};
+	if ( ip.address[ 0 ] >= 224 && ip.address[ 0 ] <= 239 )
 	{
-		Z_ERR ( "Failed to join C64u UDP multicast group at address " << address );
-		socket->shutdown ();
-		socket.reset ();
-		return;
-	}
+		if ( ! socket->joinMulticast ( addressOnly ) )
+		{
+			socket->shutdown ();
+			socket.reset ();
+			return "Failed to join C64u UDP multicast group at address " + address;
+		}
 
-	currentMulticastAddress = address;
+		currentMulticastAddress = addressOnly;
+	}
 
 	lastReadTime = std::chrono::steady_clock::now ();
 	startThread ( Priority::normal );
+
+	return "Streaming " + juce::String ( type == video ? "video" : "audio" ) + " from " + address;
 }
 //-----------------------------------------------------------------------------
 
@@ -64,7 +81,8 @@ void C64u_UDP_Receiver::stop ()
 	if ( ! socket )
 		return;
 
-	socket->leaveMulticast ( currentMulticastAddress );
+	if ( currentMulticastAddress.isNotEmpty () )
+		socket->leaveMulticast ( currentMulticastAddress );
 
 	stopThread ( 200 );
 
