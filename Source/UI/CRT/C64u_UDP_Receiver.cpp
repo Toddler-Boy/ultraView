@@ -55,7 +55,7 @@ void C64u_UDP_Receiver::start ( const juce::String& address, int newPort )
 	currentMulticastAddress = address;
 
 	lastReadTime = std::chrono::steady_clock::now ();
-	startThread ();
+	startThread ( Priority::normal );
 }
 //-----------------------------------------------------------------------------
 
@@ -64,9 +64,10 @@ void C64u_UDP_Receiver::stop ()
 	if ( ! socket )
 		return;
 
-	stopThread ( 100 );
-
 	socket->leaveMulticast ( currentMulticastAddress );
+
+	stopThread ( 200 );
+
 	socket->shutdown ();
 	socket.reset ();
 }

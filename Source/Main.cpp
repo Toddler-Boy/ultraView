@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "UI/GUI_ultraSID.h"
+#include "UI/GUI_ultraView.h"
 #include "UI/SID_LookAndFeel.h"
 
 #include "Globals/Settings.h"
@@ -14,15 +14,15 @@
 
 //-----------------------------------------------------------------------------
 
-class ultraSIDApp : public juce::JUCEApplication
+class ultraViewApp : public juce::JUCEApplication
 {
 public:
-	ultraSIDApp ()
+	ultraViewApp ()
 	{
 		juce::Logger::setCurrentLogger ( lime::Logger::getInstance () );
 	}
 
-	~ultraSIDApp () override
+	~ultraViewApp () override
 	{
 		juce::Logger::setCurrentLogger ( nullptr );
 	}
@@ -70,7 +70,7 @@ public:
 
 			// Set up window
 			setUsingNativeTitleBar ( true );
-			auto	ultra = new GUI_ultraSID;
+			auto	ultra = new GUI_ultraView;
 
 			setContentOwned ( ultra, false );
 
@@ -94,7 +94,7 @@ public:
 					{
 						const auto	b = display->userBounds.toNearestIntEdges ();
 						centreWithSize ( std::clamp ( b.getWidth () - 100, 890, 1280 ),
-										 std::clamp ( b.getHeight () - 25, 700, 100'000 ) );
+										 std::clamp ( b.getHeight () - 100, 700, 100'000 ) );
 					}
 				}
 				else
@@ -131,9 +131,8 @@ public:
 
 		void closeButtonPressed () override
 		{
-			auto	content = dynamic_cast<GUI_ultraSID*> ( getContentComponent () );
+			auto	content = dynamic_cast<GUI_ultraView*> ( getContentComponent () );
 			content->saveState ();
-			content->stopThread ( -1 );
 			JUCEApplication::getInstance ()->systemRequestedQuit ();
 		}
 
@@ -183,4 +182,4 @@ private:
 };
 //-----------------------------------------------------------------------------
 
-START_JUCE_APPLICATION ( ultraSIDApp )
+START_JUCE_APPLICATION ( ultraViewApp )

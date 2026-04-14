@@ -4,98 +4,12 @@
 
 #include "constants.h"
 #include "Icons.h"
-#include "Playlists.h"
 #include "Preferences.h"
 #include "Settings.h"
 #include "Strings.h"
-#include "Tags.h"
 
 #include "UI/SID_LookAndFeel.h"
 
-//-----------------------------------------------------------------------------
-
-juce::String SID::convertTimeToString ( int timeMS )
-{
-	if ( timeMS < 0 )
-		return {};
-
-	// Round up by half a second
-	timeMS += 500;
-
-	// Convert millisecond counter to human readable time
-	const auto	hours = timeMS / ( 1000 * 60 * 60 );		timeMS -= hours * 1000 * 60 * 60;
-	const auto	min = timeMS / ( 1000 * 60 );				timeMS -= min * 1000 * 60;
-	const auto	sec = timeMS / 1000;
-
-	if ( hours )	return std::format ( "{}:{:02}:{:02}", hours, min, sec );
-
-	return std::format ( "{}:{:02}", min, sec );
-}
-//-----------------------------------------------------------------------------
-
-juce::String SID::convertToLongTimeString ( int timeMS )
-{
-	if ( timeMS < 0 )
-		return {};
-
-	// Round up by half a second
-	timeMS += 500;
-
-	// Convert millisecond counter to human readable time
-	const auto	days = timeMS / ( 1000 * 60 * 60 * 24 );	timeMS -= days * 1000 * 60 * 60 * 24;
-	const auto	hours = timeMS / ( 1000 * 60 * 60 );		timeMS -= hours * 1000 * 60 * 60;
-	const auto	min = timeMS / ( 1000 * 60 );				timeMS -= min * 1000 * 60;
-	const auto	sec = timeMS / 1000;
-
-	auto	ret = juce::String ();
-
-	if ( days )		ret += juce::String ( days ) + " days ";
-	if ( hours )	ret += juce::String ( hours ) + " hr ";
-	if ( min )		ret += juce::String ( min ) + " min ";
-	if ( ! hours )	ret += juce::String ( sec ) + " sec";
-
-	return ret.trim ();
-}
-//-----------------------------------------------------------------------------
-
-uint32_t SID::getTuneLength ( const std::string& tuneName, int subTune )
-{
-	const juce::SharedResourcePointer<HVSC_database>	hvscDB;
-
-	if ( const auto	lengthMs = hvscDB->getLengthMs ( tuneName, subTune ) )
-		return lengthMs;
-
-	const juce::SharedResourcePointer<Preferences>	settings;
-
-	return settings->get<int> ( "Songs", "unknown" ) * 60u * 1000u;
-}
-//-----------------------------------------------------------------------------
-
-std::tuple<uint32_t, uint32_t, float, bool> SID::getRenderInfo ( const std::string& tuneName, const int subtune )
-{
-	const juce::SharedResourcePointer<HVSC_database>	hvscDB;
-	const juce::SharedResourcePointer<Database>			database;
-
-	const auto	lufs = database->getSongLoudness ( tuneName, subtune );
-	auto		len = SID::getTuneLength ( tuneName, subtune );
-	const auto	filterUsed = database->getSongFilterUsed ( tuneName, subtune );
-
-	const juce::SharedResourcePointer<Preferences>	settings;
-
-	// Extend song-render-length considering minimum-length, repetition count, and fade-out
-	{
-		auto		songMinimum = settings->get<int> ( "Songs", "minimum" ) * 1000u;
-		const auto	songLoops = settings->get<int> ( "Songs", "max-loops" ) * len;
-
-		if ( songLoops )
-			songMinimum = std::min ( songLoops, songMinimum );
-
-		len = std::max ( len, songMinimum );
-	}
-	const auto	songFade = settings->get<int> ( "Songs", "fade-out" ) * 1000u;
-
-	return { len + songFade, songFade, lufs, filterUsed };
-}
 //-----------------------------------------------------------------------------
 
 namespace UI
@@ -123,46 +37,6 @@ void UI::setShades ( const juce::Colour col1, const juce::Colour col2 ) noexcept
 juce::Colour UI::getShade ( const float blend ) noexcept
 {
 	return startColor.interpolatedWith ( endColor, blend );
-}
-//-----------------------------------------------------------------------------
-
-juce::Colour UI::getAverageColor ( const juce::Image& img, const float bright, const float satMul, const float satDiv )
-{
-	auto	r = 0.0f;
-	auto	g = 0.0f;
-	auto	b = 0.0f;
-
-	// Get average color, weighted by saturation
-	{
-		auto	src = juce::Image::BitmapData ( img, juce::Image::BitmapData::ReadWriteMode::readOnly );
-		auto	countedPixels = 0.0f;
-
-		for ( auto y = 0; y < img.getHeight (); ++y )
-		{
-			for ( auto x = 0; x < img.getWidth (); ++x )
-			{
-				const auto	col = src.getPixelColour ( x, y ).withMultipliedSaturation ( satMul );
-				const auto	sat = col.getSaturation ();
-
-				r += col.getFloatRed () * sat;
-				g += col.getFloatGreen () * sat;
-				b += col.getFloatBlue () * sat;
-
-				countedPixels += sat;
-			}
-		}
-
-		r /= countedPixels;
-		g /= countedPixels;
-		b /= countedPixels;
-	}
-
-	auto	col = juce::Colour::fromFloatRGBA ( r, g, b, 1.0f ).withMultipliedSaturation ( satDiv );
-
-	if ( bright <= 0.0f )
-		return col;
-
-	return UI::getColorWithPerceivedBrightness ( col, bright );
 }
 //-----------------------------------------------------------------------------
 
@@ -270,35 +144,6 @@ juce::Font UI::monoFont ( const float height )
 	auto&	laf = static_cast<SID_LookAndFeel&> ( juce::LookAndFeel::getDefaultLookAndFeel () );
 
 	return laf.monoFontWithHeight ( height );
-}
-//-----------------------------------------------------------------------------
-
-std::unique_ptr<juce::Drawable> UI::getMenuIcon ( const juce::String& name )
-{
-	auto	[ iconImage, _ ] = UI::getSVG ( name );
-
-	iconImage->replaceColour ( juce::Colours::black, endColor );
-
-	return std::move ( iconImage );
-}
-//-----------------------------------------------------------------------------
-
-juce::PopupMenu::Item UI::newMenuItem ( const juce::String& name, const juce::String& icon, std::function<void ()> func )
-{
-	juce::PopupMenu::Item	item ( name );
-
-	item.setAction ( std::move ( func ) );
-	item.setImage ( getMenuIcon ( icon ) );
-
-	return item;
-}
-//-----------------------------------------------------------------------------
-
-juce::PopupMenu::Item UI::newDangerousMenuItem ( const juce::String& name, const juce::String& icon, std::function<void ()> func )
-{
-	auto	item = newMenuItem ( name, icon, std::move ( func ) );
-
-	return item.setColour ( juce::Colours::red );
 }
 //-----------------------------------------------------------------------------
 
@@ -434,226 +279,14 @@ juce::Path& UI::getScaledPathWithSize ( const juce::String& resourceName, juce::
 }
 //-----------------------------------------------------------------------------
 
-const Database::entry* UI::findDatabaseEntry ( const std::string& filename )
-{
-	const juce::SharedResourcePointer<Database>	database;
-
-	if ( auto ent = database->findEntry ( filename ) )
-		return ent;
-
-	const juce::SharedResourcePointer<UserDatabase>	userDatabase;
-	return userDatabase->findEntry ( filename );
-}
-//-----------------------------------------------------------------------------
-
-void UI::repaintCell ( juce::TableListBox* tlb, const int rowNumber, const int columnId )
-{
-	if ( tlb->getHeader ().getIndexOfColumnId ( columnId, true ) < 0 )
-		return;
-
-	auto	cp = tlb->getCellPosition ( columnId, rowNumber, true );
-	if ( cp.isEmpty () )
-		return;
-
-	tlb->repaint ( cp );
-}
-//-----------------------------------------------------------------------------
-
-void UI::repaintColumn ( juce::TableListBox* tlb, const int columnId )
-{
-	auto&	header = tlb->getHeader ();
-	auto	headerCell = header.getColumnPosition ( header.getIndexOfColumnId ( columnId, true ) );
-
-	headerCell.translate ( header.getX (), 0 );
-
-	tlb->repaint ( headerCell.withY ( 0 ).withHeight ( tlb->getHeight () ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_AddToPlaylist ( juce::PopupMenu& m, const juce::String& tuneStr )
-{
-	juce::PopupMenu	submenu;
-
-	// Add to new playlist
-	submenu.addItem ( UI::newMenuItem ( UI::strings::newPlaylist, "plus-solid-full", [ tuneStr ]
-	{
-		const juce::SharedResourcePointer<Playlists>	playlists;
-
-		auto	newName = playlists->addToPlaylist ( "", tuneStr );
-		sendGlobalMessage ( "playlist new \"{}\"", newName );
-	} ) );
-
-	submenu.addSeparator ();
-
-	// Add to existing playlist
-	{
-		const juce::SharedResourcePointer<Playlists>	playlists;
-
-		for ( auto cnt = 0; const auto& name : playlists->getPlaylistNames () )
-		{
-			submenu.addItem ( UI::newMenuItem ( name, "list-solid-full", [ name, tuneStr ]
-			{
-				const juce::SharedResourcePointer<Playlists>	playlists;
-
-				playlists->addToPlaylist ( name, tuneStr );
-				sendGlobalMessage ( "playlist addTo \"{}\"", name );
-			} ) );
-
-			if ( ++cnt % 10 == 0 )
-				submenu.addColumnBreak ();
-		}
-	}
-
-	m.addSubMenu ( UI::strings::addToPlaylist, submenu, true, UI::getMenuIcon ( "plus-solid-full" ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_RemoveFromPlaylist ( juce::PopupMenu& m, const juce::String& plName, const juce::SparseSet<int>& rows )
-{
-	const juce::SharedResourcePointer<Playlists>	playlists;
-
-	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
-
-	// Remove items from playlist
-	m.addItem ( UI::newDangerousMenuItem ( UI::strings::removeFromPlaylist, "trash-can-regular-full", [ plItems, rows ]
-	{
-		if ( ! plItems )
-			return;
-
-		for ( auto i = rows.size () - 1; i >= 0; --i )
-			plItems->removeItem ( rows[ i ], true );
-
-		plItems->createShuffle ();
-		plItems->save ();
-
-		sendGlobalMessage ( "playlist update \"{}\"", plItems->getName () );
-
-	} ).setEnabled ( plItems && plItems->hasWriteAccess () ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_MoveItems ( juce::PopupMenu& m, const juce::String& plName, const juce::SparseSet<int>& rows )
-{
-	const juce::SharedResourcePointer<Playlists>	playlists;
-
-	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
-
-	// Move to top
-	m.addItem ( UI::newMenuItem ( UI::strings::moveToTop, "arrow-up-solid-full", [ plItems, rows ]
-	{
-		plItems->moveItems ( rows, 0 );
-		plItems->createShuffle ();
-		plItems->save ();
-
-		sendGlobalMessage ( "playlist update \"{}\"", plItems->getName () );
-
-	} ).setEnabled ( plItems&& plItems->hasWriteAccess () ) );
-
-	// Move to bottom
-	m.addItem ( UI::newMenuItem ( UI::strings::moveToBottom, "arrow-down-solid-full", [ plItems, rows ]
-	{
-		plItems->moveItems ( rows, plItems->getNumItems () );
-		plItems->createShuffle ();
-		plItems->save ();
-
-		sendGlobalMessage ( "playlist update \"{}\"", plItems->getName () );
-
-	} ).setEnabled ( plItems && plItems->hasWriteAccess () ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_GoToFolder ( juce::PopupMenu& m, const juce::String& folder )
-{
-	// TODO: re-implment this differently
-	auto	authorStr = juce::String ( UI::strings::goToFolder );
-
-	if ( folder.isEmpty () )
-		authorStr += " <multiple>";
-	else
-		authorStr += " " + folder;
-
-	m.addItem ( UI::newMenuItem ( authorStr, "folder-open-solid-full", [ folder ]
-	{
-		sendGlobalMessage ( "goToFolder \"{}\"", folder );
-
-	} ).setEnabled ( folder.isNotEmpty () ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_ExportTrack ( juce::PopupMenu& m, const juce::String& tuneStr )
-{
-	m.addItem ( UI::newMenuItem ( UI::strings::exportTrack, "arrow-up-right-from-square-solid-full", [ tuneStr ]
-	{
-		sendGlobalMessage ( "exportTune {}", tuneStr );
-	} ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_DeleteCover ( juce::PopupMenu& m, const juce::String& plName )
-{
-	const juce::SharedResourcePointer<Playlists>	playlists;
-
-	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
-
-	m.addItem ( UI::newDangerousMenuItem ( UI::strings::playlistDeleteCover, "trash-can-regular-full", [ plName ]
-	{
-		const juce::SharedResourcePointer<Playlists>	playlists;
-
-		playlists->deleteCover ( plName.toStdString () );
-
-		sendGlobalMessage ( "playlist updateInfo \"{}\"", plName );
-
-	} ).setEnabled ( plItems->hasCover () ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_DeletePlaylist ( juce::PopupMenu& m, const juce::String& plName )
-{
-	const juce::SharedResourcePointer<Playlists>	playlists;
-
-	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
-
-	m.addItem ( UI::newDangerousMenuItem ( UI::strings::playlistDelete, "trash-can-regular-full", [ plName ]
-	{
-		const juce::SharedResourcePointer<Playlists>	playlists;
-
-		sendGlobalMessage ( "playlist deleteList \"{}\"", plName );
-
-	} ).setEnabled ( plItems ) );
-}
-//-----------------------------------------------------------------------------
-
-void UI::menu_ToggleTag ( juce::PopupMenu& m, const juce::String& tuneStr )
-{
-	const juce::SharedResourcePointer<Tags>		tags;
-	const juce::SharedResourcePointer<Strings>	strings;
-	const juce::SharedResourcePointer<Icons>	icons;
-
-	for ( const auto& tag : tags->getTagEntries () )
-	{
-		m.addItem ( UI::newMenuItem ( UI::strings::toggleTag + strings->get ( tag.name ), icons->get ( tag.name ), [ name = tag.name, tuneStr, tags ]
-		{
-			tags->toggleTags ( name, tuneStr.toStdString () );
-			sendGlobalMessage ( "tagsToggled" );
-		} ) );
-	}
-}
-//-----------------------------------------------------------------------------
-
-bool UI::isDeveloperMode ()
-{
-	return juce::SystemStats::getEnvironmentVariable ( "ULTRASID_DEVELOPER_MODE", "" ).equalsIgnoreCase ( "enabled" );
-}
-//-----------------------------------------------------------------------------
-
 juce::File paths::getDataRoot ( juce::String path )
 {
 	#if JUCE_MAC
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "Application Support/ultraSID" );
+		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "Application Support/ultraView" );
 	#elif JUCE_WINDOWS
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraSID" );
+		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
 	#elif JUCE_LINUX
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraSID" );
+		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
 	#else
 		// Unsupported platform
 		jassertfalse;
@@ -664,56 +297,6 @@ juce::File paths::getDataRoot ( juce::String path )
 		ret = ret.getChildFile ( path );
 
 	return ret;
-}
-//-----------------------------------------------------------------------------
-
-static juce::File getAppDataPath ( const juce::String& file )
-{
-	auto	path = juce::File::getSpecialLocation ( juce::File::SpecialLocationType::userApplicationDataDirectory ).getChildFile ( ProjectInfo::projectName );
-
-	path.createDirectory ();
-	path = path.getChildFile ( file );
-
-	return path;
-}
-//-----------------------------------------------------------------------------
-
-juce::File paths::getSearchtermsPath ()
-{
-	return getAppDataPath ( "searchterms.csv" );
-}
-//-----------------------------------------------------------------------------
-
-juce::File paths::getHistoryPath ()
-{
-	return getAppDataPath ( "history.csv" );
-}
-//-----------------------------------------------------------------------------
-
-static juce::File getUserPath ( const juce::String& folder )
-{
-	const juce::SharedResourcePointer<Settings>	settings;
-
-	auto	path = settings->get<juce::String> ( "Paths", "user" );
-	if ( path.isEmpty () )
-		return {};
-
-	auto	subFolder = juce::File ( path ).getChildFile ( folder );
-	subFolder.createDirectory ();
-
-	return subFolder;
-}
-//-----------------------------------------------------------------------------
-
-juce::File paths::getPlaylistsPath ()
-{
-	return getUserPath ( "Playlists" );
-}
-//-----------------------------------------------------------------------------
-
-juce::File paths::getUserTunesPath ()
-{
-	return getUserPath ( "Tunes" );
 }
 //-----------------------------------------------------------------------------
 
@@ -754,19 +337,6 @@ juce::StringArray helpers::getFilteredStrings ( const juce::StringArray& arr, co
 				filteredResults.add ( item );
 
 	return filteredResults;
-}
-//-----------------------------------------------------------------------------
-
-std::pair<std::string, int> helpers::parseTuneName ( const std::string& tuneName )
-{
-	const auto	commaOffset = tuneName.find_last_of ( ',' );
-	auto	subTune = 0;
-
-	// If this entry uses a subtune, remember it
-	if ( commaOffset != std::string::npos )
-		subTune = std::atoi ( tuneName.substr ( commaOffset + 1 ).c_str () );
-
-	return { tuneName.substr ( 0, commaOffset ), subTune };
 }
 //-----------------------------------------------------------------------------
 
@@ -885,57 +455,5 @@ void helpers::buildComponentMap ( std::unordered_map<juce::String, juce::Compone
 		compMap[ fullName ] = comp;
 		buildComponentMap ( compMap, comp, fullName);
 	}
-}
-//-----------------------------------------------------------------------------
-
-helpers::imageHint helpers::hintFromFilename ( const juce::String& in )
-{
-	if ( in.isEmpty () )
-		return {};
-
-	auto	arr = juce::StringArray::fromTokens ( in, "#.", "" );
-
-	jassert ( arr.size () >= 2 );
-
-	// No hints, add empty string
-	if ( arr.size () == 2 )
-		arr.insert ( 1, "" );
-
-	imageHint	hint;
-
-	hint.name = arr[ 0 ];
-	hint.extension = "." + arr[ 2 ];
-
-	auto	hintStr = arr[ 1 ].toUpperCase ();
-
-	hint.firstLuma = hintStr.containsChar ( 'L' );
-	hint.isThumbnail = hintStr.containsChar ( 'T' );
-
-	hintStr = hintStr.removeCharacters ( "LT" );
-
-	// Last parameter left over is always border color
-	if ( hintStr.isNotEmpty () )
-		hint.borderColor = int8_t ( juce::String ( UI::strings::hexDigits ).indexOfChar ( hintStr[ 0 ] ) );
-
-	return hint;
-}
-//-----------------------------------------------------------------------------
-
-juce::String helpers::filenameFromHint ( const helpers::imageHint& hint )
-{
-	if ( hint.name.isEmpty () )
-		return {};
-
-	auto	hintStr = juce::String ();
-
-	if ( hint.isThumbnail )		hintStr += "T";
-	if ( hint.firstLuma )		hintStr += "L";
-	if ( hint.borderColor >= 0 && hint.borderColor < 16 )
-		hintStr += UI::strings::hexDigits[ hint.borderColor ];
-
-	if ( hintStr.isNotEmpty () )
-		hintStr = "#" + hintStr;
-
-	return hint.name + hintStr + hint.extension;
 }
 //-----------------------------------------------------------------------------

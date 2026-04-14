@@ -107,8 +107,6 @@ SID_LookAndFeel::SID_LookAndFeel ()
 
 	for ( auto [ colorId, color ] : juceDefaultColors )
 		setColour ( colorId, color );
-
-	progressSlider.isRadial = false;
 }
 //----------------------------------------------------------------------------------
 
@@ -119,7 +117,7 @@ SID_LookAndFeel::~SID_LookAndFeel ()
 
 void SID_LookAndFeel::drawResizableWindowBorder ( juce::Graphics& g, int w, int h, const juce::BorderSize<int>& border, juce::ResizableWindow& window )
 {
-	if ( window.getName () == "ultraSID" )
+	if ( window.getName () == "ultraView" )
 		return;
 
 	juce::LookAndFeel_V4::drawResizableWindowBorder ( g, w, h, border, window );
@@ -133,7 +131,7 @@ void SID_LookAndFeel::drawResizableFrame ( juce::Graphics& /*g*/, int /*w*/, int
 
 void SID_LookAndFeel::drawDocumentWindowTitleBar ( juce::DocumentWindow& window, juce::Graphics& g, int w, int h, int titleSpaceX, int titleSpaceW, const juce::Image* icon, bool drawTitleTextOnLeft )
 {
-	if ( window.getName () == "ultraSID" )
+	if ( window.getName () == "ultraView" )
 		return;
 
 	juce::LookAndFeel_V4::drawDocumentWindowTitleBar ( window, g, w, h, titleSpaceX, titleSpaceW, icon, drawTitleTextOnLeft );
@@ -1049,8 +1047,6 @@ void SID_LookAndFeel::drawLinearSlider ( juce::Graphics& g, int x, int y, int wi
 
 			juce::Point<float>	startPoint ( float ( x ), y + height * 0.5f );
 
-			const auto	withProgress = prop.contains ( "progress" );
-			const float	sliderProgress = prop.getWithDefault ( "progress", 0.0f );
 			const auto	sliderCol = findColour ( UI::colors::text );
 
 			// Background track
@@ -1061,11 +1057,11 @@ void SID_LookAndFeel::drawLinearSlider ( juce::Graphics& g, int x, int y, int wi
 
 				backgroundTrack.startNewSubPath ( startPoint );
 				backgroundTrack.lineTo ( endPoint );
-				g.setColour ( UI::getShade ( withProgress && sliderProgress < 1.0f ? 0.1f : 0.3f ) );
+				g.setColour ( UI::getShade ( 0.3f ) );
 				g.strokePath ( backgroundTrack, { trackHeight, juce::PathStrokeType::curved, juce::PathStrokeType::rounded } );
 
 				// Slider with bi-polar range, draw tick at the 0 position
-				if ( ! withProgress && slider.getMinimum () < 0.0 )
+				if ( slider.getMinimum () < 0.0 )
 				{
 					juce::Path	middleLine;
 					middleLine.startNewSubPath ( float ( width / 2 + x ), 0.0f );
@@ -1075,20 +1071,6 @@ void SID_LookAndFeel::drawLinearSlider ( juce::Graphics& g, int x, int y, int wi
 					middleLine.lineTo ( float ( width / 2 + x ), float ( height ) );
 
 					g.strokePath ( middleLine, { trackHeight / 2.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded } );
-				}
-
-				// Draw progress on top
-				if ( withProgress && sliderProgress < 1.0f )
-				{
-					juce::Point<float>	endProgressPoint ( sliderProgress * width + x, startPoint.y );
-
-					backgroundTrack.clear ();
-
-					backgroundTrack.startNewSubPath ( startPoint );
-					backgroundTrack.lineTo ( endProgressPoint );
-
-					g.setColour ( UI::getShade ( 0.3f ) );
-					g.strokePath ( backgroundTrack, { trackHeight, juce::PathStrokeType::curved, juce::PathStrokeType::rounded } );
 				}
 			}
 
@@ -1101,18 +1083,7 @@ void SID_LookAndFeel::drawLinearSlider ( juce::Graphics& g, int x, int y, int wi
 				valueTrack.startNewSubPath ( startPoint );
 				valueTrack.lineTo ( maxPoint );
 
-				if ( withProgress )
-				{
-					// Add small gradient (last 20%) for style
-					progressSlider.point1 = startPoint;
-					progressSlider.point2 = maxPoint;
-
-					g.setGradientFill ( progressSlider );
-				}
-				else
-				{
-					g.setColour ( hover ? findColour ( UI::colors::accent ) : sliderCol );
-				}
+				g.setColour ( hover ? findColour ( UI::colors::accent ) : sliderCol );
 				g.strokePath ( valueTrack, { trackHeight, juce::PathStrokeType::curved, juce::PathStrokeType::rounded } );
 			}
 
@@ -1133,7 +1104,7 @@ void SID_LookAndFeel::drawRasterBars ( juce::Graphics& g, juce::Rectangle<float>
 {
 	static juce::Random	rand;
 	static colodore	colo;
-	static auto	c64Palette = colo.generateRGB ( 0, colo.generateYUV ( VIC2_Render::settings::colorStandard::PAL, 60.0f, 100.0f, 60.0f ) );
+	static auto	c64Palette = colo.generateRGB ( 0, colo.generateYUV ( VIC2_Render::settings::colorStandard::PAL, 55.0f, 85.0f, 55.0f ) );
 
 	static auto	colIdx = 0;
 	auto	y = b.getY ();
@@ -1158,109 +1129,11 @@ void SID_LookAndFeel::drawRasterBars ( juce::Graphics& g, juce::Rectangle<float>
 }
 //-------------------------------------------------------------------------------------------------
 
-void SID_LookAndFeel::drawPlaybackAnimation ( juce::Graphics& g, const juce::Rectangle<float>& rect, const juce::Colour color, const float animSpeed )
-{
-	g.setColour ( color );
-
-	auto	iconRect = rect;
-
-	const auto	w = iconRect.getWidth () / 4.0f;
-	const auto	h = iconRect.getHeight () * 0.8f;
-
-	for ( auto idx = 0; idx < 4; ++idx )
-		g.fillRect ( iconRect.removeFromLeft ( w ).withTrimmedRight ( 1.5f ).withTrimmedTop ( std::abs ( std::sin ( animSpeed + idx * 1.87f ) * h ) ) );
-}
-//-------------------------------------------------------------------------------------------------
-
 void SID_LookAndFeel::drawOutlinedRect ( juce::Graphics& g, const juce::Rectangle<float>& rect, const float radius, const float outline, const juce::Colour outlineCol )
 {
 	g.fillRoundedRectangle ( rect, radius );
 
 	g.setColour ( outlineCol );
 	g.drawRoundedRectangle ( rect.reduced ( outline / 2.0f ), radius - outline / 2.0f, outline );
-}
-//-------------------------------------------------------------------------------------------------
-
-void SID_LookAndFeel::updateProgressColors ()
-{
-	auto generateOklchPalette = [] ( juce::Colour startColor, juce::Colour endColor, const int numSteps ) -> std::vector<juce::Colour>
-	{
-		constexpr auto	PI = juce::MathConstants<float>::pi;
-
-		std::vector<juce::Colour> palette;
-		palette.reserve ( numSteps );
-
-		// --- Helper: sRGB to Linear and Linear to sRGB ---
-		auto toLinear = [] ( float c ) { return c <= 0.04045f ? c / 12.92f : std::pow ( ( c + 0.055f ) / 1.055f, 2.4f ); };
-		auto fromLinear = [] ( float c ) { return c <= 0.0031308f ? 12.92f * c : 1.055f * std::pow ( c, 1.0f / 2.4f ) - 0.055f; };
-
-		// --- Conversion: RGB to OkLch ---
-		auto rgbToOkLch = [ & ] ( juce::Colour c ) {
-			float r = toLinear ( c.getFloatRed () ), g = toLinear ( c.getFloatGreen () ), b = toLinear ( c.getFloatBlue () );
-			float l = 0.4122214708f * r + 0.5363325363f * g + 0.0514459929f * b;
-			float m = 0.2119034982f * r + 0.6806995451f * g + 0.1073969566f * b;
-			float s = 0.0883024619f * r + 0.2817188376f * g + 0.6299787005f * b;
-			float l_ = std::cbrt ( l ), m_ = std::cbrt ( m ), s_ = std::cbrt ( s );
-			float L = 0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_;
-			float a = 1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_;
-			float b_ = 0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_;
-			return std::vector<float>{ L, std::sqrt ( a* a + b_ * b_ ), std::atan2 ( b_, a ), c.getFloatAlpha () };
-		};
-
-		// --- Lambda: OkLch back to RGB ---
-		auto oklchToRgb = [ & ] ( float L, float C, float h, float alpha ) {
-			float a_comp = C * std::cos ( h ), b_comp = C * std::sin ( h );
-			float l_ = L + 0.3963377774f * a_comp + 0.2158037573f * b_comp;
-			float m_ = L - 0.1055613458f * a_comp - 0.0638541728f * b_comp;
-			float s_ = L - 0.0894841775f * a_comp - 1.2914855480f * b_comp;
-			float l = l_ * l_ * l_, m = m_ * m_ * m_, s = s_ * s_ * s_;
-			float r = fromLinear ( +4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s );
-			float g = fromLinear ( -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s );
-			float b = fromLinear ( -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s );
-			return juce::Colour::fromFloatRGBA ( juce::jlimit ( 0.0f, 1.0f, r ), juce::jlimit ( 0.0f, 1.0f, g ), juce::jlimit ( 0.0f, 1.0f, b ), alpha );
-		};
-
-		auto	lch1 = rgbToOkLch ( startColor );
-		auto	lch2 = rgbToOkLch ( endColor );
-
-		auto	h1 = lch1[ 2 ];
-		auto	h2 = lch2[ 2 ];
-		auto	diff = h2 - h1;
-
-		if ( diff > PI )       h1 += 2.0f * PI;
-		else if ( diff < -PI ) h2 += 2.0f * PI;
-
-		for ( auto i = 0; i < numSteps; ++i )
-		{
-			auto	t = i / (float)( numSteps - 1 );
-
-			palette.push_back ( oklchToRgb (
-				lch1[ 0 ] + t * ( lch2[ 0 ] - lch1[ 0 ] ), // L
-				lch1[ 1 ] + t * ( lch2[ 1 ] - lch1[ 1 ] ), // C
-				h1 + t * ( h2 - h1 ),                // h
-				lch1[ 3 ] + t * ( lch2[ 3 ] - lch1[ 3 ] )  // alpha
-			) );
-		}
-
-		return palette;
-	};
-
-	auto& g = progressSlider;
-
-	g.clearColours ();
-
-	const auto	col1 = findColour ( UI::colors::accent );
-	const auto	col2 = findColour ( UI::colors::accent2 );
-
-	g.addColour ( 0.0, col1 );
-	g.addColour ( 1.0, col2 );
-
-	const auto	pal = generateOklchPalette ( col1, col2, 16 );
-	const auto	lerpInc = 1.0f / pal.size ();
-	for ( auto i = 0.0f; const auto c : pal )
-	{
-		g.addColour ( double ( i ) * 0.2 + 0.8, c );
-		i += lerpInc;
-	}
 }
 //-------------------------------------------------------------------------------------------------

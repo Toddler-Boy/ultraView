@@ -26,41 +26,6 @@ private:
 			{ "UI",			"allow-screensaver",	false },
 			{ "UI",			"theme",				"default" },
 
-			{ "STIL",		"show-stingers",		false },
-			{ "STIL",		"show-information",		true },
-
-			{ "Player",		"volume",				100 },
-			{ "Player",		"mute",					false },
-			{ "Player",		"quality",				"MAGIC" },
-			{ "Player",		"normalize",			true },
-
-			{ "Songs",		"unknown",				5 },
-			{ "Songs",		"minimum",				60 },
-			{ "Songs",		"max-loops",			5 },
-			{ "Songs",		"fade-out",				10 },
-
-			{ "Emulation",	"dac-leakage",			false },
-
-			{ "FX",			"stereo-processing",	true },
-			{ "FX",			"splitter-freq",		80 },
-			{ "FX",			"wide-mono",			true },
-			{ "FX",			"wide-mono-width",		100 },
-			{ "FX",			"delay",				true },
-			{ "FX",			"delay-wet",			3 },
-			{ "FX",			"delay-feedback",		10 },
-			{ "FX",			"reverb",				true },
-			{ "FX",			"reverb-wet",			3 },
-			{ "FX",			"mid-side",				true },
-			{ "FX",			"mid-side-width",		100 },
-			{ "FX",			"loudness",				true },
-			{ "FX",			"noise",				true },
-			{ "FX",			"noise-volume",			5 },
-			{ "FX",			"noise-color",			50 },
-
-			{ "Export",		"name-template",		"{A} - {T} {N}" },
-			{ "Export",		"quality",				"PURE" },
-			{ "Export",		"format",				"WAV" },
-
 			{ "Overlay",	"enabled",				true },
 			{ "Overlay",	"bitmap",				"C1702 Bedroom" },
 			{ "Overlay",	"daytime",				35 },

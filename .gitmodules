@@ -1,0 +1,11 @@
+[submodule "modules/JUCE"]
+	path = modules/JUCE
+	url = https://github.com/juce-framework/JUCE.git
+	shallow = true
+[submodule "modules/Gin"]
+	path = modules/Gin
+	url = https://github.com/FigBug/Gin.git
+	shallow = true
+[submodule "modules/lime"]
+	path = modules/lime
+	url = https://github.com/Toddler-Boy/Lime

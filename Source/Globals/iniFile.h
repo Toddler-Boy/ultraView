@@ -103,8 +103,6 @@ public:
 	template<typename T>
 	[[ nodiscard ]] T get ( const juce::String& section, const juce::String& key )
 	{
-		jassert ( hasData () );
-
 		T	def = getDefault<T> ( section, key );
 
 		std::function<juce::StringArray()>	splitStr;
@@ -160,8 +158,6 @@ public:
 	template<typename T>
 	[[ nodiscard ]] T getDefault ( const juce::String& section, const juce::String& key )
 	{
-		jassert ( hasData () );
-
 		if constexpr ( std::is_same_v<T, juce::String> )
 			return T ( std::get<std::string> ( findEntry ( section, key ).defaultValue ) );
 		else
@@ -176,8 +172,6 @@ public:
 	template<typename T>
 	void set ( const juce::String& section, const juce::String& key, const T value )
 	{
-		jassert ( hasData () );
-
 		if constexpr ( std::is_same_v<T, bool> )
 			setString ( section, key, juce::String ( value ? "on" : "off" ) );
 		else if constexpr ( std::is_same_v<T, float> || std::is_same_v<T, double> )
@@ -220,8 +214,6 @@ public:
 private:
 	[[ nodiscard ]] const value& findEntry ( const juce::String& section, const juce::String& key )
 	{
-		jassert ( hasData () );
-
 		for ( const auto& val : values )
 		{
 			if ( section.equalsIgnoreCase ( juce::String ( val.section ) )
@@ -240,8 +232,6 @@ private:
 
 	[[ nodiscard ]] juce::String getString ( const juce::String& section, const juce::String& key, const juce::String& def )
 	{
-		jassert ( hasData () );
-
 		juce::StringPairArray	strPair;
 
 		// Find value
@@ -259,8 +249,6 @@ private:
 
 	void setString ( const juce::String& section, const juce::String& key, const juce::String& value )
 	{
-		jassert ( hasData () || loading );
-
 		juce::StringPairArray	strPair;
 
 		// Add/replace value
@@ -279,8 +267,6 @@ private:
 
 	[[ nodiscard ]] std::optional<juce::StringPairArray> getGlobalSection ()
 	{
-		jassert ( hasData () );
-
 		if ( ! data.empty () )
 			return data[ 0 ].second;
 
@@ -290,8 +276,6 @@ private:
 
 	[[ nodiscard ]] juce::StringPairArray& findSection ( const juce::String& section, juce::StringPairArray& newArr )
 	{
-		jassert ( hasData () || loading );
-
 		for ( auto& [ secName, secData ] : data )
 			if ( section.equalsIgnoreCase ( secName ) )
 				return secData;

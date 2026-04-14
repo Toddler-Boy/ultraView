@@ -118,10 +118,7 @@ public:
 	// ultraSID specific stuff
 	//
 	static void drawRasterBars ( juce::Graphics& g, juce::Rectangle<float> b );
-	static void drawPlaybackAnimation ( juce::Graphics& g, const juce::Rectangle<float>& rect, const juce::Colour color, const float animSpeed );
 	static void drawOutlinedRect ( juce::Graphics& g, const juce::Rectangle<float>& rect, const float radius, const float outline, const juce::Colour outlineCol );
-
-	void updateProgressColors ();
 
 private:
 	juce::FontOptions	defaultFont;
@@ -130,8 +127,6 @@ private:
 	juce::FontOptions	monoFont;
 
 	bool	fontTableUsed[ 10 ] = { false };
-
-	juce::ColourGradient	progressSlider;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( SID_LookAndFeel )
 };

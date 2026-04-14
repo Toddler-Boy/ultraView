@@ -10,7 +10,6 @@
 #include "UI/Components/GUI_Label.h"
 #include "UI/Components/GUI_Line.h"
 #include "UI/Components/GUI_SettingsBox.h"
-#include "UI/Components/GUI_SettingsLocation.h"
 #include "UI/Components/GUI_SettingsNumberEdit.h"
 #include "UI/Components/GUI_SettingsToggle.h"
 #include "UI/Components/GUI_Slider.h"
@@ -68,12 +67,6 @@ std::pair<juce::Component*, bool> componentFactory ( const juce::String& typeNam
 	//
 	if ( compType == "set-number" )
 		return { new GUI_SettingsNumberEdit ( typeParts[ 0 ], typeParts[ 1 ] ), false };
-
-	//
-	// Settings location
-	//
-	if ( compType == "set-location" )
-		return { new GUI_SettingsLocation ( typeParts[ 0 ] ), false };
 
 	//
 	// Audio device selector

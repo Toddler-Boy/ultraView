@@ -31,7 +31,7 @@ Include (FetchContent)
 include (CMakeDependentOption)
 
 set_property (DIRECTORY APPEND PROPERTY LABELS ultraView)
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ultraSID)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ultraView)
 
 set (CMAKE_OSX_DEPLOYMENT_TARGET 14.0)
 
@@ -106,71 +106,6 @@ FetchContent_Declare (melatonin_blur
 					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/melatonin_blur)
 FetchContent_MakeAvailable (melatonin_blur)
 
-# --- xz (liblzma) options ---
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(ENABLE_TOOLS OFF CACHE BOOL "" FORCE)
-set(ENCODERS "" CACHE STRING "" FORCE)
-set(DECODERS "lzma1;lzma2" CACHE STRING "" FORCE)
-set(ADDITIONAL_CHECK_TYPES "crc64" CACHE STRING "" FORCE)
-set(ENABLE_SMALL OFF CACHE BOOL "" FORCE)
-set(MICROLZMA_ENCODER OFF CACHE BOOL "" FORCE)
-set(MICROLZMA_DECODER OFF CACHE BOOL "" FORCE)
-set(LZIP_DECODER OFF CACHE BOOL "" FORCE)
-foreach(_t XZ XZDEC LZMADEC LZMAINFO SCRIPTS DOC)
-  set(XZ_TOOL_${_t} OFF CACHE BOOL "" FORCE)
-endforeach()
-set(ENABLE_NLS OFF CACHE BOOL "" FORCE)
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-
-# --- libarchive options ---
-foreach(_o OPENSSL LIBB2 LZ4 LZO ZSTD ZLIB BZip2 LIBXML2 EXPAT PCREPOSIX
-          PCRE2POSIX CNG MBEDTLS NETTLE ICONV ACL XATTR
-          TAR CPIO CAT UNZIP TEST INSTALL WERROR)
-  set(ENABLE_${_o} OFF CACHE BOOL "" FORCE)
-endforeach()
-set(POSIX_REGEX_LIB "NONE" CACHE STRING "" FORCE)
-
-# Block libarchive from finding system LibLZMA — we provide our own
-set(CMAKE_DISABLE_FIND_PACKAGE_LibLZMA ON CACHE BOOL "" FORCE)
-
-FetchContent_Declare(xz
-					GIT_REPOSITORY https://github.com/tukaani-project/xz.git
-					GIT_TAG v5.8.2
-					GIT_SHALLOW TRUE)
-
-FetchContent_Declare(libarchive
-					GIT_REPOSITORY https://github.com/libarchive/libarchive.git
-					GIT_TAG v3.8.5
-					GIT_SHALLOW TRUE)
-
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
-
-FetchContent_MakeAvailable(xz)
-
-# Manually wire liblzma into libarchive's config since we blocked find_package
-set(LIBLZMA_FOUND TRUE CACHE BOOL "" FORCE)
-set(HAVE_LIBLZMA 1 CACHE INTERNAL "")
-set(HAVE_LZMA_H 1 CACHE INTERNAL "")
-set(LIBLZMA_INCLUDE_DIR "${xz_SOURCE_DIR}/src/liblzma/api" CACHE PATH "" FORCE)
-set(LIBLZMA_INCLUDE_DIRS "${xz_SOURCE_DIR}/src/liblzma/api" CACHE PATH "" FORCE)
-set(LIBLZMA_LIBRARIES liblzma CACHE STRING "" FORCE)
-set(LIBLZMA_HAS_AUTO_DECODER TRUE CACHE BOOL "" FORCE)
-set(LIBLZMA_HAS_EASY_ENCODER TRUE CACHE BOOL "" FORCE)
-set(LIBLZMA_HAS_LZMA_PRESET TRUE CACHE BOOL "" FORCE)
-
-# Fix Linux id_t conflict
-if(UNIX AND NOT APPLE)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE")
-  set(HAVE_ID_T 1 CACHE BOOL "" FORCE)
-endif()
-
-FetchContent_MakeAvailable(libarchive)
-
-# Ensure archive_static links our FetchContent liblzma
-target_include_directories(archive_static PUBLIC ${xz_SOURCE_DIR}/src/liblzma/api)
-target_link_libraries(archive_static liblzma)
-target_compile_definitions(archive_static PUBLIC HAVE_LIBLZMA=1 HAVE_LZMA_H=1 LZMA_API_STATIC)
-
 # JUCE
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -178,7 +113,7 @@ juce_add_gui_app (ultraView
 				  PRODUCT_NAME ultraView
 				  CAMERA_PERMISSION_ENABLED YES
 				  CAMERA_PERMISSION_TEXT "User reflection"
-				  VERSION "${ultraSID_VERSION}"
+				  VERSION "${ultraView_VERSION}"
   				  COMPANY_NAME "Michael Hartmann"
 				  COMPANY_WEBSITE "https://ultrasid.com/"
 				  ICON_BIG "${icon_path_big}"
@@ -193,6 +128,8 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 
 target_sources (ultraView PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
+
+target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
 target_link_libraries (ultraView PRIVATE
 

@@ -144,32 +144,6 @@ private:
 		{ "accent",					{ UI::colors::accent,				juce::Colours::deeppink } },
 		{ "accent2",				{ UI::colors::accent2,				juce::Colours::deeppink.withRotatedHue ( 300.0f / 360.0f ) } },
 
-		// Browser
-		{ "tag-liked",				{ UI::colors::tagLiked,				juce::Colour ( 0xff'f23d5b ) } },
-		{ "tag-golden-age",			{ UI::colors::tagGoldenAge,			juce::Colour ( 0xff'ffd432 ) } },
-		{ "tag-gem",				{ UI::colors::tagGem,				juce::Colour ( 0xff'77b9e8 ) } },
-
-		// STIL
-		{ "stil-toggle-stingers",	{ UI::colors::stilToggleStingers,	juce::Colour ( 0xff'00b3ff ) } },
-		{ "stil-toggle-stil",		{ UI::colors::stilToggleSTIL,		juce::Colour ( 0xff'00ff95 ) } },
-
-		{ "stil-box-title",			{ UI::colors::stilBoxTitle,			juce::Colour ( 0xff'333355 ) } },
-		{ "stil-box-title-icon1",	{ UI::colors::stilBoxTitleIcon1,	juce::Colour ( 0xff'9999ff ) } },
-		{ "stil-box-title-icon2",	{ UI::colors::stilBoxTitleIcon2,	juce::Colour ( 0xff'0000ff ) } },
-		{ "stil-box-quote",			{ UI::colors::stilBoxQuote,			juce::Colour ( 0xff'2f3235 ) } },
-		{ "stil-box-bug",			{ UI::colors::stilBoxBug,			juce::Colour ( 0x99'ff0000 ) } },
-
-		// Chips
-		{ "chip-divot",				{ UI::colors::chipDivot,			juce::Colour ( 0x88'000000 ) } },
-		{ "chip-text",				{ UI::colors::chipText,				juce::Colour ( 0x66'f0f8ff ) } },
-
-		// Off state for all voices and filters
-		{ "voice-off",				{ UI::colors::voiceOff,				juce::Colour ( 0xff'565e66 ) } },
-		{ "voice-on",				{ UI::colors::voiceOn,				juce::Colour ( 0xff'66ff99 ) } },
-		{ "voice-muted",			{ UI::colors::voiceMuted,			juce::Colour ( 0xff'ff3636 ) } },
-		{ "filter-on",				{ UI::colors::filterOn,				juce::Colour ( 0xff'66ffff ) } },
-		{ "digi",					{ UI::colors::digi,					juce::Colour ( 0xff'00ffc8 ) } },
-
 		// FX modes
 		{ "fx-real",				{ UI::colors::fxReal,				juce::Colour ( 0xff'e4e4e7 ) } },
 		{ "fx-pure",				{ UI::colors::fxPure,				juce::Colour ( 0xff'33ffee ) } },

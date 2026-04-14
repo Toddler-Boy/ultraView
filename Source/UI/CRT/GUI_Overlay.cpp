@@ -26,21 +26,13 @@ GUI_Overlay::GUI_Overlay ()
 	}
 
 	//
-	// Page control
-	//
-	{
-		addAndMakeVisible ( pageControl );
-	}
-
-	//
 	// Setup C64u UDP receiver callback for live preview
 	//
-/*	c64uReceiver.setVideoBuffers (c64uBuffer[0].data.data (), c64uBuffer[1].data.data ());
+	c64uReceiver.setVideoBuffers ( c64uBuffer[ 0 ].data.data (), c64uBuffer[ 1 ].data.data () );
 
-	c64uReceiver.onVideoFrame = [ this ] ( int finishedBufferIndex, bool isNTSC )
+	c64uReceiver.onVideoFrame = [ this ] ( int finishedBufferIndex, bool /*isNTSC*/ )
 	{
-		if ( preferences->get<bool> ( "stream/enabled" ) )
-			indexSourceTexture->fromImage ( c64uBuffer[ finishedBufferIndex ], false, false, true );
+		setIndexTextureSource ( c64uBuffer[ finishedBufferIndex ] );
 	};
 
 	c64uReceiver.onStatusChange = [] ( bool receiving )
@@ -50,26 +42,24 @@ GUI_Overlay::GUI_Overlay ()
 		else
 			lime::Logger::writeToLog ( "[W]C64u UDP receiver stopped receiving data (video)" );
 	};
-*/
 }
 //-----------------------------------------------------------------------------
 
-/*void GUI_Overlay::newOpenGLContextCreated ()
+void GUI_Overlay::newOpenGLContextCreated ()
 {
 	ShaderToyComponent::newOpenGLContextCreated ();
 
-//	c64uReceiver.start ( "239.0.1.64", 11000 );
+	c64uReceiver.start ( "239.0.1.64", 11000 );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_Overlay::openGLContextClosing ()
 {
-//	c64uReceiver.stop ();
+	c64uReceiver.stop ();
 
 	ShaderToyComponent::openGLContextClosing ();
 }
 //-----------------------------------------------------------------------------
-*/
 
 void GUI_Overlay::resized ()
 {
@@ -82,8 +72,6 @@ void GUI_Overlay::resized ()
 
 	if ( shouldHideCursor () )
 		startTimer ( 2000 );
-
-	pageControl.updateLayout ();
 }
 //-----------------------------------------------------------------------------
 
@@ -100,15 +88,11 @@ void GUI_Overlay::showCursor ()
 	//
 	setMouseCursor ( juce::MouseCursor::NormalCursor );
 	openSettings.setAlpha ( 1.0f );
-	pageControl.setAlpha ( 1.0f );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_Overlay::hideCursor ()
 {
-	if ( pageControl.isMouseOverOrDragging () )
-		return;
-
 	//
 	// Hide the cursor and settings button
 	//
@@ -116,7 +100,6 @@ void GUI_Overlay::hideCursor ()
 		setMouseCursor ( juce::MouseCursor::NoCursor );
 
 	openSettings.setAlpha ( 0.0f );
-	pageControl.setAlpha ( 0.0f );
 }
 //-----------------------------------------------------------------------------
 

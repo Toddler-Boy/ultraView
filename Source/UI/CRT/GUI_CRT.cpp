@@ -2,8 +2,6 @@
 
 #include "GUI_CRT.h"
 
-#include "libSidplayEZ/src/stringutils.h"
-
 #include "UI/Components/GUI_ComboBox.h"
 #include "UI/Components/GUI_CRTSliderIcon.h"
 #include "UI/Components/GUI_CRTSliderLabel.h"
@@ -55,16 +53,6 @@ void GUI_CRT::timerCallback ( int timerID )
 			stopTimer ( timerID );
 
 			updateOverlayCRTSettings ();
-			break;
-
-		case 'CURS':
-			if ( ! isBasicScreen )
-			{
-				stopTimer ( timerID );
-				return;
-			}
-			cursorVisible = ! cursorVisible;
-			renderCRT ( lastWasGenerated );
 			break;
 	}
 }
@@ -128,60 +116,23 @@ void GUI_CRT::mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseW
 }
 //-----------------------------------------------------------------------------
 
-void GUI_CRT::visibilityChanged ()
+void GUI_CRT::update ( const float secondsPassed )
 {
-	if ( isVisible () && isBasicScreen )
-		startTimer ( 'CURS', 333 );
-	else
-		stopTimer ( 'CURS' );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::setRoot ( const juce::File& _root )
-{
-	screenshotRoot = _root.getChildFile ( "Screenshots/" );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::setStrings ( const SidTuneInfoEZ& src )
-{
-	sidInfoStr = src;
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::loadGameArtwork ( const juce::String& sidName, const juce::String& index /* ="" */ )
-{
-	std::tie ( lastLoaded, tuneArtIndex ) = findArtwork ( sidName, index );
-
-	lastFirstLuma = helpers::hintFromFilename ( lastLoaded.getFullPathName () ).firstLuma;
-
-	sidname = sidName.fromLastOccurrenceOf ( "/", false, false );
-
-	if ( vicRender.loadImage ( lastLoaded.getFullPathName ().toRawUTF8 () ) )
-		renderCRT ();
-	else
-		renderCRT ( true );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::loadGameArtwork ( const int index )
-{
-	if ( index < 0 || index >= int ( tuneArtwork.size () ) )
-	{
-		lastLoaded = juce::File ();
-		renderCRT ( true );
+	if ( ! isShowing () )
 		return;
-	}
 
-	tuneArtIndex = index;
-	lastLoaded = screenshotRoot.getChildFile ( tuneArtwork[ tuneArtIndex ] );
+	// Update OpenGL iFrame & iTime
+	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
 
-	lastFirstLuma = helpers::hintFromFilename ( lastLoaded.getFullPathName () ).firstLuma;
+	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
+	constexpr auto	frameMS = 1.0f / 60.0f - 0.01f;
 
-	if ( vicRender.loadImage ( lastLoaded.getFullPathName ().toRawUTF8 () ) )
-		renderCRT ();
-	else
-		renderCRT ( true );
+	// Handle updates (skip if it happened faster than 65 Hz)
+	timePassed += secondsPassed;
+	if ( timePassed < frameMS )
+		return;
+
+	timePassed = 0.0f;
 }
 //-----------------------------------------------------------------------------
 
@@ -199,123 +150,15 @@ void GUI_CRT::setBackgroundColour ( const juce::Colour& bckCol )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles )
+void GUI_CRT::renderCRT ()
 {
-	if ( ! isShowing () )
-		return;
-
-	// Update OpenGL iFrame & iTime
-	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
-
-	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
-	constexpr auto	frameMS = 1.0f / 60.0f - 0.01f;
-
-	// Handle updates (skip if it happened faster than 65 Hz)
-	timePassed += secondsPassed;
-	if ( timePassed < frameMS )
-		return;
-
-	timePassed = 0.0f;
-
-	// Draw raster lines
-	if ( cpuCycles < 50 || cpuCycles > 10'000 )
-		return;
-
-	vicRender.restoreIndexBuffer ();
-
-	auto&	img = vicRender.getCRT ();
-	auto	dst = (uint8_t*)juce::Image::BitmapData ( img, juce::Image::BitmapData::ReadWriteMode::writeOnly ).data;
-
-	// Draw raster lines
-	auto fillLine = [ &dst ] ( int y, int width, const uint8_t color )
-	{
-		width = std::clamp ( width, 0, VIC2_Render::outerUnscaledWidth );
-		if ( width <= 0 )
-			return;
-
-		y = y % VIC2_Render::outerUnscaledHeight;
-		y = y + ( ( y >> 31 ) & VIC2_Render::outerUnscaledHeight );
-
-		const auto	d = dst + y * VIC2_Render::outerUnscaledWidth;
-
-		// In border?
-		if ( y < VIC2_Render::unscaledBorderSizeY || y > ( VIC2_Render::unscaledBorderSizeY + VIC2_Render::innerUnscaledHeight ) )
-		{
-			std::fill_n ( d, width, color );
-		}
-		else
-		{
-			std::fill_n ( d, std::min ( width, VIC2_Render::unscaledBorderSizeX ), color );
-
-			width -= VIC2_Render::unscaledBorderSizeX + VIC2_Render::innerUnscaledWidth;
-			if ( width > 0 )
-				std::fill_n ( d + VIC2_Render::unscaledBorderSizeX + VIC2_Render::innerUnscaledWidth, width, color );
-		}
-	};
-
-	// Convert cycles to rasterlines
-	const auto	crtSet = overlay.getSettings ();
-	const auto	cyclesPerLine = crtSet.isNTSC ? 65 : 63;
-	const auto	lineWidth = cyclesPerLine * 8;
-	const auto	fullLines = cpuCycles / cyclesPerLine;
-	const auto	remainder = ( cpuCycles - ( fullLines * cyclesPerLine ) ) * 8;
-
-	// Draw raster lines
-	for ( auto i = 0; i < int ( fullLines ); ++i )
-		fillLine ( 100 + i, lineWidth, 13 );
-	fillLine ( 100 + fullLines, remainder - ( lineWidth - VIC2_Render::outerUnscaledWidth ), 13 );
-
-	overlay.triggerIndexTextureUpdate ();
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::renderCRT ( const bool generate )
-{
-	lastWasGenerated = generate;
-
 	auto	vic2Settings = getVIC2SettingsFromPreferences ();
-	vicRender.setSettings ( vic2Settings );
-
-	isBasicScreen = generate && sidname.isEmpty ();
-
-	if ( generate )
-	{
-		static const char* resetText = "\n    **** COMMODORE 64 BASIC V2 ****\n\n 64K RAM SYSTEM  38911 BASIC BYTES FREE\n\nREADY.\n";
-
-		char	sidText[ 40 * 25 * 2 + 1 ];		// double space needed for control characters
-
-		if ( sidname.isNotEmpty () )
-		{
-			auto	sidUpper = sidname.replaceCharacter ( '_', '-' );
-			auto	sid = sidUpper.toRawUTF8 ();
-			auto	title = stringutils::utf8toExtendedASCII ( sidInfoStr.title );
-			auto	author = stringutils::utf8toExtendedASCII ( sidInfoStr.author );
-			auto	released = stringutils::utf8toExtendedASCII ( sidInfoStr.released );
-
-			std::snprintf ( sidText, sizeof ( sidText ), "%sLOAD\"%.16s\",8,1\n\nSEARCHING FOR %.16s\nLOADING\nREADY.\nRUN\n\n\1"
-						   " -------------------------------------- "
-						   " TITLE    : %.27s\n"
-						   " AUTHOR   : %.27s\n"
-						   " RELEASED : %.27s\n"
-						   " -------------------------------------- "
-						   , resetText, sid, sid, title.c_str (), author.c_str (), released.c_str () );
-		}
-		else
-		{
-			std::strcpy ( sidText, resetText );
-			if ( cursorVisible )
-				std::strcat ( sidText, "`" );
-		}
-		vicRender.generateTextCRT ( vic2::light_blue << 4 | vic2::blue, vic2::light_blue, sidText );
-	}
-
 	auto	settings = overlay.getSettings ();
 	settings.isNTSC = vic2Settings.standard == VIC2_Render::settings::NTSC;
 
 	updateCRTPalette ( vic2Settings );
 
 	overlay.setSettings ( settings );
-	overlay.setIndexTextureSource ( vicRender.getCRT () );
 
 	updateCRTsettingsUI ();
 }
@@ -336,7 +179,7 @@ VIC2_Render::settings GUI_CRT::getVIC2SettingsFromPreferences () const
 
 		auto	intChoiceSystem = getChoiceInt ( tvSystemChoices, "tv/system" );
 		if ( intChoiceSystem == 0 )
-			intChoiceSystem = tvSystemChoices.indexOf ( sidInfoStr.clock, true );
+			intChoiceSystem = tvSystemChoices.indexOf ( "PAL", true );
 
 		renderSettings.standard = VIC2_Render::settings::colorStandard ( intChoiceSystem - 1 );
 	}
@@ -472,38 +315,6 @@ void GUI_CRT::updateCRTsettingsUI ()
 	// Set palette
 	auto	palette = helpers::findComponent<GUI_VIC2_Palette> ( "tv/palette", crtSettingsComponentMap );
 	palette->setSettings ( vic2Settings.standard, vic2Settings.brightness, vic2Settings.contrast, vic2Settings.saturation, vic2Settings.firstLuma );
-}
-//-----------------------------------------------------------------------------
-
-std::pair<juce::File, const int> GUI_CRT::findArtwork ( const juce::String& _sidname, const juce::String& indexStr )
-{
-	tuneArtwork = scrshot->getScreenshots ( _sidname.toStdString () );
-
-	overlay.setNumCRTpages ( int ( tuneArtwork.size () ) );
-
-	if ( tuneArtwork.empty () )
-		return {};
-
-	auto	index = ScreenshotLookup::getDefaultScreenshotIndex ( tuneArtwork );
-	if ( indexStr.isNotEmpty () )
-	{
-		const auto	idxStr = indexStr.toStdString ();
-		auto findWithHint = [ &idxStr ] (const std::string& str) -> bool
-		{
-			if ( idxStr == str )
-				return true;
-
-			const auto	hint = helpers::hintFromFilename ( str );
-			return idxStr == hint.name + hint.extension;
-		};
-
-		auto	it = std::ranges::find_if ( tuneArtwork, findWithHint );
-		index = int ( std::distance ( tuneArtwork.begin (), it ) );
-	}
-
-	overlay.setCRTPage ( index );
-
-	return { screenshotRoot.getChildFile ( tuneArtwork[ index ] ), index };
 }
 //-----------------------------------------------------------------------------
 
@@ -746,55 +557,5 @@ void GUI_CRT::connectComponents ()
 	overlay.updateZoom ();
 
 	updateDisablers ();
-}
-//-----------------------------------------------------------------------------
-
-bool GUI_CRT::isInterestedInFileDrag ( const juce::StringArray& files )
-{
-	if ( ! UI::isDeveloperMode () )
-		return false;
-
-	if ( helpers::getFilteredStrings ( files, { ".png" } ).size () )
-		return true;
-
-	return false;
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::filesDropped ( const juce::StringArray& files, int /*x*/, int /*y*/ )
-{
-	if ( ! UI::isDeveloperMode () )
-		return;
-
-	const auto	s = helpers::createActionMessage ( "addScreenshots", helpers::getFilteredStrings ( files, { ".png" } ) );
-
-	if ( s.empty () )
-		return;
-
-	UI::sendGlobalMessage ( s );
-}
-//-----------------------------------------------------------------------------
-
-bool GUI_CRT::isInterestedInTextDrag ( const juce::String& text )
-{
-	const auto	trimmed = text.trim ().toLowerCase ();
-
-	if ( trimmed.startsWith ( "http://" ) || trimmed.startsWith ( "https://" ) )
-	{
-		const auto	url = juce::URL ( trimmed );
-		const auto	domain = url.getDomain ().toLowerCase ();
-
-		const auto	fname = url.getFileName ();
-		if ( UI::isDeveloperMode () && fname.endsWithIgnoreCase ( ".png" ) )
-			return true;
-	}
-
-	return false;
-}
-//-----------------------------------------------------------------------------
-
-void GUI_CRT::textDropped ( const juce::String& text, int /*x*/, int /*y*/ )
-{
-	UI::sendGlobalMessage ( "downloadScreenshot \"{}\"", text.trim () );
 }
 //-----------------------------------------------------------------------------
