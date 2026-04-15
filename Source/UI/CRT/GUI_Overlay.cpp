@@ -33,7 +33,7 @@ GUI_Overlay::GUI_Overlay ()
 		{
 			button.setWantsKeyboardFocus ( false );
 			actionButtons.addAndMakeVisible ( button );
-			button.onClick = [ this, name = button.getName () ]
+			button.onClick = [ name = button.getName () ]
 			{
 				UI::sendGlobalMessage ( "c64action {}", name );
 			};
@@ -53,8 +53,25 @@ GUI_Overlay::GUI_Overlay ()
 	//
 	c64uReceiver.setVideoBuffers ( c64uBuffer[ 0 ].data.data (), c64uBuffer[ 1 ].data.data () );
 
-	c64uReceiver.onVideoFrame = [ this ] ( int finishedBufferIndex, bool /*isNTSC*/ )
+	c64uReceiver.onVideoFrame = [ this ] ( int finishedBufferIndex, bool isNTSC )
 	{
+		if ( isNTSC )
+		{
+			constexpr auto	w = VIC2_Render::outerUnscaledWidth;
+			constexpr auto	h = 240;
+			constexpr auto	ntscOverscanTop = 15;
+			constexpr auto	ntscOverscanBottom = VIC2_Render::outerUnscaledHeight - h - ntscOverscanTop;
+			constexpr auto	ntscBottomStart = VIC2_Render::outerUnscaledHeight - ntscOverscanBottom;
+
+			std::memmove ( c64uBuffer[ finishedBufferIndex ].data.data () + ntscOverscanTop * w, c64uBuffer[ finishedBufferIndex ].data.data (), w * h );
+
+			// Clear top and bottom borders (NTSC overscan area)
+			std::memset ( c64uBuffer[ finishedBufferIndex ].data.data (), 0, ntscOverscanTop * w );
+			std::memset ( c64uBuffer[ finishedBufferIndex ].data.data () + ntscBottomStart * w, 0, ntscOverscanBottom * w );
+		}
+
+		isStreamNTSC.store ( isNTSC, std::memory_order_relaxed );
+
 		setIndexTextureSource ( c64uBuffer[ finishedBufferIndex ] );
 	};
 

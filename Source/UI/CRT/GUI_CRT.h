@@ -60,6 +60,7 @@ private:
 	colodore::shaderPalette		yuvE_yuvO_yiq;
 	VIC2_Render::settings		curVicSettings;
 
+	std::atomic<bool>	streamIsNTSC = false;
 	bool	lastFirstLuma = false;
 	bool	cursorVisible = true;
 

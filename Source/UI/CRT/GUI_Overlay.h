@@ -29,6 +29,8 @@ public:
 
 	GUI_SVG_Button	openSettings { "open", { "crt/settings_close", "crt/settings_open" } };
 
+	std::atomic<bool>	isStreamNTSC = false;
+
 private:
 	// juce::Timer
 	void timerCallback () override;

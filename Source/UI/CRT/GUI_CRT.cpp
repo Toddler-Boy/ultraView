@@ -34,6 +34,8 @@ GUI_CRT::GUI_CRT ()
 	settingsWrapper.addAndMakeVisible ( settingsViewport );
 	addChildComponent ( settingsWrapper );
 
+	startTimer ( 'NTSC', 100 );
+
 	addMouseListener ( this, true );
 }
 //-----------------------------------------------------------------------------
@@ -53,6 +55,15 @@ void GUI_CRT::timerCallback ( int timerID )
 			stopTimer ( timerID );
 
 			updateOverlayCRTSettings ();
+			break;
+
+		case 'NTSC':
+			if ( overlay.isStreamNTSC != streamIsNTSC )
+			{
+				streamIsNTSC.store ( overlay.isStreamNTSC.load () );
+				updateOverlayCRTSettings ();
+				updateCRTsettingsUI ();
+			}
 			break;
 	}
 }
@@ -183,7 +194,7 @@ VIC2_Render::settings GUI_CRT::getVIC2SettingsFromPreferences () const
 
 		auto	intChoiceSystem = getChoiceInt ( tvSystemChoices, "tv/system" );
 		if ( intChoiceSystem == 0 )
-			intChoiceSystem = tvSystemChoices.indexOf ( "PAL", true );
+			intChoiceSystem = tvSystemChoices.indexOf ( streamIsNTSC ? "NTSC" : "PAL", true );
 
 		renderSettings.standard = VIC2_Render::settings::colorStandard ( intChoiceSystem - 1 );
 	}
