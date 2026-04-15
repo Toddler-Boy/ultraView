@@ -62,11 +62,8 @@ GUI_ultraView::GUI_ultraView ()
 
 	// Setup network
 	{
+		findC64OnNetwork ();
 	}
-	network.setBaseAddress ( "http://" + preferences->get<juce::String> ( "network/base-address" ) );
-
-	findC64OnNetwork ();
-	setupNetworking ();
 }
 //-----------------------------------------------------------------------------
 
@@ -238,13 +235,11 @@ bool GUI_ultraView::isDataRootValid () const
 	static const juce::StringArray	arr = {
 		"CRTEmulation/Shaders/",
 
-		"Data/",
 		"Themes/",
 
 		"UI/",
 		"UI/fonts/",
 		"UI/layouts/",
-		"UI/png/",
 		"UI/strings/",
 		"UI/svg/",
 		"UI/icons.yml",

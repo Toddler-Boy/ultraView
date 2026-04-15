@@ -39,11 +39,11 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 
 		const auto	extension = params[ 0 ].fromLastOccurrenceOf ( ".", false, false ).toLowerCase ();
 
-		network.post ( "v1/runners:run_" + extension, mb, [ this, params ] ( const juce::StringPairArray& response, const int statusCode )
+		network.post ( "v1/runners:run_" + extension, mb, [ this, params ] ( const juce::var& response, const int statusCode )
 		{
 			if ( statusCode != 200 )
 			{
-				Z_ERR ( "Failed to upload file: " << params[ 0 ].quoted () << "\n" << response[ "errors" ] );
+				Z_ERR ( "Failed to upload file: " << params[ 0 ].quoted () << "\n" << response[ "errors" ].toString () );
 				return;
 			}
 

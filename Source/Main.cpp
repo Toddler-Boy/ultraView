@@ -64,12 +64,9 @@ public:
 		{
 			juce::LookAndFeel::setDefaultLookAndFeel ( &laf );
 
-			//layout.setConstant ( "mac", 1 );
-			//layout.setConstant ( "win", 0 );
-			//layout.setConstant ( "linux", 0 );
-
 			// Set up window
 			setUsingNativeTitleBar ( true );
+
 			auto	ultra = new GUI_ultraView;
 
 			setContentOwned ( ultra, false );

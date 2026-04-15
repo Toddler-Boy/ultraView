@@ -1,0 +1,71 @@
+#
+# This is not a full-fledged YAML file.
+# The parser will fail if you go beyond this extremely simple format.
+#
+main-menu:
+  search:     magnifying-glass-solid-full
+  playlists:  list-solid-full
+  crt:        display-solid-full
+  export:     arrow-up-right-from-square-solid-full
+  history:    clock-rotate-left-solid-full
+  settings:   gear-solid-full
+
+search:
+  tag:
+    golden_age:  tags/crown-solid-full
+    gem:         tags/gem-solid-full
+    liked:       heart-solid-full
+
+stil:
+  toggle:
+    stingers: stopwatch-20-solid-full
+    stil:     comment-solid-full
+
+  list:
+    song:     record-vinyl-solid-full
+    stinger:  sparkles-svgrepo-com
+    fx:       explosion-solid-full
+    speech:   record_voice_over
+
+playlist:
+  play: footer/player_play
+
+crt:
+  settings_open:  sliders-solid-full
+  settings_close: sliders-solid-full
+
+crt:
+  settings:
+    tv:
+      brightness:  crt/brightness
+      contrast:    crt/contrast
+      saturation:  crt/saturation
+      overscan:    crt/overscan
+
+    webcam:
+      brightness:  crt/brightness
+      contrast:    crt/contrast
+      saturation:  crt/saturation
+
+footer:
+  volume:
+    mute:    footer/volume_mute
+    low:     footer/volume_low
+    medium:  footer/volume_medium
+    high:    footer/volume_high
+
+  player:
+    play:     footer/player_play
+    pause:    footer/player_pause
+    previous: footer/player_previous
+    next:     footer/player_next
+    repeat:   footer/player_repeat
+    repeat_1: footer/player_repeat_1
+    shuffle:  footer/player_shuffle
+
+history_back: chevron-left-solid-full
+
+# Likes
+liked:        heart-solid-full
+not-liked:    heart-regular-full
+other-liked:  heart-circle-exclamation-solid-full

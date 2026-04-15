@@ -13,9 +13,10 @@ C64uScanner::~C64uScanner ()
 }
 //-----------------------------------------------------------------------------
 
-void C64uScanner::scan ( ScannerCallback _callback )
+void C64uScanner::scan ( ScannerCallback _callback, const juce::String& _lastIP )
 {
 	callback = std::move ( _callback );
+	lastIP = std::move ( _lastIP );
 
 	startThread ( juce::Thread::Priority::low );
 }
@@ -33,20 +34,28 @@ void C64uScanner::run ()
 		return;
 	}
 
-	// Extract subnet (e.g., 192.168.1.)
-	auto    base = local.toString ().upToLastOccurrenceOf ( ".", true, false );
-	const auto  thisMachine = local.toString ().fromLastOccurrenceOf ( ".", false, false ).getIntValue ();
+	const auto	base = local.toString ().upToLastOccurrenceOf ( ".", true, false );
 
-	juce::ThreadPool	pool ( 20, 0, juce::Thread::Priority::low );
+	// Let's try IP 64 first, as large portion of users will probably pick that one...
+	auto	lastIndex = 64;
+	if ( const auto lastBase = lastIP.upToLastOccurrenceOf ( ".", true, false ); base == lastBase )
+		lastIndex = lastIP.fromLastOccurrenceOf ( ".", false, false ).getIntValue ();
 
-	for ( auto i = 1; i <= 254; ++i )
+	// Get this machine's IP address, so we can skip it in the scan
+	const auto	thisMachine = local.toString ().fromLastOccurrenceOf ( ".", false, false ).getIntValue ();
+
+	juce::ThreadPool	pool ( 20, juce::Thread::osDefaultStackSize, juce::Thread::Priority::low );
+
+	for ( auto i = 0; i < 256; ++i )
 	{
-		if ( i == thisMachine )
+		const auto	ip = ( i + lastIndex ) & 255;
+
+		if ( ip == 0 || ip == 255 || ip == thisMachine )
 			continue;
 
-		auto    targetIP = base + juce::String ( i );
+		auto    targetIP = base + juce::String ( ip );
 
-		pool.addJob ( [ targetIP, this ]
+		pool.addJob ( [ &pool, targetIP, this ]
 		{
 			juce::StreamingSocket   socket;
 
@@ -54,9 +63,10 @@ void C64uScanner::run ()
 			{
 				if ( auto hostName = isActualC64u ( socket ); hostName.isNotEmpty () )
 				{
-					const juce::ScopedLock sl ( resultsLock );
+					if ( callback )
+						callback ( targetIP + " (" + hostName + ")" );
 
-					foundDevices.add ( targetIP + " " + hostName );
+					pool.removeAllJobs ( true, 300 );
 				}
 			}
 		} );
@@ -72,9 +82,6 @@ void C64uScanner::run ()
 
 		wait ( 50 );
 	}
-
-	if ( callback )
-		callback ( foundDevices );
 }
 //-----------------------------------------------------------------------------
 
@@ -88,7 +95,7 @@ juce::String C64uScanner::isActualC64u ( juce::StreamingSocket& socket )
 	if ( auto numBytes = socket.read ( buffer, sizeof ( buffer ) - 1, true ); numBytes > 0 )
 	{
 		buffer[ numBytes ] = 0;
-		juce::String    response ( buffer );
+		const juce::String    response ( buffer );
 
 		if ( response.contains ( "HTTP/1.1 200 OK\r\n" ) && response.containsIgnoreCase ( "Ultimate" ) )
 		{

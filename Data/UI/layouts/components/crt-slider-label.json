@@ -1,0 +1,6 @@
+{
+	"components": [
+		{ "id": "label", "x": 0, "cy": "parH2", "w": 70, "h": "parH" },
+		{ "id": "slider", "x": "prevR", "y": "prevY", "r": "parW", "h": "prevH" }
+	]
+}

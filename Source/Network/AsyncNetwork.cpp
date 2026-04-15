@@ -57,46 +57,6 @@ void AsyncNetwork::enqueue ( const juce::String& endpoint, const juce::String& m
 }
 //-----------------------------------------------------------------------------
 
-namespace
-{
-
-void flattenJsonToPairArray ( const juce::var& v, juce::String currentPath, juce::StringPairArray& results )
-{
-	if ( v.isArray () )
-	{
-		if ( auto* arr = v.getArray (); arr->isEmpty () )
-			results.set ( currentPath, {} );
-		else
-		{
-			for ( auto i = 0; i < arr->size (); ++i )
-			{
-				juce::String nextPath = currentPath + "/" + juce::String ( i );
-				flattenJsonToPairArray ( arr->getReference ( i ), nextPath, results );
-			}
-		}
-	}
-	else if ( v.isObject () )
-	{
-		if ( auto& props = v.getDynamicObject ()->getProperties (); props.isEmpty () )
-			results.set ( currentPath, {} );
-		else
-		{
-			for ( auto& prop : props )
-			{
-				juce::String nextPath = currentPath.isEmpty () ? prop.name.toString () : currentPath + "/" + prop.name.toString ();
-				flattenJsonToPairArray ( prop.value, nextPath, results );
-			}
-		}
-	}
-	else
-	{
-		results.set ( currentPath, v.toString () );
-	}
-}
-
-}
-//-----------------------------------------------------------------------------
-
 void AsyncNetwork::run ()
 {
 	while ( ! threadShouldExit () )
@@ -115,7 +75,7 @@ void AsyncNetwork::run ()
 		auto	options = juce::URL::InputStreamOptions ( juce::URL::ParameterHandling::inAddress )
 			.withHttpRequestCmd ( req.method )
 			.withStatusCode ( &req.statusCode )
-			.withConnectionTimeoutMs ( 1000 )
+			.withConnectionTimeoutMs ( 200 )
 			.withNumRedirectsToFollow ( 0 );
 
 		if ( auto stream = req.url.createInputStream ( options ) )
@@ -123,11 +83,9 @@ void AsyncNetwork::run ()
 			if ( req.callback )
 			{
 				const auto	jsonString = stream->readEntireStreamAsString ();
+				const auto	json = juce::JSON::parse ( jsonString );
 
-				juce::StringPairArray	results;
-				flattenJsonToPairArray ( juce::JSON::parse ( jsonString ), "", results );
-
-				req.callback ( results, req.statusCode );
+				req.callback ( json, req.statusCode );
 			}
 		}
 		else

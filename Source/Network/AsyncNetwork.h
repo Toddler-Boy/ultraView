@@ -6,7 +6,7 @@
 class AsyncNetwork : private juce::Thread
 {
 public:
-	using NetworkCallback = std::function<void ( const juce::StringPairArray&, const int )>;
+	using NetworkCallback = std::function<void ( const juce::var&, const int )>;
 
 	AsyncNetwork ();
 	~AsyncNetwork () override;

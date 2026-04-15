@@ -1,0 +1,7 @@
+{
+	"components": [
+		{ "id": "toggle", "r": "parW", "cy": "parH2", "w": 48, "h": 32 },
+		{ "id": "label", "x": 0, "y": 0, "r": "prevX - 1", "h": "parH2" },
+		{ "id": "help", "yd": 0 }
+	]
+}

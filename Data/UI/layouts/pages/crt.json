@@ -1,0 +1,114 @@
+{
+	"constants": [
+		{ "compH": 24 },
+		{ "togS": { "w": 38, "h": 24 } },
+		{ "togSpc": 8 },
+		{ "settingsW": "276 + 16" }
+	],
+
+	// Macros
+	"macros": [
+		{ "id": "label", "x": "bentoMargin", "cy": "getCY('P1')", "r": "getX('P1')", "h": "getH('P1')" }
+	],
+
+	"components": [
+		{ "id": "crt", "x": "fullscreen", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
+			"components": [
+				{ "id": "open", "r": "parW", "y": 0 }
+			]
+		},
+		{ "id": "settings", "x": "prevR + bentoGap", "y": "prevY", "r": "parW - bentoGap", "b": "parB - bentoGap",
+			"components": [
+				{ "id": "viewport", "bounds": "0, 5, parW, parH - 5",
+					"components": [
+						{ "id": "content", "x": 0, "y": 0, "pW": "settingsW - 30", "pH": "maxY",
+							"components": [
+								{ "id": "overlay", "factory": "bento", "bounds": "0, 0, parW, 0", "pH": "maxY + bentoGap",
+									"components": [
+										{ "id": "enabled", "factory": "toggle(Overlay, enabled)", "x": "bentoMargin", "y": "bentoGap + 2", "size": "togS" },
+										{ "id": "label", "factory": "crt-header(overlay)", "xd": "togSpc", "w": "parW - prevR - togSpc * 2" },
+										{ "id": "disabler", "factory": "disabler", "bounds": "0, prevB, parW, 0", "pH": "maxY",
+											"components": [
+												{ "id": "bitmap", "factory": "selector", "x": "bentoMargin + 78", "y": "bentoGap", "r": "parW - bentoGap", "h": 28 },
+												{ "id": "daytime", "factory": "crt-slider-label(overlay, daytime)", "x": "bentoMargin", "y": "prevB + compGap", "r": "prevR", "h": "compH" },
+												{ "id": "bezel", "factory": "crt-slider-label(overlay, bezel)", "yd": "compGap" },
+												{ "id": "shadow", "factory": "crt-slider-label(overlay, shadow)", "yd": "compGap" },
+												{ "id": "zoom", "factory": "crt-slider-label(overlay, zoom)", "yd": "compGap" },
+												{ "id": "dust", "factory": "crt-slider-label(overlay, dust)", "yd": "compGap" },
+												{ "id": "chromatic", "factory": "crt-slider-label(overlay, chromatic-aberration)", "yd": "compGap" },
+												{ "id": "grain", "factory": "crt-slider-label(overlay, grain)", "yd": "compGap" },
+
+												{ "id": "label-bitmap", "factory": "crt-label(crt/settings/overlay/bitmap)", "macro": "label(bitmap)" }
+											]
+										}
+									]
+								},
+								{ "id": "tv", "factory": "bento", "yd": "bentoGap", "pH": "maxY + bentoGap",
+									"components": [
+										{ "id": "label-system", "factory": "crt-header(system)", "bounds": "bentoMargin, bentoGap, parW - bentoMargin * 2, 28" },
+
+										{ "id": "system", "factory": "choices(TV, system, AUTO, PAL, NTSC)", "bounds": "prevX, prevB + bentoGap - 2, parW - bentoMargin * 2, 29" },
+										{ "id": "first-luma", "factory": "choices(TV, first-luma, AUTO, FIRST, REV)", "yd": "compGap" },
+										{ "id": "palette", "factory": "vic2palette", "x": "prevX", "y": "prevB + bentoGap * 1.5", "r": "prevR", "h": "prevW / 16" },
+										{ "id": "brightness", "factory": "crt-slider-icon(tv, brightness)", "x": "prevX", "y": "prevB + bentoGap * 1.5", "r": "parW - bentoGap * 1.5", "h": "compH" },
+										{ "id": "contrast", "factory": "crt-slider-icon(tv, contrast)", "yd": "compGap" },
+										{ "id": "saturation", "factory": "crt-slider-icon(tv, saturation)", "yd": "compGap" },
+										{ "id": "overscan", "factory": "crt-slider-icon(tv, overscan)", "yd": "compGap" }
+								]
+								},
+								{ "id": "crt", "factory": "bento", "yd": "bentoGap", "pH": "maxY + bentoGap",
+									"components": [
+										{ "id": "emulation", "factory": "toggle(crt, emulation)", "x": "bentoMargin", "y": "bentoGap + 2", "size": "togS" },
+										{ "id": "label", "factory": "crt-header(crt)", "xd": "togSpc", "w": "parW - prevR - togSpc * 2" },
+										{ "id": "disabler", "factory": "disabler", "bounds": "0, prevB + bentoGap, parW, 0", "pH": "maxY",
+											"components": [
+												{ "id": "jailbars", "factory": "crt-slider-label(crt, jailbars)", "x": "bentoMargin", "y": 0, "r": "parW - bentoGap", "h": "compH" },
+												{ "id": "sharpening", "factory": "crt-slider-label(crt, sharpening)", "yd": "compGap" },
+												{ "id": "luma-blur", "factory": "crt-slider-label(crt, luma-blur)", "yd": "compGap" },
+												{ "id": "chroma-blur", "factory": "crt-slider-label(crt, chroma-blur)", "yd": "compGap" },
+												{ "id": "crosstalk", "factory": "crt-slider-label(crt, crosstalk)", "yd": "compGap" },
+												{ "id": "sub-carrier", "factory": "crt-slider-label(crt, sub-carrier)", "yd": "compGap" },
+												{ "id": "interference", "factory": "crt-slider-label(crt, interference)", "yd": "compGap" },
+												{ "id": "noise", "factory": "crt-slider-label(crt, noise)", "yd": "compGap" },
+
+												{ "id": "curve", "factory": "crt-slider-label(crt, curve, true)", "yd": "bentoGap * 3" },
+												{ "id": "bleed", "factory": "crt-slider-label(crt, bleed, true)", "yd": "compGap" },
+												{ "id": "bleed-green", "factory": "xypad(crt, bleed-green, 44ff44)", "cx": "parW2", "y": "prevB + bentoGap", "w": 48, "h": 48 },
+												{ "id": "bleed-red", "factory": "xypad(crt, bleed-red, ff6666)", "xd": -4 },
+												{ "id": "bleed-blue", "factory": "xypad(crt, bleed-blue, 8888ff)", "xd": "4, bleed-green" },
+												{ "id": "h-wave", "factory": "crt-slider-label(crt, h-wave)", "yd": "bentoGap * 2 + prevH, bleed" },
+												{ "id": "scanlines", "factory": "crt-slider-label(crt, scanlines)", "yd": "compGap" },
+												{ "id": "mask", "factory": "crt-slider-label(crt, mask)", "yd": "compGap" },
+												{ "id": "mask-bitmap", "factory": "selector", "x": "bentoMargin + 78", "y": "prevB + compGap", "r": "parW - bentoGap", "h": 28 },
+												{ "id": "glow", "factory": "crt-slider-label(crt, glow)", "yd": "compGap * 2 + prevH, mask", "h": "compH" },
+												{ "id": "ambient", "factory": "crt-slider-label(crt, ambient)", "yd": "compGap" },
+												{ "id": "phosphor", "factory": "crt-slider-label(crt, phosphor-decay)", "yd": "compGap" },
+												{ "id": "vignette", "factory": "crt-slider-label(crt, vignette)", "yd": "compGap" },
+												{ "id": "reflection", "factory": "crt-slider-label(crt, reflection)", "yd": "compGap" },
+
+												{ "id": "webcam", "factory": "toggle(Webcam, enabled)", "x": "bentoMargin", "y": "prevB + bentoGap * 3", "size": "togS" },
+												{ "id": "label", "factory": "crt-header(webcam)", "xd": "togSpc", "w": "parW - prevR - togSpc * 2" },
+												{ "id": "disabler", "factory": "disabler", "bounds": "0, prevB + bentoGap, parW - bentoGap, 0", "pH": "maxY",
+													"components": [
+														{ "id": "brightness", "factory": "crt-slider-icon(webcam, brightness)", "x": "bentoMargin", "y": 0, "r": "parW", "h": "compH" },
+														{ "id": "contrast", "factory": "crt-slider-icon(webcam, contrast)", "yd": "compGap" },
+														{ "id": "saturation", "factory": "crt-slider-icon(webcam, saturation)", "yd": "compGap" }
+													]
+												},
+
+												{ "id": "label-mask-bitmap", "factory": "crt-label(crt/settings/crt/mask-pattern)", "macro": "label(mask-bitmap)" },
+
+												{ "id": "line", "factory": "line", "x": "bentoGap", "macro": "centerY(noise, curve, -1)", "r": "parW", "h": 1 },
+												{ "id": "line2", "factory": "line", "x": "bentoGap", "macro": "centerY(reflection, webcam, -1)", "r": "parW", "h": 1 }
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

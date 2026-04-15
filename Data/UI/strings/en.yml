@@ -1,0 +1,218 @@
+#
+# This is not a full-fledged YAML file.
+# The parser will fail if you go beyond this extremely simple format.
+#
+main-menu:
+  search:     Search
+  playlists:  Platylists
+  crt:        CRT
+  export:     Export
+  history:    History
+  settings:   Settings
+
+# Chip
+chip:
+  sid6581_profile_tip: Excellent 6581 emulation
+  sid8580_profile_tip: Excellent 8580 emulation
+
+# Memory overview
+memory:
+  nothing_loaded_tip: No SID tune loaded
+
+# Footer
+footer:
+  quality:
+    header: Audio Quality
+    real:   This is how a C=64 really sounds through a real 1084 monitor.
+    pure:   Direct output from the emulation with no modifcations.
+    magic:  Widened, delayed, reverberated, and bass-boosted.
+
+  volume:
+    mute_tip:   Mute
+    unmute_tip: Unmute
+
+  quality_tip:  Audio quality settings
+
+  play_tip:               Play
+  pause_tip:              Pause
+  previous_tip:           Previous
+  next_tip:               Next
+  enable_repeat_all_tip:  Repeat
+  enable_repeat_one_tip:  Repeat
+  disable_repeat_tip:     Repeat one
+  enable_shuffle_tip:     Shuffle
+  disable_shuffle_tip:    Shuffle
+
+# STIL
+stil:
+  toggle:
+    stingers: Stingers / FX
+    stingers_tip: Toggle Stingers / FX
+    stil: STIL
+    stil_tip: Toggle STIL
+
+# Search
+search:
+  tag:
+    golden_age: Golden Age
+    golden_age_tip: |
+      The mid/late 1980s era, when
+      the SID chip defined C64 music
+
+    gem: Gem
+    gem_tip: Timeless standout SID tunes
+
+    liked: Liked
+    liked_tip: Liked by you
+
+  no_exact_like_tip: |
+    This file is liked, but not this specific tune.
+    Click to like/unlike this tune.
+
+# Playlist
+playlist:
+  back_tip: Back to playlist grid
+
+# CRT settings
+crt:
+  settings:
+    overlay:
+      header: Overlay
+      bitmap: Bitmap
+      daytime: Time of day
+      bezel: Bezel rflctns
+      shadow: Shadow
+      zoom: Zoom
+      dust: Dust
+      chromatic-aberration: Chrmtc Abrrtn
+      grain: Grain
+
+    stream:
+      header: C64u Streaming
+
+    system:
+      header: System
+
+    crt:
+      header: CRT Emulation
+      jailbars: Jailbars
+      sharpening: Fringing
+      luma-blur: Luma Blur
+      chroma-blur: Chroma Blur
+      crosstalk: Crosstalk
+      crosstalk: Crosstalk
+      sub-carrier: Sub-carrier
+      interference: Interference
+      noise: Noise
+
+      curve: Curvature
+      bleed: Color bleed
+      h-wave: H-Wave
+      scanlines: Scanlines
+      mask: Mask
+      mask-pattern: Mask ptrn
+      glow: Halation
+      ambient: Ambient
+      phosphor-decay: Phsphr Dcy
+      vignette: Vignette
+      reflection: Reflection
+
+    webcam:
+      header: Webcam
+
+# Settings
+settings:
+  header:
+    settings: Settings
+    storage: Storage
+    playback: Playback
+    song-lengths: Song Lengths
+    emulation: SID Emulation
+    audio-fx: Audio Enhancements
+    user-interface: User Interface
+
+settings:
+  location:
+    hvsc: High Voltage SID Collection
+    user: My data (Playlists, Likes, Preferences, User-tunes etc.)
+
+  browse: Change location
+
+  player:
+    normalize: Normalize volume
+    normalize-help: Set the same volume level for all tunes.
+
+  sound_output: Sound output device
+
+  songs:
+    unknown:        Unknown tune
+    unknown-help:   How many minutes an non-HVSC tune plays.
+
+    fade-out:       Fade out
+    fade-out-help:  Continues to play for this many seconds while fading out.
+
+    minimum:        Minimum length
+    minimum-help:   Play for at least this many seconds.
+
+    max-loops:      Maximum repeats
+    max-loops-help: How often does a tune repeat.
+
+  emulation:
+    dac-leakage:      6581 DAC leakage
+    dac-leakage-help: Voices will leak and not go fully silent on the 6581.
+
+  fx:
+    stereo-processing:      Stereo processing
+    stereo-processing-help: Multi-chip tunes get selectively narrowed.
+
+  ui:
+    allow-screensaver:      System screensaver
+    allow-screensaver-help: Allows system screensaver.
+
+#
+# Onboarding screen
+#
+onboarding_welcome: |
+  This SID player requires a copy of the High Voltage SID Collection (HVSC).
+
+  If you already have downloaded and extracted a copy of the HVSC, then please specify the location of your HVSC folder below.
+
+  If you do not have a copy of HVSC, ultraSID can download and install it for you.
+
+#
+# Update HVSC screen
+#
+updateHVSC_welcome: |
+  Your copy of the HVSC is outdated.
+
+  Would you like to update to the latest version of the HVSC automatically?
+
+#
+# These are only temporary until the final values have been found
+#
+crt/settings/fx/splitter-freq: Splitter Freq
+
+settings/fx/wide-mono: Wide-mono
+settings/fx/wide-mono-help: Creates a fake stereo image by using the HAAS effect.
+crt/settings/fx/wide-mono-width: Width
+
+settings/fx/delay: Delay
+settings/fx/delay-help: X-Over delay (feedback feeds into opposite side)
+crt/settings/fx/delay-wet: Wet
+crt/settings/fx/delay-feedback: Feedback
+
+settings/fx/reverb: Reverb
+settings/fx/reverb-help: Standard reverb
+crt/settings/fx/reverb-wet: Wet
+
+settings/fx/mid-side: Mid/Side
+settings/fx/mid-side-help: Widens the now existing stereo-field further
+crt/settings/fx/mid-side-width: Width
+
+settings/fx/loudness: Loudness
+settings/fx/loudness-help: Bass and trebble boost
+
+settings/fx/noise: Noise
+settings/fx/noise-help: For a bit of analog warmth
+crt/settings/fx/noise-volume: Level
+crt/settings/fx/noise-color: Color

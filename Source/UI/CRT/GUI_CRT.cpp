@@ -69,7 +69,7 @@ void GUI_CRT::resized ()
 	const auto	pos = settingsViewport.getViewPosition ();
 
 	crtLayout.setLayout ( {	paths::getDataRoot ( "UI/layouts/constants.json" ),
-							paths::getDataRoot ( "UI/layouts/crt.json" ) } );
+							paths::getDataRoot ( "UI/layouts/pages/crt.json" ) } );
 
 	settingsViewport.setViewPosition ( pos );
 

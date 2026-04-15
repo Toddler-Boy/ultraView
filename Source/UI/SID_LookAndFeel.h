@@ -44,17 +44,6 @@ public:
 	juce::Font getLabelFont ( juce::Label& label ) override		{		return label.getFont ();	}
 
 	//
-	// Window decorations (titlebar, border, frame, etc.)
-	//
-	juce::Button* createDocumentWindowButton ( int ) override;
-	void positionDocumentWindowButtons ( juce::DocumentWindow&, int titleBarX, int titleBarY, int titleBarW, int titleBarH, juce::Button* minimiseButton, juce::Button* maximiseButton, juce::Button* closeButton, bool positionTitleBarButtonsOnLeft ) override;
- 	void drawResizableWindowBorder ( juce::Graphics&, int w, int h, const juce::BorderSize<int>& border, juce::ResizableWindow& window ) override;
-	void drawResizableFrame ( juce::Graphics& g, int w, int h, const juce::BorderSize<int>& border ) override;
-	void drawDocumentWindowTitleBar ( juce::DocumentWindow& window, juce::Graphics& g, int w, int h, int titleSpaceX, int titleSpaceW, const juce::Image* icon, bool drawTitleTextOnLeft ) override;
-	void mouseEnter ( const juce::MouseEvent& e ) override;
-	void mouseExit ( const juce::MouseEvent& e ) override;
-
-	//
 	// Scrollbar
 	//
 	int getDefaultScrollbarWidth () override;

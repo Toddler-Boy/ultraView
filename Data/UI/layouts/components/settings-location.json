@@ -1,0 +1,8 @@
+{
+	"components": [
+		{ "id": "label", "x": 0, "y": 0, "r": "parW - 140", "h": 16 },
+		{ "id": "path", "yd": 3 },
+		{ "id": "status", "yd": 3 },
+		{ "id": "browse", "x": "prevR + 1", "macro": "centerY(label, path, 0)", "r": "parW", "h": 28 }
+	]
+}

@@ -1,0 +1,15 @@
+{
+	"constants": [
+		{ "dialogMargin": 50 },
+		{ "margin": 7 },
+		{ "bentoGap": 8 },
+		{ "bentoMargin": "bentoGap * 1.5" },
+		{ "compGap": 4 },
+		{ "sectionPadding": "bentoGap * 5" }
+	],
+
+	// Macros
+	"macros": [
+		{ "id": "centerY", "cy": "getB('P1') + ( getY('P2') - getB('P1') ) / 2 + P3" }
+	]
+}

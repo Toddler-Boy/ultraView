@@ -1,0 +1,81 @@
+{
+	"components": [
+		{ "id": "header", "factory": "header1(settings)", "cx": "parW2", "y": "bentoGap * 3", "w": 650, "h": 40 },
+		{ "id": "viewport", "x": 0, "y": "prevB + sectionPadding", "r": "parR - bentoGap * 0.5", "b": "parB",
+			"components": [
+				{ "id": "wrapper", "x": 0, "y": 0, "w": "parW - 22", "pH": "maxY + bentoGap * 4",
+					"components": [
+						{ "id": "label-storage", "factory": "header2(storage)", "x": "getX('../../header')", "y": 0, "r": "parW - 10", "h": 30 },
+						{ "id": "storage", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "getW('../../header')", "pH": "maxY + 20",
+							"components": [
+								{ "id": "hvsc", "factory": "set-location(hvsc)", "x": 20, "y": 20, "r": "parW - 20", "pH": "maxY" },
+								{ "id": "user", "factory": "set-location(user)", "yd": 46 },
+								{ "id": "line", "factory": "line", "x": "prevX", "w": "prevW", "h": 1, "macro": "centerY(hvsc, user, -1)" }
+							]
+						},
+						{ "id": "label-audio-device", "factory": "header2(playback)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
+						{ "id": "audio-device", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 20",
+							"components": [
+								{ "id": "player-normalize", "factory": "set-toggle(player, normalize)",  "x": 20, "y": 20, "r": "parW - 20", "h": 42 },
+								{ "id": "line", "factory": "line", "yd": 20, "h": 1 },
+								{ "id": "label", "factory": "set-label(sound_output)", "x": 20, "y": "prevB + 20", "w": 280, "h": 32 },
+								{ "id": "output", "factory": "audio-device", "x": "prevR + 1", "y": "prevY", "r": "parW - 20", "h": "prevH" }
+							]
+						},
+						{ "id": "label-song-lengths", "factory": "header2(song-lengths)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
+						{ "id": "song-lengths", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 16",
+							"components": [
+								{ "id": "songs-unknown", "factory": "set-number(songs, unknown)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 },
+								{ "id": "line1", "yd": 16, "h": 1, "factory": "line" },
+								{ "id": "songs-fade-out", "factory": "set-number(songs, fade-out)", "x": 20, "y": "prevB + 20", "r": "parW - 20", "h": 42 },
+								{ "id": "line2", "yd": 16, "h": 1, "factory": "line"  },
+								{ "id": "songs-minimum", "factory": "set-number(songs, minimum)", "x": 20, "y": "prevB + 20", "r": "parW - 20", "h": 42 },
+								{ "id": "line3", "yd": 16, "h": 1, "factory": "line"  },
+								{ "id": "songs-max-loops", "factory": "set-number(songs, max-loops)", "x": 20, "y": "prevB + 20", "r": "parW - 20", "h": 42 }
+							]
+						},
+						{ "id": "label-emulation", "factory": "header2(emulation)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
+						{ "id": "emulation", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 20",
+							"components": [
+								{ "id": "emulation-dac-leakage", "factory": "set-toggle(emulation, dac-leakage)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 }
+							]
+						},
+						{ "id": "label-fx", "factory": "header2(audio-fx)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
+						{ "id": "fx", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 20",
+							"components": [
+								{ "id": "fx-stereo-processing", "factory": "set-toggle(fx, stereo-processing)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 },
+								{ "id": "line1", "yd": 16, "h": 1, "factory": "line" },
+								{ "id": "fx-splitter-freq", "factory": "crt-slider-label(fx, splitter-freq)", "yd": 20, "h": 42 },
+								{ "id": "line2", "yd": 16, "h": 1, "factory": "line" },
+								{ "id": "fx-wide-mono", "factory": "set-toggle(fx, wide-mono)", "yd": 20, "h": 42 },
+								{ "id": "fx-wide-mono-width", "factory": "crt-slider-label(fx, wide-mono-width)", "yd": 5, "h": 25  },
+								{ "id": "line3", "yd": 5, "h": 1, "factory": "line" },
+								{ "id": "fx-delay", "factory": "set-toggle(fx, delay)", "yd": 20, "h": 42 },
+								{ "id": "fx-delay-wet", "factory": "crt-slider-label(fx, delay-wet)", "yd": 5, "h": 25 },
+								{ "id": "fx-delay-feedback", "factory": "crt-slider-label(fx, delay-feedback)", "yd": 0 },
+								{ "id": "line4", "yd": 10, "h": 1, "factory": "line" },
+								{ "id": "fx-reverb", "factory": "set-toggle(fx, reverb)", "yd": 20, "h": 42 },
+								{ "id": "fx-reverb-wet", "factory": "crt-slider-label(fx, reverb-wet)", "yd": 0, "h": 25  },
+								{ "id": "line5", "yd": 10, "h": 1, "factory": "line" },
+								{ "id": "fx-mid-side", "factory": "set-toggle(fx, mid-side)", "yd": 20, "h": 42 },
+								{ "id": "fx-mid-side-width", "factory": "crt-slider-label(fx, mid-side-width, true)", "yd": 5, "h": 25 },
+								{ "id": "line6", "yd": 10, "h": 1, "factory": "line" },
+								{ "id": "fx-loudness", "factory": "set-toggle(fx, loudness)", "yd": 20, "h": 42 },
+								{ "id": "line7", "yd": 5, "h": 1, "factory": "line" },
+								{ "id": "fx-noise", "factory": "set-toggle(fx, noise)", "yd": 20, "h": 42 },
+								{ "id": "fx-noise-volume", "factory": "crt-slider-label(fx, noise-volume)", "yd": 5, "h": 25 },
+								{ "id": "fx-noise-color", "factory": "crt-slider-label(fx, noise-color)", "yd": 0 }
+							]
+						},
+						{ "id": "label-ui", "factory": "header2(user-interface)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
+						{ "id": "ui", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 20",
+							"components": [
+								{ "id": "ui-allow-screensaver", "factory": "set-toggle(ui, allow-screensaver)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 }
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
