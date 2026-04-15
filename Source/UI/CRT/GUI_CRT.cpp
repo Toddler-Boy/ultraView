@@ -141,6 +141,9 @@ void GUI_CRT::showSettings ( const bool visible )
 {
 	settingsWrapper.setVisible ( visible );
 	settingsVisible = visible;
+
+	overlay.openSettings.setStage ( settingsVisible ? 1 : 0	);
+
 	resized ();
 }
 //-----------------------------------------------------------------------------
