@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 
 #include "UI/Misc/VIC2_Render.h"
+#include "UI/Misc/colodore.h"
 
 #include "GUI_Overlay.h"
 

@@ -53,7 +53,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 				return;
 
 			strings->load ();
-			repaint ();
+			sendLookAndFeelChange ();
 		}
 
 		// UI icons
@@ -63,7 +63,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 				return;
 
 			icons->load ();
-			repaint ();
+			sendLookAndFeelChange ();
 		}
 
 		return;

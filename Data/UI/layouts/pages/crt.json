@@ -14,7 +14,12 @@
 	"components": [
 		{ "id": "crt", "x": "fullscreen", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
 			"components": [
-				{ "id": "open", "r": "parW", "y": 0 }
+				{ "id": "open", "r": "parW", "y": 0 },
+				{ "id": "action-buttons", "b": "parH - 15", "cx": "parW2", "w": 660, "h": 40,
+					"components": [
+						{ "grid": "menu_button, pause, resume, reboot, poweroff", "bounds": "parent", "cols": 5, "colGap": 10 }
+					]
+				}
 			]
 		},
 		{ "id": "settings", "x": "prevR + bentoGap", "y": "prevY", "r": "parW - bentoGap", "b": "parB - bentoGap",

@@ -51,6 +51,10 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 			network.put ( "v1/configs/U64 Specific Settings/System Mode", {}, nullptr, { "value", "PAL" } );
 		} );
 	}
+	else if ( cmd == "c64action" )
+	{
+		network.put ( "v1/machine:" + params[ 0 ], {} );
+	}
 	else
 	{
 		Z_ERR ( "Unknown action: " << message );

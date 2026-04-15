@@ -141,8 +141,7 @@ private:
 		{ "text",					{ UI::colors::text,					juce::Colour ( 0xff'E4E9F4 ) } },
 
 		// Accent
-		{ "accent",					{ UI::colors::accent,				juce::Colours::deeppink } },
-		{ "accent2",				{ UI::colors::accent2,				juce::Colours::deeppink.withRotatedHue ( 300.0f / 360.0f ) } },
+		{ "accent",					{ UI::colors::accent,				juce::Colour ( 0xff'25856b ) } },
 
 		// FX modes
 		{ "fx-real",				{ UI::colors::fxReal,				juce::Colour ( 0xff'e4e4e7 ) } },
@@ -153,6 +152,12 @@ private:
 		{ "status-ok",				{ UI::colors::statusOk,				juce::Colour ( 0xff'66ff99 ) } },
 		{ "status-warning",			{ UI::colors::statusWarning,		juce::Colour ( 0xff'ffd432 ) } },
 		{ "status-error",			{ UI::colors::statusError,			juce::Colour ( 0xff'ff3636 ) } },
+
+		// Action buttons
+		{ "action-ok",				{ UI::colors::actionOk,				juce::Colour ( 0xff'00aa55 ) } },
+		{ "action-info",			{ UI::colors::actionInfo,			juce::Colour ( 0xff'4466bb ) } },
+		{ "action-warning",			{ UI::colors::actionWarning,		juce::Colour ( 0xff'bb7700 ) } },
+		{ "action-danger",			{ UI::colors::actionDanger,			juce::Colour ( 0xff'cc0000 ) } },
 	};
 
 	const std::array<juce::Colour, UI::colors::count - UI::colors::accent>	colors;

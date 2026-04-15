@@ -2,6 +2,8 @@
 
 #include "Globals/constants.h"
 
+#include "UI/Misc/VIC2_Render.h"
+
 //-----------------------------------------------------------------------------
 
 GUI_Overlay::GUI_Overlay ()
@@ -23,6 +25,27 @@ GUI_Overlay::GUI_Overlay ()
 		openSettings.setWantsKeyboardFocus ( false );
 
 		addAndMakeVisible ( openSettings );
+	}
+
+	// Action buttons
+	{
+		auto addActionButton = [ this ] ( GUI_IconButton& button )
+		{
+			button.setWantsKeyboardFocus ( false );
+			actionButtons.addAndMakeVisible ( button );
+			button.onClick = [ this, name = button.getName () ]
+			{
+				UI::sendGlobalMessage ( "c64action {}", name );
+			};
+		};
+
+		addActionButton ( actionMenu );
+		addActionButton ( actionPause );
+		addActionButton ( actionResume );
+		addActionButton ( actionReboot );
+		addActionButton ( actionPower );
+
+		addAndMakeVisible ( actionButtons );
 	}
 
 	//
@@ -100,7 +123,7 @@ void GUI_Overlay::resized ()
 
 bool GUI_Overlay::shouldHideCursor () const
 {
-	return ! openSettings.getStage () && isMouseOverOrDragging ();
+	return ! openSettings.getStage () && isMouseOverOrDragging () && kioskMode;
 }
 //-----------------------------------------------------------------------------
 
@@ -110,7 +133,8 @@ void GUI_Overlay::showCursor ()
 	// Show cursor and settings button
 	//
 	setMouseCursor ( juce::MouseCursor::NormalCursor );
-	openSettings.setAlpha ( 1.0f );
+	openSettings.setVisible ( true );
+	actionButtons.setVisible ( true );
 }
 //-----------------------------------------------------------------------------
 
@@ -122,7 +146,8 @@ void GUI_Overlay::hideCursor ()
 	if ( kioskMode )
 		setMouseCursor ( juce::MouseCursor::NoCursor );
 
-	openSettings.setAlpha ( 0.0f );
+	openSettings.setVisible ( false );
+	actionButtons.setVisible ( false );
 }
 //-----------------------------------------------------------------------------
 

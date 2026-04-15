@@ -124,7 +124,7 @@ void GUI_CRT::update ( const float secondsPassed )
 	// Update OpenGL iFrame & iTime
 	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
 
-	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
+/*	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
 	constexpr auto	frameMS = 1.0f / 60.0f - 0.01f;
 
 	// Handle updates (skip if it happened faster than 65 Hz)
@@ -133,6 +133,7 @@ void GUI_CRT::update ( const float secondsPassed )
 		return;
 
 	timePassed = 0.0f;
+*/
 }
 //-----------------------------------------------------------------------------
 

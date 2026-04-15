@@ -10,7 +10,9 @@ void GUI_ultraView::findC64OnNetwork ()
 	{
 		if ( ip.isEmpty () )
 		{
-			getTopLevelComponent ()->setName ( ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString + juce::String ( " - Not connected" ) );
+			juce::MessageManager::callAsync ( [ this ] {
+				getTopLevelComponent ()->setName ( ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString + juce::String ( " - Not connected" ) );
+			} );
 
 			Z_ERR ( "No C64 found on the network" );
 			return;
@@ -20,7 +22,9 @@ void GUI_ultraView::findC64OnNetwork ()
 
 		const auto	ipOnly = ip.upToFirstOccurrenceOf ( " ", false, false );
 
-		getTopLevelComponent ()->setName ( ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString + juce::String ( " - " ) + ip );
+		juce::MessageManager::callAsync ( [ this, ip ] {
+			getTopLevelComponent ()->setName ( ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString + juce::String ( " - " ) + ip );
+		} );
 
 		settings->set ( "Network/last-ip", ipOnly );
 		network.setBaseAddress ( "http://" + ipOnly );

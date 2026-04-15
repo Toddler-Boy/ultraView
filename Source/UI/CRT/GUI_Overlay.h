@@ -2,16 +2,12 @@
 
 #include <JuceHeader.h>
 
-#include <chrono>
-
+#include "UI/Components/GUI_IconButton.h"
 #include "UI/Components/GUI_SVG_Button.h"
 
-#include "UI/Misc/colodore.h"
-#include "UI/Misc/VIC2_Render.h"
-
-#include "Globals/Preferences.h"
-
 #include "Network/C64u_UDP_Receiver.h"
+
+#include "Globals/constants.h"
 
 //-----------------------------------------------------------------------------
 
@@ -44,6 +40,14 @@ private:
 	lime::openGL_Image	c64uBuffer[ 2 ] = { { 1, 384, 272 }, { 1, 384, 272 } };
 
 	void startVideoStream ();
+
+	// Action buttons
+	juce::Component		actionButtons { "action-buttons" };
+		GUI_IconButton		actionMenu { "menu_button", UI::colors::actionOk };
+		GUI_IconButton		actionPause { "pause", UI::colors::actionInfo };
+		GUI_IconButton		actionResume { "resume", UI::colors::actionInfo };
+		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning };
+		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger };
 
 	//
 	// Hide mouse-cursor helpers

@@ -21,7 +21,6 @@ namespace UI
 		text,
 
 		accent,
-		accent2,
 
 		// FX mode
 		fxReal,
@@ -32,6 +31,12 @@ namespace UI
 		statusOk,
 		statusWarning,
 		statusError,
+
+		// Action buttons
+		actionOk,
+		actionInfo,
+		actionWarning,
+		actionDanger,
 
 		// End of stuff
 		count,
@@ -132,9 +137,4 @@ namespace helpers
 namespace paths
 {
 	juce::File getDataRoot ( juce::String path = "" );
-}
-
-namespace url
-{
-	constexpr auto	updateInfo = "https://ultrasid.com/updates.json";
 }
