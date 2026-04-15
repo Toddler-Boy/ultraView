@@ -61,8 +61,11 @@ GUI_ultraView::GUI_ultraView ()
 	};
 
 	// Setup network
+	{
+	}
 	network.setBaseAddress ( "http://" + preferences->get<juce::String> ( "network/base-address" ) );
 
+	findC64OnNetwork ();
 	setupNetworking ();
 }
 //-----------------------------------------------------------------------------

@@ -17,8 +17,9 @@
 #include "Globals/Strings.h"
 #include "Globals/Theme.h"
 
-#include "Network/C64u_UDP_Receiver.h"
 #include "Network/AsyncNetwork.h"
+#include "Network/C64u_UDP_Receiver.h"
+#include "Network/C64u_Scanner.h"
 
 //-----------------------------------------------------------------------------
 
@@ -84,6 +85,7 @@ private:
 
 	void updateColors ();
 
+	void findC64OnNetwork ();
 	void setupNetworking ();
 
 	juce::CriticalSection	inAudio;
@@ -119,6 +121,9 @@ private:
 
 	// AsyncNetwork
 	AsyncNetwork				network;
+
+	// C64 network scanner
+	C64uScanner					c64uScanner;
 
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
 
