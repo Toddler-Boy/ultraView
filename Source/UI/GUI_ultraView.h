@@ -88,6 +88,9 @@ private:
 	void findC64OnNetwork ();
 	void setupNetworking ();
 
+	void c64_reboot ();
+	void c64_run ( const juce::String& type, const juce::MemoryBlock& crtData, const juce::String& filename );
+
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;
 	SmoothedValue			curOutVol;

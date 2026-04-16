@@ -38,18 +38,19 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 		}
 
 		const auto	extension = params[ 0 ].fromLastOccurrenceOf ( ".", false, false ).toLowerCase ();
-
-		network.post ( "v1/runners:run_" + extension, mb, [ this, params ] ( const juce::var& response, const int statusCode )
+		if ( extension == "crt" )
 		{
-			if ( statusCode != 200 )
+			const auto	cartType = juce::ByteOrder::bigEndianShort ( static_cast<const char*>( mb.getData () ) + 22 );
+
+			if ( cartType == 32 )
 			{
-				Z_ERR ( "Failed to upload file: " << params[ 0 ].quoted () << "\n" << response[ "errors" ].toString () );
+				c64_reboot ();
+				juce::Timer::callAfterDelay ( 2000, [ this, mb, filename = params[ 0 ] ] {	c64_run ( "crt", mb, filename );	} );
 				return;
 			}
+		}
 
-			// Switch C64 into PAL mode
-			network.put ( "v1/configs/U64 Specific Settings/System Mode", {}, nullptr, { "value", "PAL" } );
-		} );
+		c64_run ( extension, mb, params[ 0 ] );
 	}
 	else if ( cmd == "c64action" )
 	{
