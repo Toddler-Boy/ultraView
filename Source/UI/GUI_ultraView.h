@@ -90,6 +90,7 @@ private:
 
 	void c64_reboot ();
 	void c64_run ( const juce::String& type, const juce::MemoryBlock& crtData, const juce::String& filename );
+	void c64_forceSystemMode ( const juce::String& mode );
 
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;

@@ -23,7 +23,7 @@ void AsyncNetwork::setBaseAddress ( const juce::String& url )
 }
 //-----------------------------------------------------------------------------
 
-void AsyncNetwork::get ( const juce::String& ep, NetworkCallback cb, const juce::StringArray& p )
+void AsyncNetwork::get ( const juce::String& ep, const juce::StringArray& p, NetworkCallback cb )
 {
 	enqueue ( ep, "GET", {}, std::move ( cb ), p );
 }
@@ -35,9 +35,9 @@ void AsyncNetwork::post ( const juce::String& ep, const juce::MemoryBlock& d, Ne
 }
 //-----------------------------------------------------------------------------
 
-void AsyncNetwork::put ( const juce::String& ep, const juce::MemoryBlock& d, NetworkCallback cb, const juce::StringArray& p )
+void AsyncNetwork::put ( const juce::String& ep, const juce::StringArray& p, NetworkCallback cb )
 {
-	enqueue ( ep, "PUT", d, std::move ( cb ), p );
+	enqueue ( ep, "PUT", {}, std::move ( cb ), p );
 }
 //-----------------------------------------------------------------------------
 

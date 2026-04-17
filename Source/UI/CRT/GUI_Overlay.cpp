@@ -51,7 +51,7 @@ GUI_Overlay::GUI_Overlay ()
 	//
 	// Setup C64u UDP receiver callback for live preview
 	//
-	c64uReceiver.setVideoBuffers ( c64uBuffer[ 0 ].data.data (), c64uBuffer[ 1 ].data.data () );
+	c64uReceiver.setVideoBuffers ( c64uBuffer[ 0 ].getData (), c64uBuffer[ 1 ].getData () );
 
 	c64uReceiver.onVideoFrame = [ this ] ( int finishedBufferIndex, bool isNTSC )
 	{
@@ -63,11 +63,12 @@ GUI_Overlay::GUI_Overlay ()
 			constexpr auto	ntscOverscanBottom = VIC2_Render::outerUnscaledHeight - h - ntscOverscanTop;
 			constexpr auto	ntscBottomStart = VIC2_Render::outerUnscaledHeight - ntscOverscanBottom;
 
-			std::memmove ( c64uBuffer[ finishedBufferIndex ].data.data () + ntscOverscanTop * w, c64uBuffer[ finishedBufferIndex ].data.data (), w * h );
+			// Move the visible 240 lines down so the buffer stays centered
+			std::memmove ( c64uBuffer[ finishedBufferIndex ].getLinePointer ( ntscOverscanTop ), c64uBuffer[ finishedBufferIndex ].getData (), w * h );
 
 			// Clear top and bottom borders (NTSC overscan area)
-			std::memset ( c64uBuffer[ finishedBufferIndex ].data.data (), 0, ntscOverscanTop * w );
-			std::memset ( c64uBuffer[ finishedBufferIndex ].data.data () + ntscBottomStart * w, 0, ntscOverscanBottom * w );
+			std::memset ( c64uBuffer[ finishedBufferIndex ].getData (), 0, ntscOverscanTop * w );
+			std::memset ( c64uBuffer[ finishedBufferIndex ].getLinePointer ( ntscBottomStart ), 0, ntscOverscanBottom * w );
 		}
 
 		isStreamNTSC.store ( isNTSC, std::memory_order_relaxed );

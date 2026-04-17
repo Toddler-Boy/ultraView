@@ -38,7 +38,7 @@ void GUI_ultraView::findC64OnNetwork ()
 void GUI_ultraView::setupNetworking ()
 {
 	// Start stream
-	network.get ( "v1/configs/Data Streams", [ this ] ( const juce::var& result, const int httpCode )
+	network.get ( "v1/configs/Data Streams", {}, [ this ] ( const juce::var& result, const int httpCode )
 	{
 		if ( httpCode < 200 || httpCode >= 300 )
 			return;
@@ -46,8 +46,8 @@ void GUI_ultraView::setupNetworking ()
 		const auto	videoAddress = result[ "Data Streams" ][ "Stream VIC to" ];
 		const auto	audioAddress = result[ "Data Streams" ][ "Stream Audio to" ];
 
-		network.put ( "v1/streams/video:start", {}, nullptr, { "ip", videoAddress } );
-		network.put ( "v1/streams/audio:start", {}, nullptr, { "ip", audioAddress } );
+		network.put ( "v1/streams/video:start", { "ip", videoAddress } );
+		network.put ( "v1/streams/audio:start", { "ip", audioAddress } );
 
 		mainScreen.crt.setStreamAddress ( videoAddress );
 		UI::sendGlobalMessage ( "stream-status audio {}", c64uReceiver.start ( audioAddress ).quoted () );

@@ -13,9 +13,9 @@ public:
 
 	void setBaseAddress ( const juce::String& url );
 
-	void get ( const juce::String& endpoint, NetworkCallback cb = nullptr, const juce::StringArray& params = {} );
+	void get ( const juce::String& endpoint, const juce::StringArray& params = {}, NetworkCallback cb = nullptr );
 	void post ( const juce::String& endpoint, const juce::MemoryBlock& data, NetworkCallback cb = nullptr, const juce::StringArray& params = {} );
-	void put ( const juce::String& endpoint, const juce::MemoryBlock& data, NetworkCallback cb = nullptr, const juce::StringArray& params = {} );
+	void put ( const juce::String& endpoint, const juce::StringArray& params = {}, NetworkCallback cb = nullptr );
 
 private:
 	struct RequestData

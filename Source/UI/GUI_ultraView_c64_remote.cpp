@@ -4,7 +4,7 @@
 
 void GUI_ultraView::c64_reboot ()
 {
-	network.put ( "v1/machine:reboot", {} );
+	network.put ( "v1/machine:reboot" );
 }
 //-----------------------------------------------------------------------------
 
@@ -15,11 +15,13 @@ void GUI_ultraView::c64_run ( const juce::String& type, const juce::MemoryBlock&
 		if ( statusCode != 200 )
 		{
 			Z_ERR ( "Failed to upload file: " << filename.quoted () << "\n" << response[ "errors" ].toString () );
-			return;
 		}
-
-		// Switch C64 into PAL mode
-		network.put ( "v1/configs/U64 Specific Settings/System Mode", {}, nullptr, { "value", "PAL" } );
 	} );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraView::c64_forceSystemMode ( const juce::String& mode )
+{
+	network.put ( "v1/configs/U64 Specific Settings/System Mode", { "value", mode } );
 }
 //-----------------------------------------------------------------------------

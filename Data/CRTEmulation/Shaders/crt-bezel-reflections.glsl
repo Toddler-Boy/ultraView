@@ -12,7 +12,7 @@ vec3 gausBlur ( vec2 uv, int samples )
 {
 //	return texture ( iChannel0, uv ).rgb;
 
-	const	vec2	scale = vec2 ( 3.0 / 1080.0, 3.0 / 813.0 );
+	const	vec2	scale = vec2 ( 4.0 / 1080.0, 4.0 / 813.0 );
 
 	float	sigma = float ( samples );
 	vec3	col = vec3 ( 0.0 );
@@ -30,8 +30,12 @@ vec3 gausBlur ( vec2 uv, int samples )
 			clipper = texture ( iChannel0, uv + scale * offset ).rgb;
 
 			// Remove ambient color
-			clipper = clamp ( clipper - 0.2, 0.0, 1.0 );
-			clipper *= 1.0 / 0.8;
+			clipper = clamp ( clipper - 0.2, 0.0, 1.0 ) * ( 1.0 / 0.8 );
+
+			float	luminance = dot ( clipper, vec3 ( 0.299, 0.587, 0.114 ) );
+			float	targetLuminance =  mix ( luminance, 1.0 - luminance, 0.15 );
+
+			clipper *= ( targetLuminance / max ( luminance, 0.01 ) );
 
 			col += clipper * weight;
 			accum += weight;
@@ -44,15 +48,9 @@ vec3 gausBlur ( vec2 uv, int samples )
 
 uniform float rflLevel;
 
-uniform vec2	rflZoom1 = vec2 ( 1.0 );
-uniform vec2	rflShift1 = vec2 ( 0.0 );
-uniform int		rflRadius1 = 2;
-uniform float	rflAmount1 = 0.5;
-
-uniform vec2	rflZoom2 = vec2 ( 1.0 );
-uniform vec2	rflShift2 = vec2 ( 0.0 );
-uniform int		rflRadius2 = 20;
-uniform float	rflAmount2 = 0.5;
+uniform vec2	rflZoom = vec2 ( 1.0 );
+uniform vec2	rflShift = vec2 ( 0.0 );
+uniform int		rflRadius = 2;
 
 uniform float	ovlGrain = 0.2;
 
@@ -74,21 +72,14 @@ void main ()
 	mask.rgb = colorGrade ( mask.rgb, iChannel2, iChannel3 );
 
 	// Reflection
-	vec2	uv1 = curve ( fragCoord, crtCurve );
-	uv1 -= 0.5;
-	vec2	uv2 = uv1;
+	vec2	uv = curve ( fragCoord, crtCurve );
 
-	// Get first bezel
-	uv1 *= rflZoom1;
-	uv1 += rflShift1;
-	uv1 += 0.5;
-	vec3	col = gausBlur ( uv1, rflRadius1 ) * rflAmount1 * rflLevel;
-
-	// Get second bezel
-	uv2 *= rflZoom2;
-	uv2 += rflShift2;
-	uv2 += 0.5;
-	col = max ( col, gausBlur ( uv2, rflRadius2 ) * rflAmount2 * rflLevel );
+	// Bezel
+	uv -= 0.5;
+	uv *= rflZoom;
+	uv += rflShift;
+	uv += 0.5;
+	vec3	col = gausBlur ( uv, rflRadius ) * rflLevel;
 
 	col += mask.rgb;
 	col *= grnGrain ( uvec2 ( fragCoord * iResolution.xy ), ovlGrain );

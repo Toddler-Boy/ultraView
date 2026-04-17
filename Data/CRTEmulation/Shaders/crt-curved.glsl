@@ -79,7 +79,6 @@ void main ()
 	{
 		// Glass distortion
 		vec2	camCoord = glassDistortion ( vec2 ( 1.0 ) - fragCoord, crtDistortion, crtRflCorrection );
-
 		vec3	yuv;
 
 		// Webcam
@@ -111,10 +110,8 @@ void main ()
 		rfl = texture ( iChannel2, glassDistortion ( fragCoord, crtDistortion * 0.1, 1.0 ) ).rgb;
 	}
 
-	rfl = rfl * rfl * rfl;
-	rfl *= 0.25;
+	col = screen ( col, ( rfl * rfl * rfl ) * 0.25 * crtReflection * glassTint );
 //	col = rfl;
-	col = screen ( col, rfl * crtReflection * glassTint );
 
 	// Mask out corners, no CRT has 90 degree angles
 	float	mask = roundedMask ( cuv * iResolution.xy, iResolution.xy, iResolution.x * 0.03 );
