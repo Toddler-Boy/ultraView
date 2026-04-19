@@ -23,6 +23,7 @@ public:
 	// lime::CRTEmulation
 	void newOpenGLContextCreated () override;
 	void openGLContextClosing () override;
+	void renderOpenGL () override;
 
 	// this
 	void setStreamAddress ( const juce::String& address );
@@ -37,9 +38,9 @@ private:
 
 	// C64u UDP Receiver
 	juce::CriticalSection	streamLock;
-	juce::String		c64uStreamAddress;
-	C64u_UDP_Receiver	c64uReceiver { C64u_UDP_Receiver::streamType::video };
-	lime::openGL_Image	c64uBuffer[ 2 ] = { { 1, 384, 272 }, { 1, 384, 272 } };
+	juce::String			c64uStreamAddress;
+	lime::openGL_Image		c64uBuffer[ 2 ] = { { 1, 384, 272 }, { 1, 384, 272 } };
+	C64u_UDP_Receiver		c64uReceiver { C64u_UDP_Receiver::streamType::video };
 
 	void startVideoStream ();
 

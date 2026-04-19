@@ -116,12 +116,11 @@ private:
 	int	sampleRate = 0;
     gin::ResamplingFifo			resamplingFifo { 1024 * 5 };
 
-	C64u_UDP_Receiver			c64uReceiver { C64u_UDP_Receiver::streamType::audio };
 	juce::AudioBuffer<float>	c64uBuffer { 2, 192 };
-
 	gin::AudioFifo				streamFifo;
 	juce::AudioBuffer<float>	streamBuffer;
 	gin::ResamplingFifo			streamResamplingFifo { 1024 * 5 };
+	C64u_UDP_Receiver			c64uReceiver { C64u_UDP_Receiver::streamType::audio };
 
 	// AsyncNetwork
 	AsyncNetwork				network;

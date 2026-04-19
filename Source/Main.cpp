@@ -71,7 +71,7 @@ public:
 
 			setContentOwned ( ultra, false );
 
-			setResizeLimits ( 1'180, 700, 100'000, 100'000 );
+			setResizeLimits ( 1'000, 500, 100'000, 100'000 );
 
 			setResizable ( true, false );
 			setWantsKeyboardFocus ( false );

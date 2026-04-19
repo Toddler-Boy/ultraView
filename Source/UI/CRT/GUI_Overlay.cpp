@@ -14,6 +14,8 @@ GUI_Overlay::GUI_Overlay ()
 {
 	setName ( "CRT" );
 
+//	enableRenderTimeMeasurement ( true );
+
 	//
 	// Settings button
 	//
@@ -33,6 +35,7 @@ GUI_Overlay::GUI_Overlay ()
 		{
 			button.setWantsKeyboardFocus ( false );
 			actionButtons.addAndMakeVisible ( button );
+
 			button.onClick = [ name = button.getName () ]
 			{
 				UI::sendGlobalMessage ( "c64action {}", name );
@@ -88,7 +91,7 @@ GUI_Overlay::GUI_Overlay ()
 
 void GUI_Overlay::newOpenGLContextCreated ()
 {
-	ShaderToyComponent::newOpenGLContextCreated ();
+	CRTEmulation::newOpenGLContextCreated ();
 
 	const juce::ScopedLock lock ( streamLock );
 	startVideoStream ();
@@ -102,7 +105,18 @@ void GUI_Overlay::openGLContextClosing ()
 		c64uReceiver.stop ();
 	}
 
-	ShaderToyComponent::openGLContextClosing ();
+	CRTEmulation::openGLContextClosing ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Overlay::renderOpenGL ()
+{
+	CRTEmulation::renderOpenGL ();
+
+	if ( const auto	load = getLastGpuTimeMS (); load > 0.0 )
+	{
+		Z_INFO ( "renderOpenGL: " + juce::String ( load ) );
+	}
 }
 //-----------------------------------------------------------------------------
 
