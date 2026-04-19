@@ -120,20 +120,20 @@ uniform	float	decChromablur = 1.0;
 const float decLumaFilter[DEC_FILTER_KERNEL] = float[DEC_FILTER_KERNEL](0.0105,0.0134,0.0057,-0.0242,-0.0824,-0.1562,-0.2078,-0.185,-0.0546,0.1626,0.3852,0.5095,0.5163,0.4678,0.2844,0.0515,-0.1308,-0.2082,-0.1891,-0.1206,-0.0511,-0.0065,0.0114,0.0127,0.008);
 const float decChromaFilter[DEC_FILTER_KERNEL] = float[DEC_FILTER_KERNEL](0.001,0.001,0.0001,0.0002,-0.0003,0.0062,0.012,-0.0079,0.0978,0.1059,-0.0394,0.2732,0.2941,0.1529,-0.021,0.1347,0.0415,-0.0032,0.0115,0.002,-0.0001,0.0002,0.001,0.001,0.001);
 
-vec3 decGetBlurredSignal ( vec2 uv )
+vec3 decGetBlurredSignal ( vec2 uv, sampler2D tex )
 {
 	// chroma sub-sampling
-	vec4	lumaChromaDelta = vec4 ( 1.0 / textureSize ( iChannel0, 0 ).x ) * vec4 ( decSharpening, decLumablur, decChromablur, decChromablur );
+	vec4	lumaChromaDelta = vec4 ( 1.0 / textureSize ( tex, 0 ).x ) * vec4 ( decSharpening, decLumablur, decChromablur, decChromablur );
 
 	vec3	lumaChroma = vec3 ( 0.0 );
 	for ( int i = 0; i < DEC_FILTER_KERNEL; i++ )
 	{
 		vec4	lumaChromaOffset = vec4 ( i - DEC_FILTER_KERNEL / 2 ) * lumaChromaDelta;
 
-		float	sumLuma = texture ( iChannel0, uv + vec2 ( lumaChromaOffset.x, 0.0 ) ).x;
-		float	sumLuma2 = texture ( iChannel0, uv + vec2 ( lumaChromaOffset.y, 0.0 ) ).x;
-		float	sumChroma = texture ( iChannel0, uv + vec2 ( lumaChromaOffset.z, 0.0 ) ).y - 0.5;
-		float	sumChroma2 = texture ( iChannel0, uv + vec2 ( lumaChromaOffset.w, 0.0 ) ).z - 0.5;
+		float	sumLuma = texture ( tex, uv + vec2 ( lumaChromaOffset.x, 0.0 ) ).x;
+		float	sumLuma2 = texture ( tex, uv + vec2 ( lumaChromaOffset.y, 0.0 ) ).x;
+		float	sumChroma = texture ( tex, uv + vec2 ( lumaChromaOffset.z, 0.0 ) ).y - 0.5;
+		float	sumChroma2 = texture ( tex, uv + vec2 ( lumaChromaOffset.w, 0.0 ) ).z - 0.5;
 
 		lumaChroma.x += sumLuma * decLumaFilter[ i ] + sumLuma2 * decChromaFilter[ i ];
 		lumaChroma.y += sumChroma * decChromaFilter[ i ];
@@ -147,10 +147,10 @@ vec3 decGetBlurredSignal ( vec2 uv )
 uniform	float	decCrosstalk = 0.25;
 uniform	float	decSubcarrier = 0.25;
 
-vec3 decGetCrosstalk ( vec3 signal, vec2 uv )
+vec3 decGetCrosstalk ( vec3 signal, vec2 uv, sampler2D tex )
 {
 	float	chroma_phase = iTime * crtRefreshRate * 0.5 * PI;
-	float	mod_phase = chroma_phase + ( uv.x + uv.y * -0.5 ) * ( 0.5 * PI ) * textureSize ( iChannel0, 0 ).y * 2.0;
+	float	mod_phase = chroma_phase + ( uv.x + uv.y * -0.5 ) * ( 0.5 * PI ) * textureSize ( tex, 0 ).y * 2.0;
 	float	subCarrier = decSubcarrier * signal.y;
 	float	i_mod = cos ( mod_phase );
 	float	q_mod = sin ( mod_phase );
@@ -250,6 +250,16 @@ vec3 colorGrade ( vec3 pix, sampler3D duskLUT, sampler3D nightLUT )
 
 	pix = mix ( pix, getLutColor ( duskLUT, pix ), dusk );
 	pix = mix ( pix, getLutColor ( nightLUT, pix ), night );
+
+	return pix;
+}
+//-----------------------------------------------------------------------------
+
+vec4 getMipMapColor ( sampler2D tex, vec2 uv, float lod )
+{
+	float	bias = 0.5 / lod;
+	vec2	offset = ( bias / textureSize ( tex, int ( lod ) ) );
+	vec4	pix = textureLod ( tex, uv + offset, lod );
 
 	return pix;
 }

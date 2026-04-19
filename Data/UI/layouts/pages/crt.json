@@ -38,10 +38,11 @@
 												{ "id": "daytime", "factory": "crt-slider-label(overlay, daytime)", "x": "bentoMargin", "y": "prevB + compGap", "r": "prevR", "h": "compH" },
 												{ "id": "bezel", "factory": "crt-slider-label(overlay, bezel)", "yd": "compGap" },
 												{ "id": "shadow", "factory": "crt-slider-label(overlay, shadow)", "yd": "compGap" },
-												{ "id": "zoom", "factory": "crt-slider-label(overlay, zoom)", "yd": "compGap" },
-												{ "id": "dust", "factory": "crt-slider-label(overlay, dust)", "yd": "compGap" },
 												{ "id": "chromatic", "factory": "crt-slider-label(overlay, chromatic-aberration)", "yd": "compGap" },
+												{ "id": "bloom", "factory": "crt-slider-label(overlay, bloom)", "yd": "compGap" },
+												{ "id": "dust", "factory": "crt-slider-label(overlay, dust)", "yd": "compGap" },
 												{ "id": "grain", "factory": "crt-slider-label(overlay, grain)", "yd": "compGap" },
+												{ "id": "zoom", "factory": "crt-slider-label(overlay, zoom)", "yd": "compGap" },
 
 												{ "id": "label-bitmap", "factory": "crt-label(crt/settings/overlay/bitmap)", "macro": "label(bitmap)" }
 											]

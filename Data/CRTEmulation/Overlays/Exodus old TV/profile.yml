@@ -1,3 +1,6 @@
-screen:
-  center: [ 815, 518 ]
-  size: [ 1014, 776 ]
+multipliers:
+  shadow: 0.6
+
+shadow:
+  offset: [ 0.2, 0.5 ]
+  blur: 5

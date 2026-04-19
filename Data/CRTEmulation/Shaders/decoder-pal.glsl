@@ -8,10 +8,10 @@ void main ()
 	vec2	uv = decCreateInterference ( fragCoord );
 
 	// Get chroma-reduced color
-	vec3	yuv = decGetBlurredSignal ( uv );
+	vec3	yuv = decGetBlurredSignal ( uv, iChannel0 );
 
 	// Add cross-talk
-	yuv = decGetCrosstalk ( yuv, uv );
+	yuv = decGetCrosstalk ( yuv, uv, iChannel0 );
 
 	// Add noise
 	yuv *= grnGrain ( uvec2 ( fragCoord * iResolution.xy ), decNoise * decNoise );

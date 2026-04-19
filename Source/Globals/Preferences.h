@@ -26,8 +26,6 @@ private:
 			{ "UI",			"allow-screensaver",	false },
 			{ "UI",			"theme",				"default" },
 
-			{ "Network",	"base-address",			"192.168.1.64" },
-
 			{ "Overlay",	"enabled",				true },
 			{ "Overlay",	"bitmap",				"C1702 Bedroom" },
 			{ "Overlay",	"daytime",				35 },
@@ -35,6 +33,7 @@ private:
 			{ "Overlay",	"shadow",				75 },
 			{ "Overlay",	"zoom",					50 },
 			{ "Overlay",	"dust",					50 },
+			{ "Overlay",	"bloom",				50 },
 			{ "Overlay",	"chromatic-aberration",	50 },
 			{ "Overlay",	"grain",				50 },
 

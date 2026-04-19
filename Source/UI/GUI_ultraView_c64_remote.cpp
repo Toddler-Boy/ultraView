@@ -10,7 +10,7 @@ void GUI_ultraView::c64_reboot ()
 
 void GUI_ultraView::c64_run ( const juce::String& type, const juce::MemoryBlock& mb, const juce::String& filename )
 {
-	network.post ( "v1/runners:run_" + type, mb, [ this, filename ] ( const juce::var& response, const int statusCode )
+	network.post ( "v1/runners:run_" + type, mb, [ filename ] ( const juce::var& response, const int statusCode )
 	{
 		if ( statusCode != 200 )
 		{

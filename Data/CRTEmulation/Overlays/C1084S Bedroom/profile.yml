@@ -1,20 +1,13 @@
 multipliers:
   grain: 0.5
-
-screen:
-  center: [ 960, 540 ]
-  size: [ 960, 728 ]
+  bezel: 0.5
+  shadow: 0.6
 
 bezel:
-  one:
-    zoom: [ 1.1, 1.1 ]
-    shift: [ 0.0, -0.1 ]
-    amount: 0.3
-
-  two:
-    zoom: [ 1.14, 1.14 ]
-    radius: 20
+  zoom: [ 1.08, 1.062 ]
+  shift: [ 0.05, -0.02 ]
+  radius: 20
 
 shadow:
-  zoom:   [ 1.005, 1.01 ]
-  shift:  [ -0.002, -0.007 ]
+  offset: [ 0.3, 0.3 ]
+  blur: 5

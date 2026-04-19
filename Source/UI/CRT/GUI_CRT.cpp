@@ -234,6 +234,7 @@ lime::CRTEmulation::settings GUI_CRT::getCRTEmulationSettingsFromPreferences () 
 	set.overlayZoom = preferences->get<int> ( "overlay/zoom" );
 
 	set.overlayDust = preferences->get<int> ( "overlay/dust" );
+	set.overlayBloom = preferences->get<int> ( "overlay/bloom" );
 	set.overlayChromaticAberration = preferences->get<int> ( "overlay/chromatic-aberration" );
 	set.overlayGrain = preferences->get<int> ( "overlay/grain" );
 
@@ -402,6 +403,7 @@ void GUI_CRT::connectComponents ()
 	};
 
 	sliderConnect ( "overlay/disabler/dust" );
+	sliderConnect ( "overlay/disabler/bloom" );
 	sliderConnect ( "overlay/disabler/chromatic" );
 	sliderConnect ( "overlay/disabler/grain" );
 

@@ -1,13 +1,17 @@
 multipliers:
   daytime: 0
-  bezel: 0.25
+  bezel: 0.3
   reflection: 0.5
-
-screen:
-  center: [ 936, 562 ]
-  size: [ 640, 490 ]
+  shadow: 0.66
+  grain: 1.3
+  bloom: 2.0
+  light-bloom: 0.5
 
 bezel:
     zoom: [ 1.15, 1.61 ]
     shift: [ 0.0, -2.2 ]
     radius: 20
+
+shadow:
+  offset: [ 0.3, 0.1 ]
+  blur: 5

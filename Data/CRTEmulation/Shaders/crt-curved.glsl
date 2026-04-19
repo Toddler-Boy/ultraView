@@ -49,10 +49,6 @@ uniform bool	crtSource = true;
 uniform float	crtReflection = 0.25;
 uniform float	crtRflCorrection = 1.0;
 
-uniform vec2	crtShadowScale = vec2 ( 1.0, 1.0 );
-uniform vec2	crtShadowTranslate = vec2 ( 0.0, 0.0 );
-uniform float	crtShadow = 1.0;
-
 uniform vec3	backCol = vec3 ( 0.0, 0.0, 0.0 );
 
 uniform	vec3	camBrightnessContrastSaturation = vec3 ( 1.0, 1.0, 1.0 );
@@ -65,10 +61,6 @@ void main ()
 
 	// Add vignette
 	col *= vignette ( cuv );
-
-	// Ambient occlusion & shadows
-	float	shd = texture ( iChannel1, fragCoord * crtShadowScale + crtShadowTranslate ).a;
-	col = clamp ( col - vec3 ( crtShadow * shd * 0.2 ), 0.0, 1.0 );
 
 	// Reflection in glass
 	const vec3	glassTint = vec3 ( 0.8, 0.9, 1.0 );
@@ -85,7 +77,7 @@ void main ()
 		if ( crtWebcamFormat == 0 )
 		{
 			// NV12
-			yuv = vec3 ( texture ( iChannel3, camCoord ).r, texture ( iChannel4, camCoord ).rg );
+			yuv = vec3 ( texture ( iChannel2, camCoord ).r, texture ( iChannel3, camCoord ).rg );
 		}
 		// else
 		// {
@@ -107,7 +99,7 @@ void main ()
 	else
 	{
 		// Glass reflection texture
-		rfl = texture ( iChannel2, glassDistortion ( fragCoord, crtDistortion * 0.1, 1.0 ) ).rgb;
+		rfl = texture ( iChannel1, glassDistortion ( fragCoord, crtDistortion * 0.1, 1.0 ) ).rgb;
 	}
 
 	col = screen ( col, ( rfl * rfl * rfl ) * 0.25 * crtReflection * glassTint );

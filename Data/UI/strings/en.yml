@@ -20,6 +20,7 @@ crt:
       shadow: Shadow
       zoom: Zoom
       dust: Dust
+      bloom: Bloom
       chromatic-aberration: Chrmtc Abrrtn
       grain: Grain
 

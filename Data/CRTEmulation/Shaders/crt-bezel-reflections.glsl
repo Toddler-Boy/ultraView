@@ -46,7 +46,7 @@ vec3 gausBlur ( vec2 uv, int samples )
 }
 //-----------------------------------------------------------------------------
 
-uniform float rflLevel;
+uniform float	rflLevel;
 
 uniform vec2	rflZoom = vec2 ( 1.0 );
 uniform vec2	rflShift = vec2 ( 0.0 );
