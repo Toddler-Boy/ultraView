@@ -3,7 +3,7 @@ multipliers:
   bezel: 0.3
   reflection: 0.5
   shadow: 0.66
-  grain: 1.3
+  grain: 1.5
   bloom: 2.0
   light-bloom: 0.5
 

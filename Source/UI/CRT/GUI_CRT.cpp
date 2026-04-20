@@ -118,12 +118,11 @@ void GUI_CRT::mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseW
  		auto	zoom = helpers::findComponent<juce::Slider> ( "overlay/disabler/zoom/slider", crtSettingsComponentMap );
 
  		const auto	newZoom = std::clamp ( zoom->getValue () + delta, 0.0, 100.0 );
- 		zoom->setValue ( newZoom, juce::dontSendNotification );
+		zoom->setValue ( newZoom, juce::dontSendNotification );
  		preferences->set ( "Overlay", "zoom", int ( newZoom ) );
 	}
 
 	updateOverlayCRTSettings ();
-	overlay.updateZoom ();
 }
 //-----------------------------------------------------------------------------
 
@@ -399,7 +398,6 @@ void GUI_CRT::connectComponents ()
 	helpers::findComponent<GUI_CRTSliderLabel> ( "overlay/disabler/zoom", crtSettingsComponentMap )->onValueChange = [ this ]
 	{
 		updateOverlayCRTSettings ();
-		overlay.updateZoom ();
 	};
 
 	sliderConnect ( "overlay/disabler/dust" );

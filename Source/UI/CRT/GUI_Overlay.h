@@ -49,8 +49,8 @@ private:
 		GUI_IconButton		actionMenu { "menu_button", UI::colors::actionOk };
 		GUI_IconButton		actionPause { "pause", UI::colors::actionInfo };
 		GUI_IconButton		actionResume { "resume", UI::colors::actionInfo };
-		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning };
-		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger };
+		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning, 500 };
+		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger, 1000 };
 
 	//
 	// Hide mouse-cursor helpers

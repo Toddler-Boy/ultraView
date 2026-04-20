@@ -24,10 +24,23 @@ void C64uScanner::scan ( ScannerCallback _callback, const juce::String& _lastIP 
 
 void C64uScanner::run ()
 {
-	auto    local = juce::IPAddress::getLocalAddress ();
+	Z_LOG ( "C64uScanner started" );
+
+	auto    local = juce::IPAddress ();
+	for ( const auto& adapter : juce::IPAddress::getAllAddresses () )
+	{
+		const auto	firstByte = adapter.address[ 0 ];
+		if ( firstByte == 10 || firstByte == 172 || firstByte == 192 )
+		{
+			local = adapter;
+			break;
+		}
+	}
 
 	if ( local.isNull () )
 	{
+		Z_ERR ( "C64uScanner failed to get local IP address" );
+
 		if ( callback )
 			callback ( {} );
 
@@ -45,6 +58,8 @@ void C64uScanner::run ()
 	const auto	thisMachine = local.toString ().fromLastOccurrenceOf ( ".", false, false ).getIntValue ();
 
 	juce::ThreadPool	pool ( 20, juce::Thread::osDefaultStackSize, juce::Thread::Priority::low );
+
+	Z_LOG ( "C64uScanner loop started" );
 
 	for ( auto i = 0; i < 256; ++i )
 	{
@@ -68,6 +83,10 @@ void C64uScanner::run ()
 
 					pool.removeAllJobs ( true, 300 );
 				}
+			}
+			else
+			{
+				Z_ERR ( "C64uScanner failed to connect to " + targetIP );
 			}
 		} );
 	}
@@ -102,8 +121,14 @@ juce::String C64uScanner::isActualC64u ( juce::StreamingSocket& socket )
 			const auto	bodyStart = response.indexOf ( "\r\n\r\n" );
 			const auto	json = juce::JSON::parse ( response.substring ( bodyStart + 4 ) );
 
+			Z_INFO ( "C64uScanner found a C64u at " + socket.getHostName () + " with hostname: " + json[ "hostname" ].toString () );
+
 			return json[ "hostname" ].toString ();
 		}
+	}
+	else
+	{
+		Z_ERR ( "C64uScanner failed to read from " + socket.getHostName () );
 	}
 	return {};
 }
