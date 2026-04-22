@@ -9,6 +9,12 @@ actions:
   reboot:       Reset
   poweroff:     Power off
 
+# Browser
+crt:
+  settings:
+    browse:
+      header: Browse CRT & PRG
+
 # CRT settings
 crt:
   settings:
@@ -68,7 +74,6 @@ settings:
     audio-fx: Audio Enhancements
     user-interface: User Interface
 
-settings:
   location:
     hvsc: High Voltage SID Collection
     user: My data (Playlists, Likes, Preferences, User-tunes etc.)

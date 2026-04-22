@@ -5,7 +5,8 @@ uniform	float	ovlBloom = 1.0;
 
 void main ()
 {
-	float	scaleFactor = clamp ( iResolution.y / 2160.0, 0.2, 1.0 );
+	float	scaleFactor = clamp ( textureSize ( iChannel0, 0 ).x / 3840.0, 0.3, 1.0 );
+
 	vec4	dust = texture ( iChannel0, fragCoord ) * ovlDust * scaleFactor;
 	vec4	mask = getMipMapColor ( iChannel1, ( fragCoord - 0.5 ) * 0.8 + 0.5, 5.5 );
 

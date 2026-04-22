@@ -14,6 +14,11 @@ struct std::formatter<juce::String> : std::formatter<std::string_view> {
 
 namespace UI
 {
+	enum columnId
+	{
+		name = 1,
+	};
+
 	enum colors
 	{
 		// Basic

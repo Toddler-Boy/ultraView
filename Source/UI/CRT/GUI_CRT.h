@@ -5,6 +5,7 @@
 #include "UI/Misc/VIC2_Render.h"
 #include "UI/Misc/colodore.h"
 
+#include "GUI_Browser.h"
 #include "GUI_Overlay.h"
 
 #include "UI/Components/GUI_Toggle.h"
@@ -30,6 +31,9 @@ public:
 	void update ( const float secondsPassed );
 
 	void reloadOverlayProfile ()	{	overlay.reloadOverlayProfile ();	}
+
+	bool isBrowserVisible () const { return browserVisible; }
+	void showBrowser ( const bool visible );
 
 	bool areSettingsVisible () const	{ return settingsVisible;	}
 	void showSettings ( const bool visible );
@@ -69,13 +73,19 @@ private:
 	GUI_Overlay		overlay;
 	float			timePassed = 0.0f;
 
+	// Show hide/browser
+	bool	browserVisible = false;
+
+	// Settings
+	GUI_Browser		browser;
+
 	// Show hide/settings
 	bool	settingsVisible = false;
 
 	// Settings
 	juce::Component	settingsWrapper { "settings" };
-	juce::Viewport	settingsViewport { "viewport" };
-	juce::Component	settingsContent { "content" };
+		juce::Viewport	settingsViewport { "viewport" };
+			juce::Component	settingsContent { "content" };
 
 	// CRT layout
 	std::unordered_map<juce::String, juce::Component*> crtSettingsComponentMap;

@@ -20,13 +20,18 @@ GUI_Overlay::GUI_Overlay ()
 	// Settings button
 	//
 	{
-		openSettings.margin = 14.0f;
-		openSettings.bckAlpha[ 1 ] = 0.1f;
-		openSettings.bckMargin = 6.0f;
-		openSettings.setSize ( 48, 48 );
-		openSettings.setWantsKeyboardFocus ( false );
+		auto setButtonProps = [ this ] ( GUI_SVG_Button& button )
+		{
+			button.margin = 14.0f;
+			button.bckAlpha[ 1 ] = 0.1f;
+			button.bckMargin = 6.0f;
+			button.setSize ( 48, 48 );
+			button.setWantsKeyboardFocus ( false );
+			addAndMakeVisible ( button );
+		};
 
-		addAndMakeVisible ( openSettings );
+		setButtonProps ( openBrowser );
+		setButtonProps ( openSettings );
 	}
 
 	// Action buttons

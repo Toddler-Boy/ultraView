@@ -28,6 +28,7 @@ public:
 	// this
 	void setStreamAddress ( const juce::String& address );
 
+	GUI_SVG_Button	openBrowser { "browser", { "crt/settings_close", "crt/settings_open" } };
 	GUI_SVG_Button	openSettings { "open", { "crt/settings_close", "crt/settings_open" } };
 
 	std::atomic<bool>	isStreamNTSC = false;

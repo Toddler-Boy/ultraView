@@ -30,6 +30,9 @@ void main ()
 		vec2	basePos = fragCoord + ovlShadowOffset;
 
 		float	shadowIntensity = 0.0;
+		float	occlusionIntensity = 0.0;
+
+		// Offset shadow
 		vec2	off = texSize * 1.5;
 
 		shadowIntensity += textureLod ( iChannel0, basePos + vec2 ( -off.x, 0.0 ), ovlShadowBlur ).a;
@@ -45,7 +48,7 @@ void main ()
 		shadowIntensity *= 0.125;
 
 		float	innerShadowAlpha = shadowIntensity * ( 1.0 - sourceAlpha );
-		vec4	shadowResult = vec4 ( vec3 ( 0.0 ), ovlShadow * innerShadowAlpha );
+		vec4	shadowResult = vec4 ( vec3 ( 0.0 ), innerShadowAlpha * ovlShadow );
 
 		// Blend shadow
 		pix += shadowResult;

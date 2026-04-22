@@ -12,8 +12,19 @@
 	],
 
 	"components": [
-		{ "id": "crt", "x": "fullscreen", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
+		{ "id": "browser", "x": "fullscreen", "y": 0, "w": 364, "b": "parB - bentoGap",
 			"components": [
+				{ "id": "background", "bounds": "bentoGap, 5, parW - bentoGap * 2, parH - 5",
+					"components": [
+						{ "id": "label-browse", "factory": "crt-header(browse)", "bounds": "bentoMargin, bentoGap, parW - bentoMargin * 2, 28" },
+						{ "id": "listbox", "x": "prevX", "y": "prevB + 10", "w": "prevW", "b": "parH - bentoMargin" }
+					]
+				}
+			]
+		},
+		{ "id": "crt", "x": "prevX + showBrowser * prevW", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
+			"components": [
+				{ "id": "browser", "x": 0, "y": 0 },
 				{ "id": "open", "r": "parW", "y": 0 },
 				{ "id": "action-buttons", "b": "parH - 15", "cx": "parW2", "w": 500, "h": 30,
 					"components": [

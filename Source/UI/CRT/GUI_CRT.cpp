@@ -20,19 +20,33 @@ GUI_CRT::GUI_CRT ()
 	setName ( "crt" );
 	addAndMakeVisible ( overlay );
 
-	// Open/close settings
+	//
+	// Browser
+	//
+	{
+		overlay.openBrowser.onClick = [ this ]
+		{
+			showBrowser ( overlay.openBrowser.getStage () );
+		};
+
+		addChildComponent ( browser );
+	}
+
+	//
+	// CRT settings
+	//
 	{
 		overlay.openSettings.onClick = [ this ]
 		{
 			showSettings ( overlay.openSettings.getStage () );
 		};
+
+		settingsViewport.setScrollBarsShown ( true, false );
+		settingsViewport.setViewedComponent ( &settingsContent, false );
+
+		settingsWrapper.addAndMakeVisible ( settingsViewport );
+		addChildComponent ( settingsWrapper );
 	}
-
-	settingsViewport.setScrollBarsShown ( true, false );
-	settingsViewport.setViewedComponent ( &settingsContent, false );
-
-	settingsWrapper.addAndMakeVisible ( settingsViewport );
-	addChildComponent ( settingsWrapper );
 
 	startTimer ( 'NTSC', 100 );
 
@@ -75,6 +89,7 @@ void GUI_CRT::resized ()
 
 	crtLayout.setConstant ( "fullscreen", kioskMode ? 1 : 0 );
 	crtLayout.setConstant ( "windowed", kioskMode ? 0 : 1 );
+	crtLayout.setConstant ( "showBrowser", browserVisible ? 1 : 0 );
 	crtLayout.setConstant ( "showSettings", settingsVisible ? 1 : 0 );
 
 	const auto	pos = settingsViewport.getViewPosition ();
@@ -126,24 +141,24 @@ void GUI_CRT::mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseW
 }
 //-----------------------------------------------------------------------------
 
-void GUI_CRT::update ( const float secondsPassed )
+void GUI_CRT::update ( const float /*secondsPassed*/ )
 {
 	if ( ! isShowing () )
 		return;
 
 	// Update OpenGL iFrame & iTime
 	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
+}
+//-----------------------------------------------------------------------------
 
-/*	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
-	constexpr auto	frameMS = 1.0f / 60.0f - 0.01f;
+void GUI_CRT::showBrowser ( const bool visible )
+{
+	browser.setVisible ( visible );
+	browserVisible = visible;
 
-	// Handle updates (skip if it happened faster than 65 Hz)
-	timePassed += secondsPassed;
-	if ( timePassed < frameMS )
-		return;
+	overlay.openBrowser.setStage ( browserVisible ? 1 : 0 );
 
-	timePassed = 0.0f;
-*/
+	resized ();
 }
 //-----------------------------------------------------------------------------
 
