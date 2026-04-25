@@ -11,7 +11,10 @@
 
 //-----------------------------------------------------------------------------
 
-class GUI_Overlay final : public lime::CRTEmulation, private juce::Timer
+class GUI_Overlay final
+	: public lime::CRTEmulation
+	, private juce::Timer
+	, public juce::DragAndDropTarget
 {
 public:
 	GUI_Overlay ();
@@ -24,6 +27,10 @@ public:
 	void newOpenGLContextCreated () override;
 	void openGLContextClosing () override;
 	void renderOpenGL () override;
+
+	// juce::DragAndDropTarget
+	bool isInterestedInDragSource ( const SourceDetails& details ) override;
+	void itemDropped ( const SourceDetails& details ) override;
 
 	// this
 	void setStreamAddress ( const juce::String& address );

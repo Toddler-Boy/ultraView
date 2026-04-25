@@ -300,6 +300,23 @@ juce::File paths::getDataRoot ( juce::String path )
 }
 //-----------------------------------------------------------------------------
 
+juce::File paths::getAppDataPath ( const juce::String& file )
+{
+	auto	path = juce::File::getSpecialLocation ( juce::File::SpecialLocationType::userApplicationDataDirectory ).getChildFile ( ProjectInfo::projectName );
+
+	path.createDirectory ();
+	path = path.getChildFile ( file );
+
+	return path;
+}
+//-----------------------------------------------------------------------------
+
+juce::File paths::getSearchtermsPath ()
+{
+	return getAppDataPath ( "searchterms.csv" );
+}
+//-----------------------------------------------------------------------------
+
 std::pair<juce::String, juce::StringArray> helpers::parseActionMessage ( const juce::String& message )
 {
 	auto	parts = juce::StringArray::fromTokens ( message, " ", "\"" );

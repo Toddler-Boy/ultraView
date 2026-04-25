@@ -66,6 +66,7 @@ SID_LookAndFeel::SID_LookAndFeel ()
 	{
 		// JUCE stuff
 		{ juce::ListBox::backgroundColourId,				juce::Colours::transparentBlack },
+		{ juce::ListBox::outlineColourId,					juce::Colours::transparentBlack },
 
 		{ juce::ComboBox::backgroundColourId,				juce::Colour::fromRGB ( 33, 42, 48 ) },
 		{ juce::ComboBox::buttonColourId,					juce::Colour::fromRGB ( 33, 42, 48 ) },
@@ -401,7 +402,7 @@ void SID_LookAndFeel::drawTableHeaderColumn ( juce::Graphics& g, juce::TableHead
 	g.setColour ( findColour ( colId ) );
 
 	const auto	fnt = font ( 12.0f * 1.3f, 600 );
-	const auto	th = float ( height );
+	const auto	th = float ( height - 2 );
 	float		tw = float ( width ) - xOff;
 
 	const juce::String	icon = props.getWithDefault ( "colIcon" + juce::String ( columnId ), juce::String () );
@@ -423,7 +424,7 @@ void SID_LookAndFeel::drawTableHeaderColumn ( juce::Graphics& g, juce::TableHead
 		sortArrow.lineTo ( 0.5f, ( columnFlags & juce::TableHeaderComponent::sortedForwards ) ? -0.5f : 0.5f );
 		sortArrow.lineTo ( 1.0f, 0.0f );
 
-		g.strokePath ( sortArrow, juce::PathStrokeType ( 1.0f ), sortArrow.getTransformToScaleToFit ( area.removeFromRight ( th / 2.0f ).reduced ( 3.0f ), true ) );
+		g.strokePath ( sortArrow, juce::PathStrokeType ( 1.0f ), sortArrow.getTransformToScaleToFit ( area.removeFromRight ( th / 2.0f ).reduced ( 1.0f ), true ) );
 	}
 
 	if ( icon.isEmpty () )

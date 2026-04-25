@@ -212,3 +212,15 @@ void GUI_Overlay::timerCallback ()
 	hideCursor ();
 }
 //-----------------------------------------------------------------------------
+
+bool GUI_Overlay::isInterestedInDragSource ( const SourceDetails& details )
+{
+	return true;
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Overlay::itemDropped ( const SourceDetails& details )
+{
+	UI::sendGlobalMessage ( "c64run {}", details.description.toString ().quoted () );
+}
+//-----------------------------------------------------------------------------

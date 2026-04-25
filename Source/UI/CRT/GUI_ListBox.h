@@ -12,9 +12,11 @@
 struct browserEntry
 {
 	int				type;	// 0 = CRT, 1 = PRG
+
 	juce::String	name;
-	std::string		lowerName;
 	juce::String	path;
+
+	std::string		normalized;
 };
 //-----------------------------------------------------------------------------
 
@@ -26,6 +28,9 @@ public:
 
 	// juce::ListBox
 	bool keyPressed ( const juce::KeyPress& key ) override;
+
+	// juce::TableListBox
+	void paint ( juce::Graphics& g ) override;
 
 	// juce::TableListBox
 	void resized () override;
@@ -40,9 +45,11 @@ public:
 	int getNumRows () override;
 	void sortOrderChanged ( int newSortColumnId, bool isForwards ) override;
 
+	juce::var getDragSourceDescription ( const juce::SparseSet<int>& selectedRows ) override;
+
 	// this
 	void addHeaderColumn ( const int colId, bool sortable = false );
-	void setRowData ( std::vector<browserEntry>& newData );
+	void setRowData ( std::vector<browserEntry*>& newData );
 
 	// juce::ChangeListener
 	void changeListenerCallback ( juce::ChangeBroadcaster* source ) override;

@@ -2,7 +2,7 @@ multipliers:
   daytime: 0
   bezel: 0.3
   reflection: 0.5
-  shadow: 0.66
+  shadow: 0.4
   grain: 1.5
   bloom: 2.0
   light-bloom: 0.5

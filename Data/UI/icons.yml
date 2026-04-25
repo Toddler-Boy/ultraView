@@ -24,3 +24,5 @@ crt:
       brightness:  crt/brightness
       contrast:    crt/contrast
       saturation:  crt/saturation
+
+delete: xmark-solid-full

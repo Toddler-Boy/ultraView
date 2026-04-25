@@ -9,7 +9,7 @@ C64uScanner::C64uScanner () : juce::Thread ( "C64uScanner" )
 
 C64uScanner::~C64uScanner ()
 {
-	stopThread ( 100 );
+	stopThread ( -1 );
 }
 //-----------------------------------------------------------------------------
 

@@ -156,7 +156,8 @@ void GUI_ultraView::updateColors ()
 	auto&	laf = getLookAndFeel ();
 
 	laf.setColour ( juce::ResizableWindow::backgroundColourId, bgCol );
-	laf.setColour ( juce::TextEditor::backgroundColourId, darkCol );
+	laf.setColour ( juce::TextEditor::backgroundColourId, UI::getShade ( 0.02f ) );
+	laf.setColour ( juce::TextEditor::textColourId, textCol );
 	laf.setColour ( juce::TextButton::buttonColourId, juce::Colours::orangered );
 
 	laf.setColour ( UI::colors::bento, bento );
@@ -294,4 +295,3 @@ void GUI_ultraView::restoreState ()
 	juce::Desktop::getInstance ().setScreenSaverEnabled ( preferences->get<bool> ( "UI", "allow-screensaver" ) );
 }
 //-----------------------------------------------------------------------------
-

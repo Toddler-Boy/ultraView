@@ -12,6 +12,8 @@
 GUI_ListBox::GUI_ListBox ()
 	: hover ( *this )
 {
+	setName ( "listbox" );
+
 	hover.addChangeListener ( this );
 
 	setModel ( this );
@@ -20,7 +22,7 @@ GUI_ListBox::GUI_ListBox ()
 	setRowHeight ( 28 );
 	setMultipleSelectionEnabled ( false );
 
-	setHeaderHeight ( 20 );
+	setHeaderHeight ( 28 );
 	getHeader ().setPopupMenuActive ( false );
 
 	getViewport ()->setScrollBarsShown ( true, false );
@@ -40,11 +42,17 @@ void GUI_ListBox::sortOrderChanged ( int newSortColumnId, bool isForwards )
 		case UI::columnId::name:
 			// Sort only by name
 			std::ranges::sort ( rowData, [ isForwards ] ( const auto& a, const auto& b ) {
-				const auto	cmp = helpers::strnatcmp ( a->lowerName.c_str (), b->lowerName.c_str () );
+				const auto	cmp = helpers::strnatcmp ( a->normalized.c_str (), b->normalized.c_str () );
 				return isForwards ? cmp < 0 : cmp > 0;
 			} );
 			break;
 	}
+}
+//-----------------------------------------------------------------------------
+
+juce::var GUI_ListBox::getDragSourceDescription ( const juce::SparseSet<int>& selectedRows )
+{
+	return juce::String ( rowData[ selectedRows[ 0 ] ]->path );
 }
 //-----------------------------------------------------------------------------
 
@@ -54,6 +62,16 @@ bool GUI_ListBox::keyPressed ( const juce::KeyPress& key )
 		return false;
 
 	return juce::TableListBox::keyPressed ( key );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ListBox::paint ( juce::Graphics& g )
+{
+	juce::TableListBox::paint ( g );
+
+/*	const auto	bounds = getLocalBounds ().toFloat ();
+	g.setColour ( UI::getShade ( 0.02f ) );
+	g.fillRoundedRectangle ( bounds, 8.0f );*/
 }
 //-----------------------------------------------------------------------------
 
@@ -114,10 +132,13 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 
 juce::String GUI_ListBox::getCellTooltip ( int rowNumber, int columnId )
 {
+	if ( columnId != UI::columnId::name )
+		return {};
+
 	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
 		return {};
 
-	return {};
+	return rowData[ rowNumber ]->path;
 }
 //-----------------------------------------------------------------------------
 
@@ -144,7 +165,7 @@ void GUI_ListBox::addHeaderColumn ( int colId, bool sortable )
 
 	static const std::unordered_map<int, columnProps>	defaultCols =
 	{
-		{ UI::columnId::name,			{ "Title",		250 } },
+		{ UI::columnId::name,			{ "Title",		280 } },
 	};
 
 	const auto&	[ name, width ] = defaultCols.at ( colId );
@@ -154,15 +175,12 @@ void GUI_ListBox::addHeaderColumn ( int colId, bool sortable )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_ListBox::setRowData ( std::vector<browserEntry>& newData )
+void GUI_ListBox::setRowData ( std::vector<browserEntry*>& newData )
 {
-	rowData.clear ();
-	rowData.reserve ( newData.size () );
-
-	for ( auto& entry : newData )
-		rowData.emplace_back ( &entry );
+	rowData = newData;
 
 	updateContent ();
+	getHeader ().reSortTable ();
 	repaint ();
 }
 //-----------------------------------------------------------------------------

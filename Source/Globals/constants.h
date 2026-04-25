@@ -142,4 +142,6 @@ namespace helpers
 namespace paths
 {
 	juce::File getDataRoot ( juce::String path = "" );
+	juce::File getAppDataPath ( const juce::String& file );
+	juce::File getSearchtermsPath ();
 }
