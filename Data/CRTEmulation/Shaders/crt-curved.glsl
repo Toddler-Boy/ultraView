@@ -1,3 +1,9 @@
+#include "includes/mathDefines.glsl"
+#include "includes/common.glsl"
+#include "includes/colorSpaces.glsl"
+
+//-----------------------------------------------------------------------------
+
 uniform float crtDistortion = 0.3;
 
 //-----------------------------------------------------------------------------

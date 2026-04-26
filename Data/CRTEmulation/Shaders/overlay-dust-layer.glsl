@@ -1,3 +1,6 @@
+#include "includes/getMipMapColor.glsl"
+#include "includes/colorGrade.glsl"
+
 uniform float	ovlDust = 1.0;
 uniform	float	ovlBloom = 1.0;
 

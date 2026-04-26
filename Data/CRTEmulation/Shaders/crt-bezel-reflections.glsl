@@ -1,3 +1,8 @@
+#include "includes/mathDefines.glsl"
+#include "includes/common.glsl"
+#include "includes/colorGrade.glsl"
+#include "includes/grain.glsl"
+
 //-----------------------------------------------------------------------------
 
 #define	POW2(x)	(x * x)

@@ -1,3 +1,10 @@
+#include "includes/mathDefines.glsl"
+#include "includes/common.glsl"
+#include "includes/grain.glsl"
+#include "includes/colorSpaces.glsl"
+
+//-----------------------------------------------------------------------------
+
 //
 // PAL decoder
 // Uses gamma correction

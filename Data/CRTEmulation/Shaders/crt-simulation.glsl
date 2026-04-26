@@ -1,3 +1,6 @@
+#include "includes/mathDefines.glsl"
+#include "includes/overscan.glsl"
+
 uniform float	crtBleed;
 uniform vec2	crtRedOffset = vec2 ( 0.0, 0.0 );
 uniform vec2	crtGreenOffset = vec2 ( 0.0, 0.0 );
@@ -6,7 +9,20 @@ uniform float	crtHoffset;
 uniform float	crtGlow;
 uniform float	crtAmbient = 0.5;
 uniform float	crtNoise;
+uniform float	crtRefreshRate = 50.125;		// 50.125 for PAL, 59.826 for NTSC
 
+//-----------------------------------------------------------------------------
+
+vec3 srgbToLinear ( vec3 col )
+{
+	return mix ( col / 12.92, pow ( ( col + 0.055 ) / 1.055, vec3 ( 2.4 ) ), step ( 0.04045, col ) );
+}
+//-----------------------------------------------------------------------------
+
+vec3 linearToSrgb ( vec3 col )
+{
+	return mix ( col * 12.92, 1.055 * pow ( col, vec3 ( 1.0 / 2.4 ) ) - 0.055, step ( 0.0031308, col ) );
+}
 //-----------------------------------------------------------------------------
 
 vec3 bleed ( vec2 uv )

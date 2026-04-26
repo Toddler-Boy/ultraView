@@ -1,3 +1,7 @@
+#include "includes/jailbars.glsl"
+
+//-----------------------------------------------------------------------------
+
 //
 // PAL encoder
 // Uses Hanover-bar suppression

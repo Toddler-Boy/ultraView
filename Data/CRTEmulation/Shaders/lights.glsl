@@ -1,3 +1,5 @@
+#include "includes/getMipMapColor.glsl"
+
 uniform	float	ovlBloom = 1.0;
 
 //-----------------------------------------------------------------------------

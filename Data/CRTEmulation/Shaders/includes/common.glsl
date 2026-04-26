@@ -1,62 +1,7 @@
 //
 // This file contains helpers used by shaders
 //
-#define PI	3.1415926535897932384626433832795
-#define	TAU	( 2.0 * PI )
-
-uniform float crtRefreshRate = 50.125;		// 50.125 for PAL, 59.826 for NTSC
-
-//
-// Color space conversions
-//
-const mat3 yuv2rgb_mat = mat3 ( 1.0,		 1.0,		1.0,
-								0.0,		-0.39465,	2.03211,
-								1.13983,	-0.581,		0.0 );
-//-----------------------------------------------------------------------------
-
-vec3 palGamma ( vec3 rgb )
-{
-	rgb = pow ( rgb, vec3 ( 1.0 / 2.2 ) );	// sRGB
-	rgb = pow ( rgb, vec3 ( 2.8 ) );		// PAL
-
-	return rgb;
-}
-//-----------------------------------------------------------------------------
-
-vec3 yuv2rgb ( vec3 yuv )
-{
-	// Convert to RGB
-	yuv = yuv2rgb_mat * yuv;
-
-	// Apply gamma correction (2.8 to 2.2)
-	yuv = palGamma ( yuv );
-
-	return yuv;
-}
-//-----------------------------------------------------------------------------
-
-const mat3 yiq2rgb_mat = mat3 ( 1.0,	 1.0,	 1.0,
-								1.63,	-0.378, -1.089,
-								0.317,	-0.466,  1.677 );
-//-----------------------------------------------------------------------------
-
-vec3 yiq2rgb ( vec3 yiq )
-{
-	return yiq2rgb_mat * yiq;
-}
-//-----------------------------------------------------------------------------
-
-vec3 srgbToLinear ( vec3 col )
-{
-	return mix ( col / 12.92, pow ( ( col + 0.055 ) / 1.055, vec3 ( 2.4 ) ), step ( 0.04045, col ) );
-}
-//-----------------------------------------------------------------------------
-
-vec3 linearToSrgb ( vec3 col )
-{
-	return mix ( col * 12.92, 1.055 * pow ( col, vec3 ( 1.0 / 2.4 ) ) - 0.055, step ( 0.0031308, col ) );
-}
-//-----------------------------------------------------------------------------
+uniform float	crtRefreshRate = 50.125;		// 50.125 for PAL, 59.826 for NTSC
 
 //
 // Encoder uniforms
@@ -164,55 +109,6 @@ vec3 decGetCrosstalk ( vec3 signal, vec2 uv, sampler2D tex )
 }
 //-----------------------------------------------------------------------------
 
-vec3 grnHash3 ( uint n )
-{
-	// integer hash copied from Hugo Elias
-	n = ( n << 13U ) ^ n;
-	n = n * (n * n * 15731U + 789221U) + 1376312589U;
-	uvec3	k = n * uvec3 ( n, n * 16807U, n * 48271U );
-	return vec3 ( k & uvec3 ( 0x7fffffffU ) ) / float ( 0x7fffffff );
-}
-//-----------------------------------------------------------------------------
-
-uniform	float	decNoise = 0.0;
-
-vec3 grnGrain ( uvec2 uv, float level )
-{
-	vec3	grain = grnHash3 ( uv.x + uint ( iResolution.x ) * uv.y + ( uint ( iResolution.x ) * uint ( iResolution.y ) ) * uint ( iTime * 30.0 ) );
-
-	return grain * level * 0.8 + ( 1.0 - ( level * 0.4 ) );
-}
-//-----------------------------------------------------------------------------
-
-uniform float	decJailbars = 1.0;
-
-float getJailbars ( vec2 uv )
-{
-	float	tri = fract ( uv.x * uv.y + 0.4 );
-
-	tri = smoothstep ( 0.8, 1.0, tri );
-
-	return ( tri * tri ) * ( decJailbars * decJailbars * decJailbars ) * 0.075;
-}
-//-----------------------------------------------------------------------------
-
-uniform vec2	crtOverscan = vec2 ( 1.0 );
-
-vec2 overscan ( vec2 uv )
-{
-	// 0 to 1 -> -1 to +1
-	vec2	ouv = ( uv - 0.5 ) * 2.0;
-
-	// Scale
-	ouv *= crtOverscan;
-
-	// -1 to + 1 -> 0 to 1
-	ouv  = ( ouv / 2.0 ) + 0.5;
-
-	return ouv;
-}
-//-----------------------------------------------------------------------------
-
 uniform float	crtCurve = 0.4;
 
 vec2 curve ( vec2 uv, float level )
@@ -228,40 +124,6 @@ vec2 curve ( vec2 uv, float level )
 	cuv  = ( cuv / 2.0 ) + 0.5;
 
 	return mix ( uv, cuv, level );
-}
-//-----------------------------------------------------------------------------
-
-uniform float lutBlend;
-
-vec3 getLutColor ( sampler3D lut, vec3 color )
-{
-	vec3	lutSize = vec3 ( textureSize ( lut, 0 ) );
-	vec3	scale = ( lutSize - 1.0 ) / lutSize;
-	vec3	offset = 1.0 / ( 2.0 * lutSize );
-
-	return texture ( lut, scale * color + offset ).rgb;
-}
-//-----------------------------------------------------------------------------
-
-vec3 colorGrade ( vec3 pix, sampler3D duskLUT, sampler3D nightLUT )
-{
-	float	dusk = ( 0.5 - abs ( lutBlend - 0.5 ) ) * 3.0;
-	float	night = max ( 0.0, ( lutBlend * 2.0 ) - 1.0 );
-
-	pix = mix ( pix, getLutColor ( duskLUT, pix ), dusk );
-	pix = mix ( pix, getLutColor ( nightLUT, pix ), night );
-
-	return pix;
-}
-//-----------------------------------------------------------------------------
-
-vec4 getMipMapColor ( sampler2D tex, vec2 uv, float lod )
-{
-	float	bias = 0.5 / lod;
-	vec2	offset = ( bias / textureSize ( tex, int ( lod ) ) );
-	vec4	pix = textureLod ( tex, uv + offset, lod );
-
-	return pix;
 }
 //-----------------------------------------------------------------------------
 
