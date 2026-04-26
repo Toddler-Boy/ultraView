@@ -173,6 +173,7 @@ void C64u_UDP_Receiver::run ()
 namespace
 {
 
+#if 0
 inline void convert ( const uint8_t* __restrict__ srcData, uint8_t* __restrict__ _dstBuffer )
 {
 	constexpr auto	payloadSize = 768;
@@ -191,6 +192,7 @@ inline void convert ( const uint8_t* __restrict__ srcData, uint8_t* __restrict__
 		dstBuffer[ offset++ ] = byte >> 4;
 	}
 }
+#endif
 
 inline void expand_nibbles_final ( const uint8_t* __restrict src, uint8_t* __restrict dst )
 {
