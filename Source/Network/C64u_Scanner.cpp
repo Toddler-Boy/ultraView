@@ -1,4 +1,5 @@
 #include "C64u_Scanner.h"
+#include "NetworkHardwareChecker.h"
 
 //-----------------------------------------------------------------------------
 
@@ -26,20 +27,36 @@ void C64uScanner::run ()
 {
 	Z_LOG ( "C64uScanner started" );
 
-	auto    local = juce::IPAddress ();
-	for ( const auto& adapter : juce::IPAddress::getAllAddresses () )
-	{
-		const auto	firstByte = adapter.address[ 0 ];
-		if ( firstByte == 10 || firstByte == 172 || firstByte == 192 )
-		{
-			local = adapter;
-			break;
-		}
-	}
+	NetworkHardwareChecker	hardware;
 
-	if ( local.isNull () )
+	auto	privateNetworks = juce::IPAddress::getAllAddresses ();
+
+	// Remove all non-private network adapters
+	privateNetworks.removeIf ( [ &hardware ] ( const juce::IPAddress& addr )
 	{
-		Z_ERR ( "C64uScanner failed to get local IP address" );
+		const auto&	b = addr.address;
+
+		const auto	isPrivate = ( b[ 0 ] == 10 ) ||
+								( b[ 0 ] == 192 && b[ 1 ] == 168 ) ||
+								( b[ 0 ] == 172 && ( b[ 1 ] >= 16 && b[ 1 ] <= 31 ) );
+
+		// It's a public IP, remove it
+		if ( ! isPrivate )
+			return true;
+
+		// Then check if it's currently wired and active
+		return ! hardware.isWiredAndActive ( addr );
+	} );
+
+	// Sort descending, so that 192.168.x.x is scanned first, as it's the most common private network range
+	std::ranges::sort ( privateNetworks, [] ( const juce::IPAddress& a, const juce::IPAddress& b )
+	{
+		return a.address[ 0 ] > b.address[ 0 ];
+	} );
+
+	if ( privateNetworks.isEmpty ()  )
+	{
+		Z_ERR ( "C64uScanner failed to find any private network adapters" );
 
 		if ( callback )
 			callback ( {} );
@@ -47,46 +64,56 @@ void C64uScanner::run ()
 		return;
 	}
 
-	const auto	base = local.toString ().upToLastOccurrenceOf ( ".", true, false );
+	// Create complete list of IPs to scan
+	juce::StringArray	ipsToScan;
 
-	// Let's try IP 64 first, as large portion of users will probably pick that one...
-	auto	lastIndex = 64;
-	if ( const auto lastBase = lastIP.upToLastOccurrenceOf ( ".", true, false ); base == lastBase )
-		lastIndex = lastIP.fromLastOccurrenceOf ( ".", false, false ).getIntValue ();
+	for ( const auto& ip : privateNetworks )
+	{
+		const auto	base = ip.toString ().upToLastOccurrenceOf ( ".", true, false );
 
-	// Get this machine's IP address, so we can skip it in the scan
-	const auto	thisMachine = local.toString ().fromLastOccurrenceOf ( ".", false, false ).getIntValue ();
+		// Let's try IP 64 first, as large portion of users will probably pick that one...
+		constexpr auto	firstIndex = 64;
+		for ( auto i = 0; i < 256; ++i )
+		{
+			const auto	scanIp = ( i + firstIndex ) & 255;
+
+			if ( scanIp == 0 || scanIp == 255 )
+				continue;
+
+			ipsToScan.add ( base + juce::String ( scanIp ) );
+		}
+
+		// Remove local IP from the list, as we don't want to scan it
+		ipsToScan.removeString ( ip.toString () );
+	}
+
+	if ( lastIP.isNotEmpty () )
+	{
+		ipsToScan.removeString ( lastIP );
+		ipsToScan.insert ( 0, lastIP );
+	}
 
 	juce::ThreadPool	pool ( 20, juce::Thread::osDefaultStackSize, juce::Thread::Priority::low );
 
 	Z_LOG ( "C64uScanner loop started" );
 
-	for ( auto i = 0; i < 256; ++i )
+	for ( const auto& targetIP : ipsToScan )
 	{
-		const auto	ip = ( i + lastIndex ) & 255;
-
-		if ( ip == 0 || ip == 255 || ip == thisMachine )
-			continue;
-
-		auto    targetIP = base + juce::String ( ip );
-
 		pool.addJob ( [ &pool, targetIP, this ]
 		{
 			juce::StreamingSocket   socket;
 
 			if ( socket.connect ( targetIP, 80, 200 ) )
 			{
+				Z_LOG ( "Scanned device on " + targetIP );
+
 				if ( auto hostName = isActualC64u ( socket ); hostName.isNotEmpty () )
 				{
 					if ( callback )
 						callback ( targetIP + " (" + hostName + ")" );
 
-					pool.removeAllJobs ( true, 300 );
+					pool.removeAllJobs ( false, 300 );
 				}
-			}
-			else
-			{
-				Z_ERR ( "C64uScanner failed to connect to " + targetIP );
 			}
 		} );
 	}
@@ -95,7 +122,7 @@ void C64uScanner::run ()
 	{
 		if ( threadShouldExit () )
 		{
-			pool.removeAllJobs ( true, 300 );
+			pool.removeAllJobs ( false, 300 );
 			return;
 		}
 

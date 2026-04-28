@@ -205,7 +205,7 @@ if (WIN32)
 	set_target_properties(ultraView PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
 	set_property(TARGET ultraView APPEND_STRING PROPERTY LINK_FLAGS_DEBUG " /INCREMENTAL:NO")
 	set_target_properties(ultraView PROPERTIES LINK_FLAGS "/ignore:4099")
-	target_link_libraries (ultraView PRIVATE mfplat mf mfuuid Mfreadwrite Shlwapi)
+	target_link_libraries (ultraView PRIVATE mfplat mf mfuuid Mfreadwrite Shlwapi iphlpapi)
 endif()
 
 if(UNIX AND NOT APPLE)
