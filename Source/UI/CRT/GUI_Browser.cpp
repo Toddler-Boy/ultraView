@@ -2,8 +2,6 @@
 
 #include "Globals/constants.h"
 
-#include <regex>
-
 //-----------------------------------------------------------------------------
 
 GUI_Browser::GUI_Browser ()
@@ -26,7 +24,7 @@ GUI_Browser::GUI_Browser ()
 			std::vector<browserEntry*>	filteredEntries;
 			filteredEntries.reserve ( browserEntryPtrs.size () );
 
-			const auto	query = normalizeString ( searchString.toLowerCase ().toStdString () );
+			const auto	query = helpers::normalizeGamesString ( searchString.toLowerCase ().toStdString () );
 
 			auto containsAllWords = [ &query ] ( const std::string& target )
 			{
@@ -70,71 +68,6 @@ GUI_Browser::GUI_Browser ()
 GUI_Browser::~GUI_Browser ()
 {
 	stopThread ( -1 );
-}
-//-----------------------------------------------------------------------------
-
-namespace
-{
-
-int romanToInt ( std::string s )
-{
-	std::map<char, int>	m = { {'i',1},{'v',5},{'x',10},{'l',50},{'c',100},{'d',500},{'m',1000} };
-	auto	res = 0;
-
-	for ( auto i = 0; i < s.length (); ++i )
-	{
-		if ( i + 1 < s.length () && m[ s[ i ] ] < m[ s[ i + 1 ] ] )
-			res -= m[ s[ i ] ];
-		else
-			res += m[ s[ i ] ];
-	}
-	return res;
-}
-
-}
-//-----------------------------------------------------------------------------
-
-std::string GUI_Browser::normalizeString ( const std::string& input )
-{
-	auto	output = input;
-
-	// Replace Roman numerals with their decimal equivalents
-	{
-		// Regex for Roman numerals as standalone words
-		std::regex	romanregex ( R"((\s)([ivxlcdm]+)(?=$|[\s]))" );
-
-		auto words_begin = std::sregex_iterator ( input.begin (), input.end (), romanregex );
-		auto words_end = std::sregex_iterator ();
-
-		auto	offset = 0;
-
-		for ( auto i = words_begin; i != words_end; ++i )
-		{
-			const auto&	match = *i;
-
-			auto	prefix = match[ 1 ].str ();
-			auto	romanPart = match[ 2 ].str ();
-
-			if ( romanPart.empty () )
-				continue;
-
-			auto	decimal = std::to_string ( romanToInt ( romanPart ) );
-			auto	replacement = prefix + decimal;
-
-			output.replace ( match.position () + offset, match.length (), replacement );
-			offset += int ( replacement.length () - match.length () );
-		}
-	}
-
-	// Remove dots in name and replace underscores with spaces
-	{
-		std::erase ( output, '.' );
-		std::erase ( output, '\'' );
-		std::ranges::replace ( output, '_', ' ' );
-		std::ranges::replace ( output, '-', ' ' );
-	}
-
-	return output;
 }
 //-----------------------------------------------------------------------------
 
@@ -208,7 +141,7 @@ void GUI_Browser::run ()
 							ext == ".crt" ? 0 : 1,
 							name + ( hasJ1 ? " (J1)" : "" ),
 							file.getFullPathName (),
-							normalizeString ( name.toLowerCase ().toStdString () )
+							helpers::normalizeGamesString ( name.toLowerCase ().toStdString () )
 						} );
 
 					if ( threadShouldExit () )

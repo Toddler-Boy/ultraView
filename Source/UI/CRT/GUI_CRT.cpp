@@ -179,6 +179,13 @@ void GUI_CRT::setBackgroundColour ( const juce::Colour& bckCol )
 }
 //-----------------------------------------------------------------------------
 
+void GUI_CRT::setFirstLuma ( const bool isFirstLuma )
+{
+	lastFirstLuma = isFirstLuma;
+	renderCRT ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_CRT::renderCRT ()
 {
 	auto	vic2Settings = getVIC2SettingsFromPreferences ();

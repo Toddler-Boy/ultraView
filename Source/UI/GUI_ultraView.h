@@ -91,6 +91,7 @@ private:
 	void c64_reboot ();
 	void c64_run ( const juce::String& type, const juce::MemoryBlock& crtData, const juce::String& filename );
 	void c64_forceSystemMode ( const juce::String& mode );
+	void c64_forceJoystickSwapper ( const juce::String& mode );
 
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;
@@ -127,6 +128,19 @@ private:
 
 	// C64 network scanner
 	C64uScanner					c64uScanner;
+
+	// Games database
+	struct GameEntry
+	{
+		std::string		name;
+		bool			isNTSC = false;
+		bool			firstLuma = false;
+		bool			firstJoyport = false;
+	};
+	std::vector<GameEntry>		gamesDatabase;
+
+	void loadGamesDatabase ();
+	GameEntry findGameEntry ( juce::String filename ) const;
 
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
 

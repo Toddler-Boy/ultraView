@@ -10,6 +10,8 @@
 
 #include "UI/SID_LookAndFeel.h"
 
+#include <regex>
+
 //-----------------------------------------------------------------------------
 
 namespace UI
@@ -472,5 +474,65 @@ void helpers::buildComponentMap ( std::unordered_map<juce::String, juce::Compone
 		compMap[ fullName ] = comp;
 		buildComponentMap ( compMap, comp, fullName);
 	}
+}
+//-----------------------------------------------------------------------------
+
+int helpers::romanToInt ( std::string s )
+{
+	std::map<char, int>	m = { { 'i',1 }, { 'v',5 }, { 'x',10 }, { 'l',50 }, { 'c',100 }, { 'd',500 }, { 'm',1000 } };
+	auto	res = 0;
+
+	for ( auto i = 0; i < s.length (); ++i )
+	{
+		if ( i + 1 < s.length () && m[ s[ i ] ] < m[ s[ i + 1 ] ] )
+			res -= m[ s[ i ] ];
+		else
+			res += m[ s[ i ] ];
+	}
+	return res;
+}
+//-----------------------------------------------------------------------------
+
+std::string helpers::normalizeGamesString ( const std::string& input )
+{
+	auto	output = input;
+
+	// Replace Roman numerals with their decimal equivalents
+	{
+		// Regex for Roman numerals as standalone words
+		std::regex	romanregex ( R"((\s)([ivxlcdm]+)(?=$|[\s]))" );
+
+		auto	words_begin = std::sregex_iterator ( input.begin (), input.end (), romanregex );
+		auto	words_end = std::sregex_iterator ();
+
+		auto	offset = 0;
+
+		for ( auto i = words_begin; i != words_end; ++i )
+		{
+			const auto& match = *i;
+
+			const auto	prefix = match[ 1 ].str ();
+			const auto	romanPart = match[ 2 ].str ();
+
+			if ( romanPart.empty () )
+				continue;
+
+			auto	decimal = std::to_string ( romanToInt ( romanPart ) );
+			auto	replacement = prefix + decimal;
+
+			output.replace ( match.position () + offset, match.length (), replacement );
+			offset += int ( replacement.length () - match.length () );
+		}
+	}
+
+	// Remove dots in name and replace underscores with spaces
+	{
+		std::erase ( output, '.' );
+		std::erase ( output, '\'' );
+		std::ranges::replace ( output, '_', ' ' );
+		std::ranges::replace ( output, '-', ' ' );
+	}
+
+	return output;
 }
 //-----------------------------------------------------------------------------

@@ -17,8 +17,6 @@ public:
 	~GUI_Browser () override;
 
 private:
-	std::string normalizeString ( const std::string& input );
-
 	void run () override;
 
 	GUI_SettingsBox	background { "background" };

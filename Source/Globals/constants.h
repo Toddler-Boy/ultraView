@@ -137,6 +137,9 @@ namespace helpers
 
 		return dynamic_cast<T*> ( it->second );
 	}
+
+	int romanToInt ( std::string s );
+	std::string normalizeGamesString ( const std::string& input );
 }
 
 namespace paths

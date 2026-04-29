@@ -270,6 +270,8 @@ void GUI_ultraView::setDataRoot ()
 	theme->setRoot ( dataRoot.getChildFile ( "Themes/" ) );
 
 	folderWatcher.addFolder ( dataRoot );
+
+	loadGamesDatabase ();
 }
 //-----------------------------------------------------------------------------
 

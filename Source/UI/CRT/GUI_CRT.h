@@ -40,6 +40,7 @@ public:
 	void setBackgroundColour ( const juce::Colour& bckCol );
 
 	void setStreamAddress ( const juce::String& address ) { overlay.setStreamAddress ( address ); }
+	void setFirstLuma ( const bool isFirstLuma );
 
 private:
 	// V-blank stuff

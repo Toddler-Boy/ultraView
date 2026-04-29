@@ -66,6 +66,15 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 			sendLookAndFeelChange ();
 		}
 
+		// Games database
+		if ( parent.equalsIgnoreCase ( "Data/Games.csv" ) )
+		{
+			if ( event != gin::FileSystemWatcher::fileUpdated )
+				return;
+
+			loadGamesDatabase ();
+		}
+
 		return;
 	}
 }

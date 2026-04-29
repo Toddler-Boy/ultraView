@@ -1,5 +1,6 @@
 #include "includes/mathDefines.glsl"
 #include "includes/overscan.glsl"
+#include "includes/common.glsl"
 
 uniform float	crtBleed;
 uniform vec2	crtRedOffset = vec2 ( 0.0, 0.0 );
@@ -9,7 +10,6 @@ uniform float	crtHoffset;
 uniform float	crtGlow;
 uniform float	crtAmbient = 0.5;
 uniform float	crtNoise;
-uniform float	crtRefreshRate = 50.125;		// 50.125 for PAL, 59.826 for NTSC
 
 //-----------------------------------------------------------------------------
 
