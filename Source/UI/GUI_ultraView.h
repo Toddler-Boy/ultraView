@@ -73,6 +73,7 @@ private:
 	bool keyPressed ( const juce::KeyPress& key ) override;
 
 	// this
+	bool	browserIsVisible = false;
 	bool	settingsAreVisible = false;
 
 	void toggleFullscreen ();

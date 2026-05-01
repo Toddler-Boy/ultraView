@@ -12,6 +12,13 @@ GUI_Overlay::GUI_Overlay ()
 					 resolutions {	VIC2_Render::outerUnscaledWidth, VIC2_Render::outerUnscaledHeight,
 									VIC2_Render::outerUnscaledWidth * 4, VIC2_Render::outerUnscaledHeight * 4 } )
 {
+	// Use a separate listener object to avoid inheritance ambiguity
+	globalListener.onMouseMove = [ this ] ( const juce::MouseEvent& e ) { handleGlobalMouseMove ( e ); };
+	globalListener.onMouseUp = [ this ] ( const juce::MouseEvent& e ) { handleGlobalMouseUp ( e ); };
+
+	// Register this separate object globally
+	juce::Desktop::getInstance ().addGlobalMouseListener ( &globalListener );
+
 	setName ( "CRT" );
 
 //	enableRenderTimeMeasurement ( true );
@@ -94,6 +101,12 @@ GUI_Overlay::GUI_Overlay ()
 }
 //-----------------------------------------------------------------------------
 
+GUI_Overlay::~GUI_Overlay ()
+{
+	juce::Desktop::getInstance ().removeGlobalMouseListener ( &globalListener );
+}
+//-----------------------------------------------------------------------------
+
 void GUI_Overlay::newOpenGLContextCreated ()
 {
 	CRTEmulation::newOpenGLContextCreated ();
@@ -144,76 +157,84 @@ void GUI_Overlay::startVideoStream ()
 }
 //-----------------------------------------------------------------------------
 
-void GUI_Overlay::resized ()
+void GUI_Overlay::handleGlobalMouseMove ( const juce::MouseEvent& e )
 {
-	CRTEmulation::resized ();
+	const auto	screenPos = e.getScreenPosition ();
 
-	kioskMode = dynamic_cast<juce::DocumentWindow*> ( getTopLevelComponent () )->isKioskMode ();
-
-	stopTimer ();
-	showCursor ();
-
-	if ( shouldHideCursor () )
-		startTimer ( 2000 );
-}
-//-----------------------------------------------------------------------------
-
-bool GUI_Overlay::shouldHideCursor () const
-{
-	return ! openSettings.getStage () && isMouseOverOrDragging () && kioskMode;
-}
-//-----------------------------------------------------------------------------
-
-void GUI_Overlay::showCursor ()
-{
-	//
-	// Show cursor and settings button
-	//
-	setMouseCursor ( juce::MouseCursor::NormalCursor );
-	openSettings.setVisible ( true );
-	actionButtons.setVisible ( true );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_Overlay::hideCursor ()
-{
-	//
-	// Hide the cursor and settings button
-	//
-	if ( kioskMode )
-		setMouseCursor ( juce::MouseCursor::NoCursor );
-
-	openSettings.setVisible ( false );
-	actionButtons.setVisible ( false );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_Overlay::mouseMove ( const juce::MouseEvent& evt )
-{
-	//
-	// Prevent modifier keys (ctrl, shift, etc.) from triggering mouseMouse events
-	//
-	const auto	newMousePos = evt.getPosition ().toInt ();
-	if ( newMousePos == oldMousePos )
+	if ( screenPos == lastMouseScreenPos )
 		return;
 
-	oldMousePos = newMousePos;
+	lastMouseScreenPos = screenPos;
 
-	showCursor ();
+	if ( e.mods.isAnyMouseButtonDown () )
+		return;
 
-	if ( shouldHideCursor () )
+	processStateAt ( screenPos );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Overlay::handleGlobalMouseUp ( const juce::MouseEvent& e )
+{
+	auto	screenPos = e.getScreenPosition ();
+	auto	isOverThis = getScreenBounds ().contains ( screenPos );
+
+	if ( isOverThis )
 		startTimer ( 2000 );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Overlay::processStateAt ( const juce::Point<int> screenPos )
+{
+	const auto	localPos = getLocalPoint ( nullptr, screenPos );
+
+	const auto*	hit = getComponentAt ( localPos );
+	const auto	isOverThis = getLocalBounds ().contains ( localPos );
+	const auto	isOverChild = ( hit != nullptr && hit != this );
+
+	if ( isOverChild )
+	{
+		stopTimer ();
+		updateUI ( true, true );
+	}
+	else if ( isOverThis )
+	{
+		updateUI ( true, true );
+		startTimer ( 2000 );
+	}
+	else
+	{
+		if ( ! isTimerRunning () )
+			startTimer ( 2000 );
+	}
 }
 //-----------------------------------------------------------------------------
 
 void GUI_Overlay::timerCallback ()
 {
 	stopTimer ();
-	hideCursor ();
+
+	auto	isCurrentlyOverUs = getScreenBounds ().contains ( juce::Desktop::getMousePosition () );
+
+	updateUI ( false, ! isCurrentlyOverUs );
 }
 //-----------------------------------------------------------------------------
 
-bool GUI_Overlay::isInterestedInDragSource ( const SourceDetails& details )
+void GUI_Overlay::updateUI ( bool childrenVisible, bool cursorVisible )
+{
+	if ( childrenVisible == curChildrenVisible && cursorVisible == curCursorVisible )
+		return;
+
+	curChildrenVisible = childrenVisible;
+	curCursorVisible = cursorVisible;
+
+	for ( auto* child : getChildren () )
+		child->setVisible ( childrenVisible );
+
+	setMouseCursor ( cursorVisible ? juce::MouseCursor::NormalCursor : juce::MouseCursor::NoCursor );
+}
+//-----------------------------------------------------------------------------
+
+bool GUI_Overlay::isInterestedInDragSource ( const SourceDetails& /*details*/ )
 {
 	return true;
 }

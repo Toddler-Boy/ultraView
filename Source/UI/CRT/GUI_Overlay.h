@@ -13,15 +13,12 @@
 
 class GUI_Overlay final
 	: public lime::CRTEmulation
-	, private juce::Timer
 	, public juce::DragAndDropTarget
+    , private juce::Timer
 {
 public:
 	GUI_Overlay ();
-
-	// juce::Component
-	void resized () override;
-	void mouseMove ( const juce::MouseEvent& evt ) override;
+	~GUI_Overlay () override;
 
 	// lime::CRTEmulation
 	void newOpenGLContextCreated () override;
@@ -41,9 +38,6 @@ public:
 	std::atomic<bool>	isStreamNTSC = false;
 
 private:
-	// juce::Timer
-	void timerCallback () override;
-
 	// C64u UDP Receiver
 	juce::CriticalSection	streamLock;
 	juce::String			c64uStreamAddress;
@@ -57,18 +51,33 @@ private:
 		GUI_IconButton		actionMenu { "menu_button", UI::colors::actionOk };
 		GUI_IconButton		actionPause { "pause", UI::colors::actionInfo };
 		GUI_IconButton		actionResume { "resume", UI::colors::actionInfo };
-		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning, 500 };
-		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger, 1000 };
+		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning, 200 };
+		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger, 500 };
 
-	//
-	// Hide mouse-cursor helpers
-	//
-	bool				kioskMode = false;
-	juce::Point<int>	oldMousePos = { -1000, -1000 };
+//	void showCursor ();
+//	void hideCursor ();
 
-	bool shouldHideCursor () const;
-	void showCursor ();
-	void hideCursor ();
+	// juce::Timer
+	void timerCallback () override;
+	void updateUI ( bool childrenVisible, bool cursorVisible );
+	void handleGlobalMouseMove ( const juce::MouseEvent& e );
+	void handleGlobalMouseUp ( const juce::MouseEvent& e );
+	void processStateAt ( const juce::Point<int> screenPos );
+
+	juce::Point<int>	lastMouseScreenPos = { -1000, -1000 };
+	bool				curChildrenVisible = true;
+	bool				curCursorVisible = true;
+
+	// A simple helper to avoid the inheritance ambiguity
+	struct HelperListener : public juce::MouseListener
+	{
+		std::function<void ( const juce::MouseEvent& )> onMouseMove;
+		std::function<void ( const juce::MouseEvent& )> onMouseUp;
+
+		void mouseMove ( const juce::MouseEvent& e ) override { if ( onMouseMove ) onMouseMove ( e ); }
+		void mouseDrag ( const juce::MouseEvent& e ) override { if ( onMouseMove ) onMouseMove ( e ); }
+		void mouseUp ( const juce::MouseEvent& e ) override { if ( onMouseUp ) onMouseUp ( e ); }
+	} globalListener;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_Overlay )
 };

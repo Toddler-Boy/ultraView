@@ -96,6 +96,10 @@ void GUI_ultraView::toFullscreen ()
 
 	auto	parent = static_cast<juce::DocumentWindow*> ( getParentComponent () );
 
+	// Only hide browser if it is open
+	if ( ( browserIsVisible = mainScreen.crt.isBrowserVisible () ) )
+		mainScreen.crt.showBrowser ( false );
+
 	// Only hide monitor/crt settings if they are open
 	if ( ( settingsAreVisible = mainScreen.crt.areSettingsVisible () ) )
 		mainScreen.crt.showSettings ( false );
@@ -114,6 +118,10 @@ void GUI_ultraView::toWindowed ()
 	mainScreen.layout.setConstant ( "windowed", 1 );
 
 	juce::Desktop::getInstance ().setKioskModeComponent ( nullptr, false );
+
+	// Only show browser if it was open when toggling to fullscreen
+	if ( browserIsVisible )
+		mainScreen.crt.showBrowser ( true );
 
 	// Only show monitor/crt settings if they where open when toggling to fullscreen
 	if ( settingsAreVisible )
