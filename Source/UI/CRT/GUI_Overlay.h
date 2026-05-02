@@ -21,7 +21,6 @@ public:
 	// lime::CRTEmulation
 	void newOpenGLContextCreated () override;
 	void openGLContextClosing () override;
-	void renderOpenGL () override;
 
 	// juce::DragAndDropTarget
 	bool isInterestedInDragSource ( const SourceDetails& details ) override;

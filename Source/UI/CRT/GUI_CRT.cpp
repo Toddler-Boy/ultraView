@@ -186,6 +186,13 @@ void GUI_CRT::setFirstLuma ( const bool isFirstLuma )
 }
 //-----------------------------------------------------------------------------
 
+void GUI_CRT::showRasterTime ( const bool show )
+{
+	overlay.enableRenderTimeMeasurement ( show );
+	overlay.enableRenderTimeDisplay ( show );
+}
+//-----------------------------------------------------------------------------
+
 void GUI_CRT::renderCRT ()
 {
 	auto	vic2Settings = getVIC2SettingsFromPreferences ();

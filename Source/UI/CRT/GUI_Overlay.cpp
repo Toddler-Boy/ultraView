@@ -14,8 +14,6 @@ GUI_Overlay::GUI_Overlay ()
 {
 	setName ( "CRT" );
 
-//	enableRenderTimeMeasurement ( true );
-
 	//
 	// Settings button
 	//
@@ -111,17 +109,6 @@ void GUI_Overlay::openGLContextClosing ()
 	}
 
 	CRTEmulation::openGLContextClosing ();
-}
-//-----------------------------------------------------------------------------
-
-void GUI_Overlay::renderOpenGL ()
-{
-	CRTEmulation::renderOpenGL ();
-
-	if ( const auto	load = getLastGpuTimeMS (); load > 0.0 )
-	{
-		Z_INFO ( "renderOpenGL: " + juce::String ( load ) );
-	}
 }
 //-----------------------------------------------------------------------------
 

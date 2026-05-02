@@ -42,6 +42,8 @@ public:
 	void setStreamAddress ( const juce::String& address ) { overlay.setStreamAddress ( address ); }
 	void setFirstLuma ( const bool isFirstLuma );
 
+	void showRasterTime ( const bool show );
+
 private:
 	// V-blank stuff
 	juce::VBlankAttachment	vBlankAttachment { this, [ this ] ( double time ) {	update ( time );	} };

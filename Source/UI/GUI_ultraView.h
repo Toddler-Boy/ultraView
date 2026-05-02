@@ -144,6 +144,7 @@ private:
 	GameEntry findGameEntry ( juce::String filename ) const;
 
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
+	bool	showRasterTime = false;
 
 	std::unique_ptr<melatonin::Inspector>	inspector;
 
