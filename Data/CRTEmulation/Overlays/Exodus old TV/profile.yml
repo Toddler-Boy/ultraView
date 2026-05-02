@@ -1,6 +1,0 @@
-multipliers:
-  shadow: 0.6
-
-shadow:
-  offset: [ 0.2, 0.5 ]
-  blur: 5

@@ -9,3 +9,6 @@
 [submodule "modules/lime"]
 	path = modules/lime
 	url = https://github.com/Toddler-Boy/Lime
+[submodule "Data/CRTEmulation"]
+	path = Data/CRTEmulation
+	url = https://github.com/Toddler-Boy/CRTEmulation-Data.git
