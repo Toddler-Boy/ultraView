@@ -17,7 +17,9 @@
 				{ "id": "background", "bounds": "bentoGap, 5, parW - bentoGap * 2, parH - 5",
 					"components": [
 						{ "id": "label-browse", "factory": "crt-header(browse)", "bounds": "bentoMargin, bentoGap, parW - bentoMargin * 2, 28" },
-						{ "id": "searchBar", "yd": 8, "h": 32 },
+						{ "id": "curPath", "x": "prevX + 2", "y": "prevB", "r": "parW - 48", "h": 28 },
+						{ "id": "changePath", "xd": 8, "w": "prevH" },
+						{ "id": "searchBar", "yd": "32, label-browse", "h": 32 },
 						{ "id": "info", "x": "prevX + 4", "y": "prevB + 8", "r": "prevR - 4", "h": 24 },
 						{ "id": "listbox", "x": "getX('searchBar')", "y": "prevB + 10", "w": "getW('searchBar')", "b": "parH - bentoMargin" }
 					]

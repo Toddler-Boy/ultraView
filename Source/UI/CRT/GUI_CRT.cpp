@@ -162,6 +162,12 @@ void GUI_CRT::showBrowser ( const bool visible )
 }
 //-----------------------------------------------------------------------------
 
+void GUI_CRT::refreshBrowserEntries ()
+{
+	browser.refreshBrowserEntries ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_CRT::showSettings ( const bool visible )
 {
 	settingsWrapper.setVisible ( visible );

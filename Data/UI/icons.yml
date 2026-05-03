@@ -9,7 +9,13 @@ actions:
   reboot:       arrow-rotate-left-solid-full
   poweroff:     power-off-solid-full
 
+browser:
+  path: folder-open-solid-full
+
 crt:
+  browser_open:   browse-games
+  browser_close:  browse-games
+
   settings_open:  sliders-solid-full
   settings_close: sliders-solid-full
 

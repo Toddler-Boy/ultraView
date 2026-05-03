@@ -56,12 +56,58 @@ GUI_Browser::GUI_Browser ()
 	background.addAndMakeVisible ( info );
 	background.addAndMakeVisible ( listbox );
 
+	curPath.setName ( "curPath" );
+	changePath.bckAlpha[ 1 ] = 0.1f;
+	changePath.margin = 6.0f;
+
+	const auto	curPathStr = settings->get<juce::String> ( "Paths/apps" );
+	if ( curPathStr.isEmpty () )
+	{
+		curPath.setText ( "No path set" );
+		curPath.setColor ( UI::colors::textMuted );
+	}
+	else
+	{
+		curPath.setText ( curPathStr );
+	}
+
+	background.addAndMakeVisible ( curPath );
+	background.addAndMakeVisible ( changePath );
+
 	addAndMakeVisible ( background );
 
 	listbox.addHeaderColumn ( UI::columnId::name, true );
 	listbox.getHeader ().setSortColumnId ( UI::columnId::name, true );
 
-	startThread ( juce::Thread::Priority::low );
+	if ( curPathStr.isNotEmpty () )
+	{
+		info.setText ( "Scanning directory..." );
+		startThread ( juce::Thread::Priority::low );
+	}
+
+	changePath.onClick = [ this ]
+	{
+		const auto	curPathStr = settings->get<juce::String> ( "Paths/apps" );
+		lastBrowsedDir = juce::File ( curPathStr );
+
+		directoryChooser = std::make_unique<juce::FileChooser> ( "Select a directory to scan for games", lastBrowsedDir, "*.crt;*.prg" );
+		directoryChooser->launchAsync ( juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories, [ this ] ( const juce::FileChooser& chooser )
+		{
+			const auto	results = chooser.getResults ();
+			if ( results.size () > 0 )
+			{
+				const auto	selectedDir = results[ 0 ];
+
+				settings->set ( "Paths/apps", selectedDir.getFullPathName () );
+
+				curPath.setText ( selectedDir.getFullPathName () );
+				curPath.setColor ( UI::colors::text );
+
+				stopThread ( -1 );
+				startThread ( juce::Thread::Priority::low );
+			}
+		} );
+	};
 }
 //-----------------------------------------------------------------------------
 
@@ -71,34 +117,27 @@ GUI_Browser::~GUI_Browser ()
 }
 //-----------------------------------------------------------------------------
 
+void GUI_Browser::refreshBrowserEntries ()
+{
+	if ( isThreadRunning () )
+		return;
+
+	info.setText ( "Found " + juce::String ( browserEntryPtrs.size () ) + " entries" );
+	listbox.setRowData ( browserEntryPtrs );
+}
+//-----------------------------------------------------------------------------
+
 void GUI_Browser::run ()
 {
 	browserEntries.clear ();
-	browserEntries.reserve ( 10'000 );
 	browserEntryPtrs.clear ();
-	browserEntryPtrs.reserve ( browserEntries.capacity () );
 
 	auto	files = juce::Array<juce::File> ();
 
 	juce::Array<juce::File> directoriesToScan;
-	directoriesToScan.add ( juce::File ( "Z:/Data/C64 games" ) );
 
-	auto sendToListBox = [ this ]
-	{
-		if ( browserEntries.empty () )
-			return;
-
-		browserEntryPtrs.resize ( browserEntries.size () );
-
-		for ( auto i = 0; auto& entry : browserEntries )
-			browserEntryPtrs[ i++ ] = &entry;
-
-		juce::MessageManager::callSync ( [ this ]
-		{
-			listbox.setRowData ( browserEntryPtrs );
-			info.setText ( juce::String ( listbox.getNumRows () ) + " entries loaded" );
-		} );
-	};
+	const auto	curPathStr = settings->get<juce::String> ( "Paths/apps" );
+	directoriesToScan.add ( juce::File ( curPathStr ) );
 
 	while ( directoriesToScan.size () > 0 )
 	{
@@ -116,11 +155,11 @@ void GUI_Browser::run ()
 
 			if ( entry.isDirectory () )
 			{
-				Z_LOG ( "Scanning directory: " + file.getFullPathName () );
-
 				const auto	name = file.getFileName ().toLowerCase ();
 				if ( name == "images" || name == "docs" || name == "dumps" || name == "tapes" )
 					continue;
+
+				Z_INFO ( "Scanning directory: " + file.getFullPathName () );
 
 				directoriesToScan.add ( file );
 			}
@@ -146,8 +185,6 @@ void GUI_Browser::run ()
 
 					if ( threadShouldExit () )
 						return;
-
-					sendToListBox ();
 				}
 			}
 		}
@@ -156,6 +193,10 @@ void GUI_Browser::run ()
 	if ( threadShouldExit () )
 		return;
 
-	sendToListBox ();
+	browserEntryPtrs.reserve ( browserEntries.size () );
+	for ( auto& entry : browserEntries )
+		browserEntryPtrs.emplace_back (	&entry );
+
+	UI::sendGlobalMessage ( "browser scan-finished" );
 }
 //-----------------------------------------------------------------------------

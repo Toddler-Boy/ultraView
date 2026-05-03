@@ -34,6 +34,7 @@ public:
 
 	bool isBrowserVisible () const { return browserVisible; }
 	void showBrowser ( const bool visible );
+	void refreshBrowserEntries ();
 
 	bool areSettingsVisible () const	{ return settingsVisible;	}
 	void showSettings ( const bool visible );

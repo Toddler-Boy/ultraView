@@ -56,6 +56,13 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 	{
 		network.put ( "v1/machine:" + params[ 0 ], {} );
 	}
+	else if ( cmd == "browser" )
+	{
+		if ( params[ 0 ] == "scan-finished" )
+		{
+			mainScreen.crt.refreshBrowserEntries ();
+		}
+	}
 	else
 	{
 		Z_ERR ( "Unknown action: " << message );
