@@ -14,12 +14,20 @@
 	"components": [
 		{ "id": "browser", "x": "fullscreen", "y": 0, "w": 364, "b": "parB - bentoGap",
 			"components": [
-				{ "id": "background", "bounds": "bentoGap, 5, parW - bentoGap * 2, parH - 5",
+				{ "id": "badge", "x": "bentoGap", "y": 5, "r": "parW - bentoGap", "h": 32,
 					"components": [
-						{ "id": "label-browse", "factory": "crt-header(browse)", "bounds": "bentoMargin, bentoGap, parW - bentoMargin * 2, 28" },
-						{ "id": "curPath", "x": "prevX + 2", "y": "prevB", "r": "parW - 48", "h": 28 },
+						{ "id": "chickenlips", "x": 10, "cy": "parH2", "w": 20, "h": "parH2 + 3" },
+						{ "id": "logo", "x": "prevR + 8", "cy": "prevCY", "w": 130, "h": "parH2" },
+						{ "id": "64", "r": "parW - 12", "cy": "parH2", "w": 48, "h": "parH2" },
+						{ "id": "stripes", "x": "getR('logo') + 8", "cy": "parH2", "r": "prevX - 4", "h": "parH2 + 3" }
+					]
+				},
+				{ "id": "background", "x": "bentoGap", "y": "prevB + 10", "r": "parW - bentoGap", "b": "parH",
+					"components": [
+						{ "id": "label-browse", "factory": "crt-header(browse)", "x": 10, "y": "prevB + 10", "r": "parW - 10", "h": 28 },
+						{ "id": "curPath", "x": "prevX + 2", "y": "prevB", "r": "parW - 44", "h": 28 },
 						{ "id": "changePath", "xd": 8, "w": "prevH" },
-						{ "id": "searchBar", "yd": "32, label-browse", "h": 32 },
+						{ "id": "searchBar", "x": 10, "y": "prevB + 10", "r": "parW - 10", "h": 32 },
 						{ "id": "info", "x": "prevX + 4", "y": "prevB + 8", "r": "prevR - 4", "h": 24 },
 						{ "id": "listbox", "x": "getX('searchBar')", "y": "prevB + 10", "w": "getW('searchBar')", "b": "parH - bentoMargin" }
 					]

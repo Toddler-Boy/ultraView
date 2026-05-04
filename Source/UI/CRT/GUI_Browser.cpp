@@ -8,6 +8,8 @@ GUI_Browser::GUI_Browser ()
 	: juce::Component ( "browser" )
 	, juce::Thread ( "Browser loading thread" )
 {
+	addAndMakeVisible ( badge );
+
 	searchBar.enableSearchHistory ( false );
 
 	searchBar.onTextChange = [ this ]
@@ -172,13 +174,14 @@ void GUI_Browser::run ()
 					auto	name = file.getFileNameWithoutExtension ();
 					const auto	hasJ1 = name.containsIgnoreCase ( "(j1)" );
 
-					name = name.upToFirstOccurrenceOf ( "(", false, false ).trimEnd ();
+					name = name.upToFirstOccurrenceOf ( "(by ", false, false ).trimEnd ();
 					name = name.upToFirstOccurrenceOf ( "[", false, false ).trimEnd ();
 
 					browserEntries.push_back (
 						{
 							ext == ".crt" ? 0 : 1,
-							name + ( hasJ1 ? " (J1)" : "" ),
+							file.getParentDirectory ().getFileName ().containsIgnoreCase ( "official" ),
+							name,
 							file.getFullPathName (),
 							helpers::normalizeGamesString ( name.toLowerCase ().toStdString () )
 						} );

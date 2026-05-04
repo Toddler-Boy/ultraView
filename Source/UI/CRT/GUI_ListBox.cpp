@@ -116,15 +116,36 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 	const auto	col = findColour ( UI::colors::textMuted );
 	const auto	txtCol = findColour ( UI::colors::text );
 
-	g.setColour ( rowIsSelected ? txtCol : col );
-	g.setFont ( UI::font ( 16.0f, 600 ) );
+	const auto& entry = *rowData[ rowNumber ];
+
+	const auto	font = UI::font ( 16.0f, 600 );
+	const auto	fontsmall = UI::font ( 10.0f, 600 );
+
+	const auto	rowCol = rowIsSelected ? txtCol : col;
 
 	switch ( columnId )
 	{
 		case UI::columnId::name:
 			{
-				g.drawText ( rowData[ rowNumber ]->name, b, juce::Justification::centredLeft, true );
-			}
+				if ( entry.official )
+				{
+					static const auto	tw = juce::GlyphArrangement::getStringWidth ( fontsmall, "OFFICIAL" );
+
+					g.setColour ( txtCol.withMultipliedBrightness ( 0.4f ) );
+					const auto	badgeRect = b.removeFromLeft ( tw + 8.0 ).reduced ( 0.0f, 2.0f );
+					g.fillRoundedRectangle ( badgeRect, 4.0f );
+
+					g.setFont ( fontsmall );
+					g.setColour ( txtCol.withMultipliedBrightness ( 0.1f ) );
+					g.drawText ( "OFFICIAL", badgeRect, juce::Justification::centred, false );
+
+					b.removeFromLeft ( 4.0f );
+				}
+
+				g.setFont ( font );
+				g.setColour ( rowCol );
+				g.drawText ( entry.name, b, juce::Justification::centredLeft, true );
+		}
 			break;
 	}
 }

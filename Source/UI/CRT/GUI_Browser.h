@@ -2,6 +2,8 @@
 
 #include <JuceHeader.h>
 
+#include "UI/Badge/GUI_ultraView_badge.h"
+
 #include "UI/Components/GUI_Label.h"
 #include "UI/Components/GUI_SearchBar.h"
 #include "UI/Components/GUI_SettingsBox.h"
@@ -32,6 +34,8 @@ private:
 
 	juce::File							lastBrowsedDir;
 	std::unique_ptr<juce::FileChooser>	directoryChooser;
+
+	GUI_ultraView_Badge	badge;
 
 	GUI_SettingsBox	background { "background" };
 		GUI_Label			curPath { "", 15.0f, 500 };

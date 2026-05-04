@@ -12,6 +12,7 @@
 struct browserEntry
 {
 	int				type;	// 0 = CRT, 1 = PRG
+	bool			official;
 
 	juce::String	name;
 	juce::String	path;
