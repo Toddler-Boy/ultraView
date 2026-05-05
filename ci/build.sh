@@ -18,7 +18,7 @@ if [ "$OS_NAME" = "Darwin" ]; then
   cd "$ROOT"
   cmake --preset xcode
   cmake --build --preset xcode --config Release --parallel
-  cp -R "$ROOT/Builds/xcode/ultraSID_artefacts/Release/ultraSID.app" "$ROOT/ci/bin/"
+  cp -R "$ROOT/Builds/xcode/ultraSID_artefacts/Release/ultraView.app" "$ROOT/ci/bin/"
 fi
 
 # Build linux version
@@ -26,7 +26,7 @@ if [ "$OS_NAME" = "Linux" ]; then
   cd "$ROOT"
   cmake --preset ninja-clang
   cmake --build --preset ninja-clang --config Release --parallel
-  cp "$ROOT/Builds/ninja-clang/ultraSID_artefacts/Release/ultraSID" "$ROOT/ci/bin/"
+  cp "$ROOT/Builds/ninja-clang/ultraSID_artefacts/Release/ultraView" "$ROOT/ci/bin/"
 fi
 
 # Build Win version
@@ -34,5 +34,5 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   cd "$ROOT"
   cmake --preset vs
   cmake --build --preset vs --config Release --parallel
-  cp "$ROOT/Builds/vs/ultraSID_artefacts/Release/ultraSID.exe" "$ROOT/ci/bin/"
+  cp "$ROOT/Builds/vs/ultraSID_artefacts/Release/ultraView.exe" "$ROOT/ci/bin/"
 fi
