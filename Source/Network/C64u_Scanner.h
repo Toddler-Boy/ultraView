@@ -12,14 +12,16 @@ public:
 	C64uScanner ();
 	~C64uScanner () override;
 
-	void scan ( ScannerCallback _callback, const juce::String& _lastIP );
+	void scan ( ScannerCallback _callback, juce::String& _lastIP );
 
 private:
 	void run () override;
 
-	static juce::String isActualC64u ( juce::StreamingSocket& socket );
+	juce::String isActualC64u ( juce::StreamingSocket& socket );
 
 	ScannerCallback	callback;
 	juce::String	lastIP;
+
+	juce::String	request;
 };
 //-----------------------------------------------------------------------------

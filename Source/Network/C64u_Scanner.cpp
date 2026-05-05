@@ -1,10 +1,19 @@
 #include "C64u_Scanner.h"
 #include "NetworkHardwareChecker.h"
 
+#include "Globals/Settings.h"
+
 //-----------------------------------------------------------------------------
 
 C64uScanner::C64uScanner () : juce::Thread ( "C64uScanner" )
 {
+	request = "GET /v1/info HTTP/1.1\r\n\r\n";
+
+	juce::SharedResourcePointer<Settings>	settings;
+
+	const auto	password = settings->get<juce::String> ( "Network", "password" );
+	if ( password.isNotEmpty () )
+		request = "GET /v1/info HTTP/1.1\r\nX-Password: " + password + "\r\n\r\n";
 }
 //-----------------------------------------------------------------------------
 
@@ -14,7 +23,7 @@ C64uScanner::~C64uScanner ()
 }
 //-----------------------------------------------------------------------------
 
-void C64uScanner::scan ( ScannerCallback _callback, const juce::String& _lastIP )
+void C64uScanner::scan ( ScannerCallback _callback, juce::String& _lastIP )
 {
 	callback = std::move ( _callback );
 	lastIP = std::move ( _lastIP );
@@ -133,8 +142,6 @@ void C64uScanner::run ()
 
 juce::String C64uScanner::isActualC64u ( juce::StreamingSocket& socket )
 {
-	static const juce::String request = "GET /v1/info HTTP/1.1\r\n\r\n";
-
 	socket.write ( request.toRawUTF8 (), request.length () );
 
 	char	buffer[ 1024 ];

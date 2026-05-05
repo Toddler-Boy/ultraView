@@ -23,21 +23,27 @@ void AsyncNetwork::setBaseAddress ( const juce::String& url )
 }
 //-----------------------------------------------------------------------------
 
-void AsyncNetwork::get ( const juce::String& ep, const juce::StringArray& p, NetworkCallback cb )
+void AsyncNetwork::setC64uPassword ( const juce::String& password )
 {
-	enqueue ( ep, "GET", {}, std::move ( cb ), p );
+	c64uPassword = password;
 }
 //-----------------------------------------------------------------------------
 
-void AsyncNetwork::post ( const juce::String& ep, const juce::MemoryBlock& d, NetworkCallback cb, const juce::StringArray& p )
+void AsyncNetwork::get ( const juce::String& endpoint, const juce::StringArray& params, NetworkCallback callback )
 {
-	enqueue ( ep, "POST", d, std::move ( cb ), p );
+	enqueue ( endpoint, "GET", {}, std::move ( callback ), params );
 }
 //-----------------------------------------------------------------------------
 
-void AsyncNetwork::put ( const juce::String& ep, const juce::StringArray& p, NetworkCallback cb )
+void AsyncNetwork::post ( const juce::String& endpoint, const juce::MemoryBlock& data, NetworkCallback callback, const juce::StringArray& params )
 {
-	enqueue ( ep, "PUT", {}, std::move ( cb ), p );
+	enqueue ( endpoint, "POST", data, std::move ( callback ), params );
+}
+//-----------------------------------------------------------------------------
+
+void AsyncNetwork::put ( const juce::String& endpoint, const juce::StringArray& params, NetworkCallback callback )
+{
+	enqueue ( endpoint, "PUT", {}, std::move ( callback ), params );
 }
 //-----------------------------------------------------------------------------
 
@@ -72,11 +78,14 @@ void AsyncNetwork::run ()
 		auto	req = queue.removeAndReturn ( 0 );
 		queueLock.exit ();
 
+		const auto	headers = c64uPassword.isNotEmpty () ? juce::String ( "X-Password: " ) + c64uPassword : juce::String ();
+
 		auto	options = juce::URL::InputStreamOptions ( juce::URL::ParameterHandling::inAddress )
 			.withHttpRequestCmd ( req.method )
 			.withStatusCode ( &req.statusCode )
 			.withConnectionTimeoutMs ( 200 )
-			.withNumRedirectsToFollow ( 0 );
+			.withNumRedirectsToFollow ( 0 )
+			.withExtraHeaders ( headers );
 
 		if ( auto stream = req.url.createInputStream ( options ) )
 		{
