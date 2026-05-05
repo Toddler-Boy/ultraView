@@ -172,7 +172,6 @@ void GUI_Browser::run ()
 				if ( ext == ".crt" || ext == ".prg" )
 				{
 					auto	name = file.getFileNameWithoutExtension ();
-					const auto	hasJ1 = name.containsIgnoreCase ( "(j1)" );
 
 					name = name.upToFirstOccurrenceOf ( "(by ", false, false ).trimEnd ();
 					name = name.upToFirstOccurrenceOf ( "[", false, false ).trimEnd ();

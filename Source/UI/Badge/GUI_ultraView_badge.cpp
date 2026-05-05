@@ -1,4 +1,4 @@
-#include "GUI_ultraView_Badge.h"
+#include "GUI_ultraView_badge.h"
 
 #include "Globals/constants.h"
 
