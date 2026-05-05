@@ -3,6 +3,13 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+extern "C" {
+	// NVIDIA: Enables high-performance mode
+	_declspec( dllexport ) DWORD NvOptimusEnablement = 0x00000001;
+
+	// AMD: Enables high-performance mode
+	_declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
+}
 //-----------------------------------------------------------------------------
 
 void setWindowProperties ( void* windowHandle, unsigned int titleColor )
