@@ -8,11 +8,19 @@ jobs:
       - name: Fix up git URLs
         run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
         shell: bash
+
       - uses: actions/checkout@v4
         with:
           submodules: true
+
       - name: "Run script"
         run: ./ci/build.sh
         shell: bash
-        env:
-          APIKEY: ${{ secrets.APIKEY }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Binaries windows_ultraView
+          path: bin/*
+          retention-days: 30
