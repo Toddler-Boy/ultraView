@@ -3,8 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build Windows
-    runs-on: [self-hosted, Windows, X64]
-    timeout-minutes: 15
+    runs-on: windows-2025-vs2026
     steps:
       - name: Fix up git URLs
         run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
@@ -17,9 +16,3 @@ jobs:
         shell: bash
         env:
           APIKEY: ${{ secrets.APIKEY }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ultraSID-windows
-          path: ci/bin/ultraSID.exe
-          retention-days: 1
