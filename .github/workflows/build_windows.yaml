@@ -22,5 +22,5 @@ jobs:
         if: always()
         with:
           name: Binaries windows_ultraView
-          path: bin/*
+          path: ./ci/bin/*
           retention-days: 30
