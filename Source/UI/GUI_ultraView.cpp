@@ -302,6 +302,5 @@ void GUI_ultraView::saveState ()
 
 void GUI_ultraView::restoreState ()
 {
-	juce::Desktop::getInstance ().setScreenSaverEnabled ( preferences->get<bool> ( "UI", "allow-screensaver" ) );
 }
 //-----------------------------------------------------------------------------

@@ -35,7 +35,7 @@ public:
 
 	void initialise ( const juce::String& /*commandLine*/ ) override
 	{
-		mainWindow.reset ( new MainWindow ( getApplicationName () + " " + getApplicationVersion (), laf ) );
+		mainWindow = std::make_unique<MainWindow> ( getApplicationName () + " " + getApplicationVersion (), laf );
 	}
 	//-----------------------------------------------------------------------------
 
@@ -63,12 +63,12 @@ public:
 			: juce::DocumentWindow ( name, juce::Colours::black, juce::DocumentWindow::allButtons )
 		{
 			juce::LookAndFeel::setDefaultLookAndFeel ( &laf );
+			juce::Desktop::setScreenSaverEnabled ( false );
 
 			// Set up window
 			setUsingNativeTitleBar ( true );
 
 			auto	ultra = new GUI_ultraView;
-
 			setContentOwned ( ultra, false );
 
 			setResizeLimits ( 1'000, 500, 100'000, 100'000 );

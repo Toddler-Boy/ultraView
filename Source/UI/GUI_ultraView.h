@@ -6,7 +6,6 @@
 
 #include "Misc/FX_Helpers.h"
 
-//#include "UI/Badge/GUI_ultraSID_badge.h"
 #include "UI/GUI_TooltipWindow.h"
 
 #include "UI/GUI_Main.h"
@@ -18,8 +17,8 @@
 #include "Globals/Theme.h"
 
 #include "Network/AsyncNetwork.h"
-#include "Network/C64u_UDP_Receiver.h"
 #include "Network/C64u_Scanner.h"
+#include "Network/C64u_UDP_Receiver.h"
 
 //-----------------------------------------------------------------------------
 
