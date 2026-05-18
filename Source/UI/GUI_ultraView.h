@@ -9,6 +9,7 @@
 #include "UI/GUI_TooltipWindow.h"
 
 #include "UI/GUI_Main.h"
+#include "UI/GUI_About.h"
 
 #include "Globals/Icons.h"
 #include "Globals/Preferences.h"
@@ -110,6 +111,7 @@ private:
 	juce::File	userRoot;
 
 	GUI_Main		mainScreen;
+	GUI_About		aboutScreen;
 
 	gin::FileSystemWatcher	folderWatcher;
 

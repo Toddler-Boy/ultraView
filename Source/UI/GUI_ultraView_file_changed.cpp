@@ -54,6 +54,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 
 			strings->load ();
 			sendLookAndFeelChange ();
+			return;
 		}
 
 		// UI icons
@@ -64,6 +65,17 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 
 			icons->load ();
 			sendLookAndFeelChange ();
+			return;
+		}
+
+		// About content
+		if ( parent.equalsIgnoreCase ( "UI/about.md" ) )
+		{
+			if ( event != gin::FileSystemWatcher::fileUpdated )
+				return;
+
+			aboutScreen.loadContent ();
+			return;
 		}
 
 		// Games database
@@ -73,6 +85,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 				return;
 
 			loadGamesDatabase ();
+			return;
 		}
 
 		return;

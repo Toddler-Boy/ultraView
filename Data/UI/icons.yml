@@ -19,6 +19,9 @@ crt:
   settings_open:  sliders-solid-full
   settings_close: sliders-solid-full
 
+  about_open:     info-solid-full
+  about_close:    xmark-solid-full
+
   settings:
     tv:
       brightness:  crt/brightness

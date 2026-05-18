@@ -30,6 +30,7 @@ GUI_Overlay::GUI_Overlay ()
 
 		setButtonProps ( openBrowser );
 		setButtonProps ( openSettings );
+		setButtonProps ( openAbout );
 	}
 
 	// Action buttons

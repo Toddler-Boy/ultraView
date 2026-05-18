@@ -28,6 +28,7 @@ GUI_ultraView::GUI_ultraView ()
 
 	// Add listener to main menu
 	addAndMakeVisible ( mainScreen );
+	addChildComponent ( aboutScreen );
 
 	folderWatcher.coalesceEvents ( 50 );
 	folderWatcher.addListener ( this );
@@ -137,6 +138,7 @@ void GUI_ultraView::toWindowed ()
 void GUI_ultraView::resized ()
 {
 	mainScreen.setBounds ( getLocalBounds () );
+	aboutScreen.setBounds ( getLocalBounds () );
 
 	const auto	kioskMode = isFullscreen ();
 
@@ -196,6 +198,7 @@ void GUI_ultraView::updateColors ()
 	}
 
 	mainScreen.crt.setBackgroundColour ( bgCol );
+	aboutScreen.updateColors ();
 }
 //-----------------------------------------------------------------------------
 

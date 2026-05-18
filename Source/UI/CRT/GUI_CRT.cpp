@@ -13,6 +13,8 @@
 #include "UI/Components/GUI_VIC2_Palette.h"
 #include "UI/Components/GUI_XYPad.h"
 
+#include "Globals/constants.h"
+
 //-----------------------------------------------------------------------------
 
 GUI_CRT::GUI_CRT ()
@@ -46,6 +48,13 @@ GUI_CRT::GUI_CRT ()
 
 		settingsWrapper.addAndMakeVisible ( settingsViewport );
 		addChildComponent ( settingsWrapper );
+	}
+
+	//
+	// About
+	//
+	{
+		overlay.openAbout.onClick = []	{	UI::sendGlobalMessage ( "showAbout" );	};
 	}
 
 	startTimer ( 'NTSC', 100 );

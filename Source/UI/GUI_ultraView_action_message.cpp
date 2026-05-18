@@ -63,6 +63,16 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 			mainScreen.crt.refreshBrowserEntries ();
 		}
 	}
+	else if ( cmd == "showAbout" )
+	{
+		mainScreen.setVisible ( false );
+		aboutScreen.setVisible ( true );
+	}
+	else if ( cmd == "closeAbout" )
+	{
+		aboutScreen.setVisible ( false );
+		mainScreen.setVisible ( true );
+	}
 	else
 	{
 		Z_ERR ( "Unknown action: " << message );

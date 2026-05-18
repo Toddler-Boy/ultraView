@@ -31,6 +31,7 @@ public:
 
 	GUI_SVG_Button	openBrowser { "browser", { "crt/browser_close", "crt/browser_open" } };
 	GUI_SVG_Button	openSettings { "open", { "crt/settings_close", "crt/settings_open" } };
+	GUI_SVG_Button	openAbout { "about", { "crt/about_open" } };
 
 	std::atomic<bool>	isStreamNTSC = false;
 

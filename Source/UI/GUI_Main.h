@@ -2,7 +2,6 @@
 
 #include <JuceHeader.h>
 
-//#include "UI/Badge/GUI_ultraSID_badge.h"
 #include "UI/CRT/GUI_CRT.h"
 
 //-----------------------------------------------------------------------------
@@ -17,7 +16,6 @@ public:
 
 	gin::LayoutSupport	layout { *this };
 
-	// GUI_ultraSID_Badge	badge;
 	GUI_CRT		crt;
 
 private:
