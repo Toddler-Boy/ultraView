@@ -69,7 +69,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 		}
 
 		// About content
-		if ( parent.equalsIgnoreCase ( "UI/about.md" ) )
+		if ( parent.equalsIgnoreCase ( "UI/about.txt" ) )
 		{
 			if ( event != gin::FileSystemWatcher::fileUpdated )
 				return;

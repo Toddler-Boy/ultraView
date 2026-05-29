@@ -6,9 +6,9 @@
 GUI_About::GUI_About ()
 	: juce::Component ( "about" )
 {
-	mdDisplay.setName ( "display" );
-	mdDisplay.setFont ( UI::monoFont ( 16.0f ) );
-	addAndMakeVisible ( mdDisplay );
+	scrollTextViewer.setName ( "display" );
+	scrollTextViewer.setFont ( UI::monoFont ( 16.0f ) );
+	addAndMakeVisible ( scrollTextViewer );
 
 	updateColors ();
 
@@ -33,37 +33,15 @@ void GUI_About::resized ()
 }
 //-----------------------------------------------------------------------------
 
-bool GUI_About::handleURL ( juce::String url )
-{
-	juce::URL ( url ).launchInDefaultBrowser ();
-	return true;
-}
-//-----------------------------------------------------------------------------
-
 void GUI_About::updateColors ()
 {
-	const auto	col = UI::getShade ( 1.0f ).toString ();
-
-	juce::StringPairArray	colors;
-
-	colors.set ( "black", "#000" );
-	colors.set ( "blue", "#00F" );
-	colors.set ( "green", "#0B0" );
-	colors.set ( "red", "#C00" );
-	colors.set ( "yellow", "#BB0" );
-	colors.set ( "orange", "#F92" );
-	colors.set ( "linkcolour", "#77F" );
-
-	colors.set ( "default", col );
-
-	mdDisplay.setColours ( colors );
-	mdDisplay.setBGColour ( UI::getShade ( 0.1f ) );
+	scrollTextViewer.setColour ( juce::Label::textColourId, UI::getShade ( 1.0f ) );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_About::loadContent ()
 {
-	const auto	str = paths::getDataRoot ( "UI/about.md" ).loadFileAsString ();
-	mdDisplay.setMarkdownString ( str );
+	const auto	str = paths::getDataRoot ( "UI/about.txt" ).loadFileAsString ();
+	scrollTextViewer.setText ( str );
 }
 //-----------------------------------------------------------------------------

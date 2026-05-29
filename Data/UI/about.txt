@@ -1,0 +1,73 @@
+==================================================
+                    ultraView
+==================================================
+Version 0.9.6
+Copyright © 2026 Michael Hartmann (Toddler Boy)
+https://github.com/Toddler-Boy/ultraView
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+--------------------------------------------------
+
+Third-Party Libraries & Open Source Notices:
+
+1. JUCE Framework (8.0.13)
+   https://github.com/juce-framework/JUCE
+   Copyright © 2026, Raw Material Software Limited
+   GNU Affero General Public License v3.0
+
+   This component is bound by the terms of the AGPLv3.
+   A full copy of the license text is available at:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   If you are not licensing the JUCE Framework modules under the AGPLv3 then by
+   downloading, installing, or using the JUCE Framework, or combining the JUCE
+   Framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE 8 End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you.
+   If you do not agree to the terms of this Agreement, we will not license the
+   JUCE Framework to you, and you must discontinue the installation or
+   download process and cease use of the JUCE Framework.
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
+
+
+
+2. Gin
+   https://github.com/FigBug/Gin
+   Copyright © 2018, Roland Rabien
+   BSD 3-Clause License
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+   * Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+   * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+   * Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+   FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

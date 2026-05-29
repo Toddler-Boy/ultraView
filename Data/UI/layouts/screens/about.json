@@ -4,7 +4,7 @@
 	],
 
 	"components": [
-		{ "id": "display", "cx": "parW2", "y": "margin", "w": 700, "b": "parB - margin" },
+		{ "id": "display", "cx": "parW2", "y": "margin", "w": 620, "b": "parB - margin" },
 		{ "id": "about", "x": "prevR", "y": "prevY - 6" }
 	]
 }
