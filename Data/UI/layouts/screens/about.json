@@ -4,7 +4,13 @@
 	],
 
 	"components": [
-		{ "id": "display", "cx": "parW2", "y": "margin", "w": 620, "b": "parB - margin" },
-		{ "id": "about", "x": "prevR", "y": "prevY - 6" }
+		{ "id": "about", "cx": "parW2", "y": "margin", "w": 600, "h": 140,
+			"components": [
+				{ "id": "icon", "x": 20, "y": 20, "w": 100, "h": 100 },
+				{ "id": "title", "x": "prevR + 15", "y": "prevY + 10", "r": "parW", "h": 24 }
+			]
+		},
+		{ "id": "scrollText", "x": "prevX", "y": "prevB + margin", "w": "prevW + 20", "b": "parB - margin" },
+		{ "id": "close", "x": "prevR - 16", "y": "getY('about') - 6" }
 	]
 }

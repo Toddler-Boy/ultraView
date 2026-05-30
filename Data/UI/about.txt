@@ -1,7 +1,4 @@
-==================================================
-                    ultraView
-==================================================
-Version 0.9.6
+ultraView 1.0.0
 Copyright © 2026 Michael Hartmann (Toddler Boy)
 https://github.com/Toddler-Boy/ultraView
 

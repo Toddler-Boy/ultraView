@@ -6,7 +6,15 @@
 GUI_About::GUI_About ()
 	: juce::Component ( "about" )
 {
-	scrollTextViewer.setName ( "display" );
+	icon.setName ( "icon" );
+	title.setName ( "title" );
+	icon.mipMap.setImage ( paths::getDataRoot ( "UI/png/ultraView.png" ) );
+
+	about.addAndMakeVisible ( icon );
+	about.addAndMakeVisible ( title );
+	addAndMakeVisible ( about );
+
+	scrollTextViewer.setName ( "scrollText" );
 	scrollTextViewer.setFont ( UI::monoFont ( 16.0f ) );
 	addAndMakeVisible ( scrollTextViewer );
 
@@ -14,7 +22,7 @@ GUI_About::GUI_About ()
 
 	closeAbout.margin = 14.0f;
 	closeAbout.bckAlpha[ 0 ] = 0.2f;
-	closeAbout.bckAlpha[ 1 ] = 0.5f;
+	closeAbout.bckAlpha[ 1 ] = 0.4f;
 	closeAbout.bckMargin = 6.0f;
 	closeAbout.setSize ( 48, 48 );
 	closeAbout.setWantsKeyboardFocus ( false );
