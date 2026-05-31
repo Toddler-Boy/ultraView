@@ -7,3 +7,5 @@ Open source C64 ultimate stream viewer deluxe.
 - Handles Video and Audio streams in perfect quality.
 - Handles CRT & PRG uploads.
 - Build in games browser.
+
+![H.E.R.O. screenshot](/docs/screenshot_hero.jpg?raw=true "H.E.R.O. in action")
