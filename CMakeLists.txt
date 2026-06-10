@@ -194,7 +194,7 @@ if (APPLE)
 		XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING[variant=Release] ON
 		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] ON)
 	target_compile_options(ultraView PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
-	target_link_libraries(ultraView PUBLIC "-framework AVFoundation" "-framework CoreMedia")
+	target_link_libraries(ultraView PUBLIC "-framework AVFoundation" "-framework CoreMedia" "-framework SystemConfiguration")
 endif()
 
 if (WIN32)
