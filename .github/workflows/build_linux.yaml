@@ -36,5 +36,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ultraView-linux
-          path: ci/bin/ultraView
+          path: ci/bin/*.deb
           retention-days: 1

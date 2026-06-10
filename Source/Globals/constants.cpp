@@ -288,7 +288,7 @@ juce::File paths::getDataRoot ( juce::String path )
 	#elif JUCE_WINDOWS
 		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
 	#elif JUCE_LINUX
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
+		auto	ret = juce::File ( "/usr/share/ultraView" );
 	#else
 		// Unsupported platform
 		jassertfalse;

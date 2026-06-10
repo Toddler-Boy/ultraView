@@ -8,9 +8,10 @@ handle_error() {
 trap 'handle_error $LINENO' ERR
 
 if [ "$(uname)" == "Darwin" ]; then
-  rsync -ur ./Data/ "/Library/Application Support/ultraView"
+  echo "macOS: Data is bundled in the app — no copy needed"
 elif [ "$(uname)" == "Linux" ]; then
-  cp -r -u ./Data "/opt/ultraView"
+  sudo cp -r -u ./Data/* "/usr/share/ultraView"
 else
-  echo "For Windows we don't need to copy"
+  mkdir -p "$ProgramData/ultraView"
+  cp -r ./Data/* "$ProgramData/ultraView"
 fi

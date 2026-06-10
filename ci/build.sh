@@ -100,7 +100,11 @@ if [ "$OS_NAME" = "Linux" ]; then
   cd "$ROOT"
   cmake --preset ninja-clang
   cmake --build --preset ninja-clang --config Release --parallel
-  cp "$ROOT/Builds/ninja-clang/ultraView_artefacts/Release/ultraView" "$ROOT/ci/bin/"
+
+  cd "$ROOT/Builds/ninja-clang"
+  cpack -G DEB -C Release
+
+  cp "$ROOT/Builds/ninja-clang/"*.deb "$ROOT/ci/bin/"
 fi
 
 # Build Win version
