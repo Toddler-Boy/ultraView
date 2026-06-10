@@ -12,9 +12,11 @@
 	#include <SystemConfiguration/SystemConfiguration.h>
 	#include <net/if.h>
 	#include <ifaddrs.h>
+	#include <netinet/in.h>
 #elif JUCE_LINUX
 	#include <ifaddrs.h>
 	#include <net/if.h>
+	#include <netinet/in.h>
 	#include <sys/ioctl.h>
 	#include <linux/wireless.h>
 #endif

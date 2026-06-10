@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build macOS
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: macos-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -12,19 +12,24 @@ jobs:
       - name: Init Homebrew
         run: |
           eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(/usr/local/bin/brew shellenv)"
-          echo "PATH=$PATH" >> $GITHUB_ENV       
+          echo "PATH=$PATH" >> $GITHUB_ENV
+      - name: Install create-dmg
+        run: brew install create-dmg
       - name: "Run script"
         run: ./ci/build.sh
         shell: bash
         env:
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          DEV_APP_ID: ${{ secrets.DEV_APP_ID }}
           APPLICATION: ${{ secrets.APPLICATION }}
-          INSTALLER: ${{ secrets.INSTALLER }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
           APPLE_USER: ${{ secrets.APPLE_USER }}
-          APIKEY: ${{ secrets.APIKEY }}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ultraSID-macos
-          path: ci/bin/ultraSID.app
+          name: ultraView-macos
+          path: ci/bin/ultraView.dmg
           retention-days: 1

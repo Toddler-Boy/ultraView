@@ -16,10 +16,10 @@
 
 namespace UI
 {
-	static	juce::ActionBroadcaster*	ab = nullptr;
+	juce::ActionBroadcaster*	ab = nullptr;
 
-	static	juce::Colour	startColor;
-	static	juce::Colour	endColor;
+	juce::Colour	startColor;
+	juce::Colour	endColor;
 }
 //-----------------------------------------------------------------------------
 
@@ -284,11 +284,11 @@ juce::Path& UI::getScaledPathWithSize ( const juce::String& resourceName, juce::
 juce::File paths::getDataRoot ( juce::String path )
 {
 	#if JUCE_MAC
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "Application Support/ultraView" );
+		auto	ret = juce::File::getSpecialLocation ( juce::File::currentApplicationFile ).getChildFile ( "Contents/Resources/Data" );
 	#elif JUCE_WINDOWS
 		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
 	#elif JUCE_LINUX
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
+		auto	ret = juce::File ( "/usr/share/ultraView" );
 	#else
 		// Unsupported platform
 		jassertfalse;
