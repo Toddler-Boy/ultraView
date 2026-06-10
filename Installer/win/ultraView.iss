@@ -5,7 +5,7 @@
 #define MyAppPublisher "Michael Hartmann"
 #define MyAppCopyright "2026 Michael Hartmann"
 #define MyAppURL "https://ultrasid.com/"
-#define MyAppVersion GetStringFileInfo("bin\ultraView.exe", "ProductVersion")
+#define MyAppVersion GetStringFileInfo("stage\ultraView.exe", "ProductVersion")
 #define MyDefaultDirName "{autopf}\ultraView"
 
 [Setup]
@@ -47,8 +47,8 @@ PrivilegesRequired=admin
 Name: english; MessagesFile: compiler:Default.isl
 
 [Files]
-Source: "bin\ultraView.exe"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly
-Source: "bin\Data\*";        DestDir: "{commonappdata}\ultraView"; Flags: ignoreversion overwritereadonly recursesubdirs createallsubdirs
+Source: "stage\ultraView.exe"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly
+Source: "stage\Data\*";       DestDir: "{commonappdata}\ultraView"; Flags: ignoreversion overwritereadonly recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}";           Filename: "{app}\ultraView.exe"

@@ -113,7 +113,7 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   cmake --preset vs
   cmake --build --preset vs --config Release --parallel
 
-  STAGE="$ROOT/Installer/win/bin"
+  STAGE="$ROOT/Installer/win/stage"
   rm -rf "$STAGE"
   mkdir -p "$STAGE"
   cp "$ROOT/Builds/vs/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
