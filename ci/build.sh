@@ -117,7 +117,7 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   rm -rf "$STAGE"
   mkdir -p "$STAGE"
   cp "$ROOT/Builds/vs/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
-  cp -R "$ROOT/Data" "$STAGE/Data"
+  rsync -a --exclude='!src' "$ROOT/Data" "$STAGE/"
 
   # Azure Trusted Signing
   uuid_re='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'

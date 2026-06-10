@@ -132,6 +132,7 @@ source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${sour
 # Bundle Data folder as resources (macOS)
 if (APPLE)
 	file (GLOB_RECURSE data_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Data/*")
+	list (FILTER data_files EXCLUDE REGEX "/!src/")
 	foreach (data_file IN LISTS data_files)
 		file (RELATIVE_PATH rel_path "${CMAKE_CURRENT_SOURCE_DIR}/Data" "${data_file}")
 		get_filename_component (rel_dir "${rel_path}" DIRECTORY)
@@ -232,7 +233,8 @@ elseif (APPLE)
 elseif (UNIX)
 	install (TARGETS ultraView DESTINATION bin)
 	install (DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Data/"
-			 DESTINATION share/ultraView)
+			 DESTINATION share/ultraView
+			 PATTERN "!src" EXCLUDE)
 
 	set (CPACK_GENERATOR DEB)
 	set (CPACK_PACKAGE_NAME "ultraview")
