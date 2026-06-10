@@ -10,6 +10,8 @@
 
 #if JUCE_WINDOWS || JUCE_MAC
 	extern void setWindowProperties ( void*, unsigned int titleColor );
+#else
+	inline void setWindowProperties ( void*, unsigned int ) {}
 #endif
 
 //-----------------------------------------------------------------------------
