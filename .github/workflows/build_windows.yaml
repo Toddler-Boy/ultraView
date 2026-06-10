@@ -13,14 +13,25 @@ jobs:
         with:
           submodules: true
 
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+        shell: bash
+
       - name: "Run script"
         run: ./ci/build.sh
         shell: bash
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
+          AZURE_ACCOUNT_NAME: ${{ secrets.AZURE_ACCOUNT_NAME }}
+          AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Binaries windows_ultraView
-          path: ./ci/bin/*
+          name: ultraView-windows
+          path: ci/bin/ultraView.exe
           retention-days: 30
