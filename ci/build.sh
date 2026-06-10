@@ -24,8 +24,8 @@ if [ "$OS_NAME" = "Darwin" ]; then
   # APPLICATION = base64 of Developer ID Application .p12
   #
   if [ -n "${APPLICATION:-}" ] && [ "${RUNNER_ENVIRONMENT:-}" = "github-hosted" ]; then
-    KC_PASS="${KEYCHAIN_PASSWORD:-nr4aGPyz}"
-    P12_PASS="${P12_PASSWORD:-aym9PKWB}"
+    KC_PASS="$KEYCHAIN_PASSWORD"
+    P12_PASS="$P12_PASSWORD"
 
     security create-keychain -p "$KC_PASS" Keys.keychain || true
 

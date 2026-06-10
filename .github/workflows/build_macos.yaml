@@ -22,9 +22,11 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
           DEV_APP_ID: ${{ secrets.DEV_APP_ID }}
           APPLICATION: ${{ secrets.APPLICATION }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
           APPLE_USER: ${{ secrets.APPLE_USER }}
-          APIKEY: ${{ secrets.APIKEY }}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
