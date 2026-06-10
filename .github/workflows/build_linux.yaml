@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build Linux
-    runs-on: [self-hosted, Linux, x64]
+    runs-on: [Linux, x64]
     timeout-minutes: 15
     steps:
       - name: Fix up git URLs
