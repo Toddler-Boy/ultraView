@@ -5,3 +5,4 @@ bin
 Builds
 .vscode
 /installer
+.*
