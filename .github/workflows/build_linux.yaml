@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build Linux
-    runs-on: [Linux, x64]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Fix up git URLs
@@ -21,11 +21,9 @@ jobs:
       - name: "Run script"
         run: ./ci/build.sh
         shell: bash
-        env:
-          APIKEY: ${{ secrets.APIKEY }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ultraSID-linux
-          path: ci/bin/ultraSID
+          name: ultraView-linux
+          path: ci/bin/ultraView
           retention-days: 1

@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build macOS
-    runs-on: [macOS, ARM64]
+    runs-on: macos-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
