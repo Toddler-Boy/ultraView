@@ -129,6 +129,18 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 target_sources (ultraView PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
 
+# Bundle Data folder as resources (macOS)
+if (APPLE)
+	file (GLOB_RECURSE data_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Data/*")
+	foreach (data_file IN LISTS data_files)
+		file (RELATIVE_PATH rel_path "${CMAKE_CURRENT_SOURCE_DIR}/Data" "${data_file}")
+		get_filename_component (rel_dir "${rel_path}" DIRECTORY)
+		set_source_files_properties ("${data_file}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Data/${rel_dir}")
+	endforeach ()
+	target_sources (ultraView PRIVATE ${data_files})
+	source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Data PREFIX Data FILES ${data_files})
+endif ()
+
 target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
 target_link_libraries (ultraView PRIVATE
