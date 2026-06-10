@@ -16,10 +16,10 @@
 
 namespace UI
 {
-	static	juce::ActionBroadcaster*	ab = nullptr;
+	juce::ActionBroadcaster*	ab = nullptr;
 
-	static	juce::Colour	startColor;
-	static	juce::Colour	endColor;
+	juce::Colour	startColor;
+	juce::Colour	endColor;
 }
 //-----------------------------------------------------------------------------
 

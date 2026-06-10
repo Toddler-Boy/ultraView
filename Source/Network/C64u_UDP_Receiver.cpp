@@ -168,7 +168,13 @@ void C64u_UDP_Receiver::run ()
 }
 //-----------------------------------------------------------------------------
 
-#include <immintrin.h>
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+ #include <immintrin.h>
+ #define ULTRAVIEW_USE_SSE 1
+#elif defined(__aarch64__) || defined(_M_ARM64)
+ #include <arm_neon.h>
+ #define ULTRAVIEW_USE_NEON 1
+#endif
 
 namespace
 {
@@ -198,6 +204,7 @@ inline void expand_nibbles_final ( const uint8_t* __restrict src, uint8_t* __res
 {
 	constexpr auto	payloadSize = 768;
 
+#if ULTRAVIEW_USE_SSE
 	// 16-byte alignment is required for these instructions
 	const auto	s = ( const __m128i* )std::assume_aligned<16> ( src );
 	auto		d = ( __m128i* )std::assume_aligned<16> ( dst );
@@ -225,6 +232,35 @@ inline void expand_nibbles_final ( const uint8_t* __restrict src, uint8_t* __res
 		_mm_store_si128 ( d + ( i * 4 ) + 2, _mm_unpacklo_epi8 ( in1_low, in1_high ) );
 		_mm_store_si128 ( d + ( i * 4 ) + 3, _mm_unpackhi_epi8 ( in1_low, in1_high ) );
 	}
+#elif ULTRAVIEW_USE_NEON
+	const auto	mask = vdupq_n_u8 ( 0x0F );
+
+	for ( auto i = 0; i < ( payloadSize / 32 ); ++i )
+	{
+		const auto	in0 = vld1q_u8 ( src + ( i * 32 ) );
+		const auto	in1 = vld1q_u8 ( src + ( i * 32 ) + 16 );
+
+		const auto	in0_low = vandq_u8 ( in0, mask );
+		const auto	in0_high = vandq_u8 ( vshrq_n_u8 ( in0, 4 ), mask );
+
+		const auto	in1_low = vandq_u8 ( in1, mask );
+		const auto	in1_high = vandq_u8 ( vshrq_n_u8 ( in1, 4 ), mask );
+
+		const auto	zip0 = vzipq_u8 ( in0_low, in0_high );
+		const auto	zip1 = vzipq_u8 ( in1_low, in1_high );
+
+		vst1q_u8 ( dst + ( i * 64 ) +  0, zip0.val[0] );
+		vst1q_u8 ( dst + ( i * 64 ) + 16, zip0.val[1] );
+		vst1q_u8 ( dst + ( i * 64 ) + 32, zip1.val[0] );
+		vst1q_u8 ( dst + ( i * 64 ) + 48, zip1.val[1] );
+	}
+#else
+	for ( auto i = 0; i < payloadSize; ++i )
+	{
+		dst[ i * 2     ] = src[ i ] & 0x0F;
+		dst[ i * 2 + 1 ] = src[ i ] >> 4;
+	}
+#endif
 }
 
 }
