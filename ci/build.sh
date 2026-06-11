@@ -69,7 +69,34 @@ if [ "$OS_NAME" = "Darwin" ]; then
     --root "$PKG_STAGE" \
     --identifier "com.refx.ultraView" \
     --version "1.0" \
+    "$ROOT/ci/bin/ultraView-component.pkg"
+
+  # Build product pkg with fixed title
+  cat > "$ROOT/ci/bin/distribution.xml" <<DISTEOF
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>ultraView</title>
+    <pkg-ref id="com.refx.ultraView"/>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.refx.ultraView"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.refx.ultraView" visible="false">
+        <pkg-ref id="com.refx.ultraView"/>
+    </choice>
+    <pkg-ref id="com.refx.ultraView" version="1.0">ultraView-component.pkg</pkg-ref>
+</installer-gui-script>
+DISTEOF
+
+  productbuild \
+    --distribution "$ROOT/ci/bin/distribution.xml" \
+    --package-path "$ROOT/ci/bin" \
     "$ROOT/ci/bin/ultraView-unsigned.pkg"
+
+  rm "$ROOT/ci/bin/ultraView-component.pkg" "$ROOT/ci/bin/distribution.xml"
 
   # Sign the pkg
   if [ -n "${INSTALLER:-}" ]; then
@@ -77,7 +104,7 @@ if [ "$OS_NAME" = "Darwin" ]; then
     rm "$ROOT/ci/bin/ultraView-unsigned.pkg"
   else
     mv "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView.pkg"
-    echo "Skipping pkg signing — APPLICATION secret not set"
+    echo "Skipping pkg signing — INSTALLER secret not set"
   fi
 
   rm -rf "$PKG_STAGE"
