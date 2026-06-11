@@ -48,7 +48,7 @@ Name: english; MessagesFile: compiler:Default.isl
 
 [Files]
 Source: "stage\ultraView.exe"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly
-Source: "stage\Data\*";       DestDir: "{commonappdata}\ultraView"; Flags: ignoreversion overwritereadonly recursesubdirs createallsubdirs
+Source: "stage\Data\*";       DestDir: "{commonappdata}\ultraView"; Excludes: "!src,!src\*"; Flags: ignoreversion overwritereadonly recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}";           Filename: "{app}\ultraView.exe"
