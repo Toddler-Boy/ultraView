@@ -1,7 +1,5 @@
+**/.*/
 JuceLibraryCode
 Builds
-.DS_Store
 bin
 Builds
-.vscode
-.*
