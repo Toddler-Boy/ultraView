@@ -283,9 +283,7 @@ juce::Path& UI::getScaledPathWithSize ( const juce::String& resourceName, juce::
 
 juce::File paths::getDataRoot ( juce::String path )
 {
-	#if JUCE_MAC
-		auto	ret = juce::File::getSpecialLocation ( juce::File::currentApplicationFile ).getChildFile ( "Contents/Resources/Data" );
-	#elif JUCE_WINDOWS
+	#if JUCE_MAC || JUCE_WINDOWS
 		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
 	#elif JUCE_LINUX
 		auto	ret = juce::File ( "/usr/share/ultraView" );

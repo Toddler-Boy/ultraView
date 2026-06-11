@@ -13,8 +13,6 @@ jobs:
         run: |
           eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(/usr/local/bin/brew shellenv)"
           echo "PATH=$PATH" >> $GITHUB_ENV
-      - name: Install create-dmg
-        run: brew install create-dmg
       - name: "Run script"
         run: ./ci/build.sh
         shell: bash
@@ -22,6 +20,8 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
           DEV_APP_ID: ${{ secrets.DEV_APP_ID }}
           APPLICATION: ${{ secrets.APPLICATION }}
+          INSTALLER: ${{ secrets.INSTALLER }}
+          DEV_INST_ID: ${{ secrets.DEV_INST_ID }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
@@ -31,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ultraView-macos
-          path: ci/bin/ultraView.dmg
+          path: ci/bin/ultraView.pkg
           retention-days: 1

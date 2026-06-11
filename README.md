@@ -23,7 +23,9 @@ The following GitHub Actions secrets are required for code signing and notarizat
 | `TEAM_ID` | Apple Developer Team ID (10-character string) | [Apple Developer Account](https://developer.apple.com/account) > Membership details |
 | `DEV_APP_ID` | Full signing identity, e.g. `Developer ID Application: Name (TEAM_ID)` | Run `security find-identity -v -p codesigning` on a Mac with the certificate installed |
 | `APPLICATION` | Base64-encoded Developer ID Application `.p12` certificate | Export from Keychain Access > My Certificates, then `base64 -i Certificates.p12` |
-| `P12_PASSWORD` | Password used when exporting the `.p12` file | Set during the Keychain Access export |
+| `INSTALLER` | Base64-encoded Developer ID Installer `.p12` certificate | Export from Keychain Access > My Certificates, then `base64 -i Installer.p12` |
+| `DEV_INST_ID` | Full installer signing identity, e.g. `Developer ID Installer: Name (TEAM_ID)` | Run `security find-identity -v` on a Mac with the certificate installed |
+| `P12_PASSWORD` | Password used when exporting the `.p12` files | Set during the Keychain Access export |
 | `KEYCHAIN_PASSWORD` | Password for the temporary CI keychain | Any random string (only used during CI builds) |
 | `APPLE_USER` | Apple ID email used for notarization | Your Apple Developer account email |
 | `APPLE_PASS` | App-specific password for notarization | [Apple ID Account](https://appleid.apple.com) > Sign-In and Security > App-Specific Passwords |

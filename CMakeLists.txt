@@ -129,17 +129,11 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 target_sources (ultraView PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
 
-# Bundle Data folder as resources (macOS)
+# Install Data folder to /Library/Application Support/ultraView (macOS)
 if (APPLE)
-	file (GLOB_RECURSE data_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Data/*")
-	list (FILTER data_files EXCLUDE REGEX "/!src/")
-	foreach (data_file IN LISTS data_files)
-		file (RELATIVE_PATH rel_path "${CMAKE_CURRENT_SOURCE_DIR}/Data" "${data_file}")
-		get_filename_component (rel_dir "${rel_path}" DIRECTORY)
-		set_source_files_properties ("${data_file}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Data/${rel_dir}")
-	endforeach ()
-	target_sources (ultraView PRIVATE ${data_files})
-	source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Data PREFIX Data FILES ${data_files})
+	install (DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Data/"
+			 DESTINATION "/Library/Application Support/ultraView"
+			 PATTERN "!src" EXCLUDE)
 endif ()
 
 target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)

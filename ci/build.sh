@@ -22,6 +22,7 @@ if [ "$OS_NAME" = "Darwin" ]; then
   #
   # Bootstrap a temp keychain from base64-encoded p12 secrets when running in CI.
   # APPLICATION = base64 of Developer ID Application .p12
+  # INSTALLER   = base64 of Developer ID Installer .p12
   #
   if [ -n "${APPLICATION:-}" ] && [ "${RUNNER_ENVIRONMENT:-}" = "github-hosted" ]; then
     KC_PASS="$KEYCHAIN_PASSWORD"
@@ -30,8 +31,10 @@ if [ "$OS_NAME" = "Darwin" ]; then
     security create-keychain -p "$KC_PASS" Keys.keychain || true
 
     echo "$APPLICATION" | base64 -D -o /tmp/Application.p12
-
     security import /tmp/Application.p12 -t agg -k Keys.keychain -P "$P12_PASS" -A -T /usr/bin/codesign
+
+    echo "$INSTALLER" | base64 -D -o /tmp/Installer.p12
+    security import /tmp/Installer.p12 -t agg -k Keys.keychain -P "$P12_PASS" -A -T /usr/bin/productsign
 
     security list-keychains -s Keys.keychain
     security default-keychain -s Keys.keychain
@@ -53,35 +56,35 @@ if [ "$OS_NAME" = "Darwin" ]; then
     echo "Skipping codesign — APPLICATION secret not set"
   fi
 
-  # Create DMG with app on left, Applications symlink on right, arrow background
-  DMG_STAGE="$ROOT/ci/bin/dmg_contents"
-  rm -rf "$DMG_STAGE"
-  mkdir -p "$DMG_STAGE"
-  cp -R "$APP_PATH" "$DMG_STAGE/"
-  ln -s /Applications "$DMG_STAGE/Applications"
+  # Stage Data for pkg
+  PKG_STAGE="$ROOT/ci/bin/pkg_root"
+  rm -rf "$PKG_STAGE"
+  mkdir -p "$PKG_STAGE/Applications"
+  mkdir -p "$PKG_STAGE/Library/Application Support/ultraView"
+  cp -R "$APP_PATH" "$PKG_STAGE/Applications/"
+  rsync -a --exclude='!src' "$ROOT/Data/" "$PKG_STAGE/Library/Application Support/ultraView/"
 
-  create-dmg \
-    --volname "ultraView" \
-    --background "$ROOT/ci/dmg_background.png" \
-    --window-pos 200 120 \
-    --window-size 660 400 \
-    --icon-size 80 \
-    --icon "ultraView.app" 180 200 \
-    --app-drop-link 480 200 \
-    --no-internet-enable \
-    "$ROOT/ci/bin/ultraView.dmg" \
-    "$DMG_STAGE/" || true
+  # Build component pkg
+  pkgbuild \
+    --root "$PKG_STAGE" \
+    --identifier "com.refx.ultraView" \
+    --version "1.0" \
+    "$ROOT/ci/bin/ultraView-unsigned.pkg"
 
-  rm -rf "$DMG_STAGE"
-
-  # Sign the DMG
-  if [ -n "${APPLICATION:-}" ]; then
-    codesign -s "$DEV_APP_ID" --options=runtime --timestamp --force -v "$ROOT/ci/bin/ultraView.dmg"
+  # Sign the pkg
+  if [ -n "${INSTALLER:-}" ]; then
+    productsign --sign "$DEV_INST_ID" "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView.pkg"
+    rm "$ROOT/ci/bin/ultraView-unsigned.pkg"
+  else
+    mv "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView.pkg"
+    echo "Skipping pkg signing — APPLICATION secret not set"
   fi
 
-  # Notarize the DMG
+  rm -rf "$PKG_STAGE"
+
+  # Notarize the pkg
   if [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
-    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView.dmg" 2>&1) || NOTARY_FAILED=1
+    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView.pkg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
     SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { print \$2; exit }")
     if [ "${NOTARY_FAILED:-0}" = "1" ] && [ -n "$SUBMISSION_ID" ]; then
@@ -89,7 +92,7 @@ if [ "$OS_NAME" = "Darwin" ]; then
       xcrun notarytool log "$SUBMISSION_ID" --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" || true
       exit 1
     fi
-    xcrun stapler staple "$ROOT/ci/bin/ultraView.dmg"
+    xcrun stapler staple "$ROOT/ci/bin/ultraView.pkg"
   else
     echo "Skipping notarization — APPLE_USER / APPLE_PASS not set"
   fi
