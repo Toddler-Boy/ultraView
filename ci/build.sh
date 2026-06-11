@@ -67,7 +67,7 @@ if [ "$OS_NAME" = "Darwin" ]; then
   # Build component pkg
   pkgbuild \
     --root "$PKG_STAGE" \
-    --identifier "com.refx.ultraView" \
+    --identifier "com.hartmann.ultraView" \
     --version "1.0" \
     "$ROOT/ci/bin/ultraView-component.pkg"
 
@@ -76,18 +76,18 @@ if [ "$OS_NAME" = "Darwin" ]; then
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
     <title>ultraView</title>
-    <pkg-ref id="com.refx.ultraView"/>
+    <pkg-ref id="com.hartmann.ultraView"/>
     <options customize="never" require-scripts="false"/>
     <choices-outline>
         <line choice="default">
-            <line choice="com.refx.ultraView"/>
+            <line choice="com.hartmann.ultraView"/>
         </line>
     </choices-outline>
     <choice id="default"/>
-    <choice id="com.refx.ultraView" visible="false">
-        <pkg-ref id="com.refx.ultraView"/>
+    <choice id="com.hartmann.ultraView" visible="false">
+        <pkg-ref id="com.hartmann.ultraView"/>
     </choice>
-    <pkg-ref id="com.refx.ultraView" version="1.0">ultraView-component.pkg</pkg-ref>
+    <pkg-ref id="com.hartmann.ultraView" version="1.0">ultraView-component.pkg</pkg-ref>
 </installer-gui-script>
 DISTEOF
 
