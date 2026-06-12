@@ -118,8 +118,6 @@ public:
 				else
 					laf->setColour ( idDef.first, idDef.second );
 		}
-
-		laf->setColour ( juce::HyperlinkButton::textColourId, laf->findColour ( UI::colors::accent ) );
 	}
 	//-----------------------------------------------------------------------------
 

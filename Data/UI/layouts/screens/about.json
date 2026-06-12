@@ -7,7 +7,9 @@
 		{ "id": "about", "cx": "parW2", "y": "margin", "w": 600, "h": 140,
 			"components": [
 				{ "id": "icon", "x": 20, "y": 20, "w": 100, "h": 100 },
-				{ "id": "title", "x": "prevR + 15", "y": "prevY + 10", "r": "parW", "h": 24 }
+				{ "id": "title", "x": "prevR + 15", "y": "prevY + 10", "r": "parW", "h": 24 },
+				{ "id": "copyright", "yd": 2 },
+				{ "id": "link", "yd": 2 }
 			]
 		},
 		{ "id": "scrollText", "x": "prevX", "y": "prevB + margin", "w": "prevW + 20", "b": "parB - margin" },

@@ -10,8 +10,8 @@
 
 [Setup]
 AppID={{E8B2F4A1-7C3D-4E5F-9A1B-2D3E4F5A6B7C}
-AppName={#MyAppCompany} {#MyAppName} {#MyAppVersion}
-AppVerName={#MyAppCompany} {#MyAppName} {#MyAppVersion}
+AppName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
 AppVersion={#MyAppVersion}
 AppCopyright={#MyAppCopyright}
 AppPublisher={#MyAppPublisher}
@@ -42,6 +42,7 @@ VersionInfoProductVersion={#MyAppVersion}
 VersionInfoProductTextVersion={#MyAppVersion}
 UsePreviousGroup=False
 PrivilegesRequired=admin
+WizardSmallImageFile=..\..\icons\windows_big.png
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -58,4 +59,4 @@ Name: "{commondesktop}\{#MyAppName}";   Filename: "{app}\ultraView.exe"; Tasks: 
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Run]
-Filename: "{app}\ultraView.exe"; Description: "Launch ultraView"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\ultraView.exe"; WorkingDir: "{app}"; Description: "Launch ultraView"; Flags: runasoriginaluser postinstall nowait skipifsilent

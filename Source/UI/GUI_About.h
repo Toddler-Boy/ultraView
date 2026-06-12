@@ -44,6 +44,8 @@ private:
 	GUI_SettingsBox			about { "about" };
 		GUI_MipMap				icon;
 		GUI_Label				title { ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString };
+		GUI_Label				copyright { u8"Copyright © 2026 Michael Hartmann (Toddler Boy)" };
+		juce::HyperlinkButton	link { "https://github.com/Toddler-Boy/ultraView", { "https://github.com/Toddler-Boy/ultraView"  } };
 
 	GUI_ScrollTextViewer	scrollTextViewer;
 	GUI_SVG_Button			closeAbout { "close", { "crt/about_close" } };

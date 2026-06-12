@@ -8,10 +8,18 @@ GUI_About::GUI_About ()
 {
 	icon.setName ( "icon" );
 	title.setName ( "title" );
+	copyright.setName ( "copyright" );
+
+	// URL
+	link.setName ( "link" );
+	link.setFont ( UI::font ( 20.0f, 700 ), false, juce::Justification::centredLeft );
+
 	icon.mipMap.setImage ( paths::getDataRoot ( "UI/png/ultraView.png" ) );
 
 	about.addAndMakeVisible ( icon );
 	about.addAndMakeVisible ( title );
+	about.addAndMakeVisible ( copyright );
+	about.addAndMakeVisible ( link );
 	addAndMakeVisible ( about );
 
 	scrollTextViewer.setName ( "scrollText" );

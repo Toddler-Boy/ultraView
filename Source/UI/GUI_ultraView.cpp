@@ -162,7 +162,7 @@ void GUI_ultraView::updateColors ()
 	UI::setShades ( bgCol, textCol );
 
 	const auto	darkCol = UI::getShade ( 0.1f );
-	const auto	bento = bgCol;// UI::getShade ( 1.0f / 16.0f );
+	const auto	bento = bgCol;
 	auto&	laf = getLookAndFeel ();
 
 	laf.setColour ( juce::ResizableWindow::backgroundColourId, bgCol );
@@ -192,6 +192,8 @@ void GUI_ultraView::updateColors ()
 		laf.setColour ( juce::PopupMenu::backgroundColourId, darkCol );
 		laf.setColour ( juce::PopupMenu::textColourId, textCol );
 		laf.setColour ( juce::PopupMenu::highlightedBackgroundColourId, UI::getShade ( 0.2f ) );
+
+		laf.setColour ( juce::HyperlinkButton::textColourId, laf.findColour ( UI::colors::accentBright ) );
 
 		if ( auto p = findParentComponentOfClass<juce::ResizableWindow> () )
 			p->setBackgroundColour ( bgCol );

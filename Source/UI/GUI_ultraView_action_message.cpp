@@ -40,11 +40,15 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 		const auto	extension = params[ 0 ].fromLastOccurrenceOf ( ".", false, false ).toLowerCase ();
 		if ( extension == "crt" )
 		{
-			const auto	cartType = juce::ByteOrder::bigEndianShort ( static_cast<const char*>( mb.getData () ) + 22 );
+			const auto	wasEasyFlash = loadedEasyFlash;
 
-			if ( cartType == 32 )
+			const auto	cartType = juce::ByteOrder::bigEndianShort ( static_cast<const char*>( mb.getData () ) + 22 );
+			loadedEasyFlash = cartType == 32;
+
+			if ( wasEasyFlash )
 			{
 				c64_reboot ();
+
 				juce::Timer::callAfterDelay ( 2000, [ this, mb, filename = params[ 0 ] ] {	c64_run ( "crt", mb, filename );	} );
 				return;
 			}
@@ -55,13 +59,14 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 	else if ( cmd == "c64action" )
 	{
 		network.put ( "v1/machine:" + params[ 0 ], {} );
+
+		if ( params[ 0 ] == "reboot" || params[ 0 ] == "poweroff" )
+			loadedEasyFlash = false;
 	}
 	else if ( cmd == "browser" )
 	{
 		if ( params[ 0 ] == "scan-finished" )
-		{
 			mainScreen.crt.refreshBrowserEntries ();
-		}
 	}
 	else if ( cmd == "showAbout" )
 	{

@@ -42,6 +42,7 @@ public:
 
 	// juce::Component
 	void resized () override;
+	bool keyPressed ( const juce::KeyPress& key ) override;
 
 	// juce::MouseListener
 	void mouseDoubleClick ( const juce::MouseEvent& evt ) override;
@@ -68,9 +69,6 @@ private:
 
 	// gin::FileSystemWatcher::Listener
 	void fileChanged ( const juce::File& file, gin::FileSystemWatcher::FileSystemEvent event ) override;
-
-	// juce::Component
-	bool keyPressed ( const juce::KeyPress& key ) override;
 
 	// this
 	bool	browserIsVisible = false;
@@ -143,6 +141,9 @@ private:
 
 	void loadGamesDatabase ();
 	GameEntry findGameEntry ( juce::String filename ) const;
+
+	// Last loaded was an EasyFlash cartridge
+	bool	loadedEasyFlash = true;
 
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
 	bool	showRasterTime = false;
