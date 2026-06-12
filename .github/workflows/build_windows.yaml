@@ -9,7 +9,7 @@ jobs:
         run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
         shell: bash
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
 
@@ -29,9 +29,8 @@ jobs:
           AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        if: always()
+        uses: actions/upload-artifact@v7
         with:
           name: ultraView-windows
-          path: ci/bin/ultraView.exe
-          retention-days: 30
+          path: ci/bin/ultraView_*.exe
+          archive: false
