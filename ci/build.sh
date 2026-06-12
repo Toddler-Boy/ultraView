@@ -1,10 +1,20 @@
 #!/bin/bash -e
+handle_error() {
+    echo "An error occurred on line $1"
+    read -p "Press enter to continue"
+    exit 1
+}
+
+trap 'handle_error $LINENO' ERR
 
 OS_NAME=$(uname)
 
 ROOT=$(cd "$(dirname "$0")/.."; pwd)
 cd "$ROOT"
-echo "$ROOT"
+
+ver=$(<"$ROOT/VERSION")
+ver=${ver%%*( )}
+echo "Bulding installer for ultraView $ver"
 
 BRANCH=${GITHUB_REF##*/}
 echo "$BRANCH"
@@ -203,7 +213,7 @@ METAEOF
   fi
   "$ISCC" "$ROOT/Installer/win/ultraView.iss"
 
-  EXE_OUT="$ROOT/Installer/win/bin/ultraView.exe"
+  EXE_OUT="$ROOT/Installer/win/bin/ultraView_$ver.exe"
 
   # Sign the installer
   if [ "$WIN_SIGN" = "1" ]; then
