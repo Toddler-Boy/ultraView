@@ -9,7 +9,7 @@ C64uScanner::C64uScanner () : juce::Thread ( "C64uScanner" )
 {
 	request = "GET /v1/info HTTP/1.1\r\n\r\n";
 
-	juce::SharedResourcePointer<Settings>	settings;
+	const juce::SharedResourcePointer<Settings>	settings;
 
 	const auto	password = settings->get<juce::String> ( "Network", "password" );
 	if ( password.isNotEmpty () )

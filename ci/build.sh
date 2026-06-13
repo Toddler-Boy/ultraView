@@ -59,9 +59,26 @@ if [ "$OS_NAME" = "Darwin" ]; then
 
   APP_PATH="$ROOT/Builds/xcode/ultraView_artefacts/Release/ultraView.app"
 
+  # Generate entitlements for Hardened Runtime (Camera and Network Client)
+  ENTITLEMENTS="$ROOT/ci/bin/entitlements.plist"
+  cat > "$ENTITLEMENTS" <<ENTEOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Allows app to use the webcam -->
+    <key>com.apple.security.device.camera</key>
+    <true/>
+    <!-- Allows app to send outgoing REST requests -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+</dict>
+</plist>
+ENTEOF
+
   # Codesign the app
   if [ -n "${APPLICATION:-}" ]; then
-    codesign -s "$DEV_APP_ID" --options=runtime --timestamp --force --deep -v "$APP_PATH"
+    codesign -s "$DEV_APP_ID" --options=runtime --timestamp --entitlements "$ENTITLEMENTS" --force --deep -v "$APP_PATH"
   else
     echo "Skipping codesign — APPLICATION secret not set"
   fi
@@ -110,10 +127,10 @@ DISTEOF
 
   # Sign the pkg
   if [ -n "${INSTALLER:-}" ]; then
-    productsign --sign "$DEV_INST_ID" "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView.pkg"
+    productsign --sign "$DEV_INST_ID" "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView_$ver.pkg"
     rm "$ROOT/ci/bin/ultraView-unsigned.pkg"
   else
-    mv "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView.pkg"
+    mv "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView_$ver.pkg"
     echo "Skipping pkg signing — INSTALLER secret not set"
   fi
 
@@ -121,7 +138,7 @@ DISTEOF
 
   # Notarize the pkg
   if [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
-    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView.pkg" 2>&1) || NOTARY_FAILED=1
+    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView_$ver.pkg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
     SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { print \$2; exit }")
     if [ "${NOTARY_FAILED:-0}" = "1" ] && [ -n "$SUBMISSION_ID" ]; then
@@ -129,7 +146,7 @@ DISTEOF
       xcrun notarytool log "$SUBMISSION_ID" --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" || true
       exit 1
     fi
-    xcrun stapler staple "$ROOT/ci/bin/ultraView.pkg"
+    xcrun stapler staple "$ROOT/ci/bin/ultraView_$ver.pkg"
   else
     echo "Skipping notarization — APPLE_USER / APPLE_PASS not set"
   fi

@@ -196,7 +196,7 @@ target_compile_definitions (ultraView PRIVATE
 
 if (APPLE)
 	set_target_properties(ultraView PROPERTIES
-		XCODE_ATTRIBUTE_INFOPLIST_KEY_NSCameraUsageDescription "Add users face to CRT screen"
+		XCODE_ATTRIBUTE_INFOPLIST_KEY_NSCameraUsageDescription "Add users reflection to CRT screen"
 		XCODE_ATTRIBUTE_CLANG_LINK_OBJC_RUNTIME OFF
 		XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING[variant=Release] ON
 		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] ON)

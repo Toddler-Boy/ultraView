@@ -6,7 +6,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Init Homebrew
@@ -28,8 +28,8 @@ jobs:
           APPLE_USER: ${{ secrets.APPLE_USER }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ultraView-macos
-          path: ci/bin/ultraView.pkg
+          path: ci/bin/ultraView_*.pkg
           retention-days: 1
