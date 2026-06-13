@@ -32,4 +32,4 @@ jobs:
         with:
           name: ultraView-macos
           path: ci/bin/ultraView_*.pkg
-          retention-days: 1
+          archive: false
