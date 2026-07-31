@@ -4,7 +4,7 @@
 
 void GUI_ultraView::findC64OnNetwork ()
 {
-	auto	lastIP = settings->get<juce::String> ( "Network/last-ip" ).trim ();
+	auto	lastIP = settings->get<juce::String> ( "network/last-ip" ).trim ();
 
 	c64uScanner.scan ( [ this ] ( const juce::String& ip )
 	{
@@ -26,9 +26,9 @@ void GUI_ultraView::findC64OnNetwork ()
 			getTopLevelComponent ()->setName ( ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString + juce::String ( " - " ) + ip );
 		} );
 
-		settings->set ( "Network/last-ip", ipOnly );
+		settings->set ( "network/last-ip", ipOnly );
 		network.setBaseAddress ( "http://" + ipOnly );
-		network.setC64uPassword ( settings->get<juce::String> ( "Network/password" ) );
+		network.setC64uPassword ( settings->get<juce::String> ( "network/password" ) );
 
 		setupNetworking ();
 

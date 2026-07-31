@@ -2,15 +2,14 @@
 
 #include <JuceHeader.h>
 
-#include "UI/Misc/VIC2_Render.h"
-#include "UI/Misc/colodore.h"
+#include "ultra-shared/Video/VIC2_Render.h"
+#include "ultra-shared/Video/colodore.h"
 
 #include "GUI_Browser.h"
 #include "GUI_Overlay.h"
 
-#include "UI/Components/GUI_Toggle.h"
-
-#include "Globals/Preferences.h"
+#include "Config/Preferences.h"
+#include "ultra-shared/UI/GUI_CRTSettings.h"
 
 #include "UI/Misc/ComponentFactory.h"
 
@@ -31,6 +30,10 @@ public:
 	void update ( const float secondsPassed );
 
 	void reloadOverlayProfile ()	{	overlay.reloadOverlayProfile ();	}
+
+	// A file under the user Overlays / CRT Masks folders changed (relPath is
+	// relative to the user root); hot-reload live tweaks or rescan pick lists
+	void userCRTContentChanged ( const juce::String& relPath, gin::FileSystemWatcher::FileSystemEvent event );
 
 	bool isBrowserVisible () const { return browserVisible; }
 	void showBrowser ( const bool visible );
@@ -54,15 +57,11 @@ private:
 
 	// this
 	void renderCRT ();
-	VIC2_Render::settings getVIC2SettingsFromPreferences () const;
-	lime::CRTEmulation::settings getCRTEmulationSettingsFromPreferences () const;
 
+	// The panel's settings plus the VIC2-derived fields, pushed into the emulation
 	void updateOverlayCRTSettings ();
 
-	void updateCRTsettingsUI ();
 	void updateCRTPalette ( const VIC2_Render::settings& vic2Settings );
-
-	void connectComponents ();
 
 	const colodore				colo;
 	colodore::shaderPalette		yuvE_yuvO_yiq;
@@ -70,12 +69,10 @@ private:
 
 	std::atomic<bool>	streamIsNTSC = false;
 	bool	lastFirstLuma = false;
-	bool	cursorVisible = true;
 
 	juce::SharedResourcePointer<Preferences>		preferences;
 
 	GUI_Overlay		overlay;
-	float			timePassed = 0.0f;
 
 	// Show hide/browser
 	bool	browserVisible = false;
@@ -86,17 +83,11 @@ private:
 	// Show hide/settings
 	bool	settingsVisible = false;
 
-	// Settings
-	juce::Component	settingsWrapper { "settings" };
-		juce::Viewport	settingsViewport { "viewport" };
-			juce::Component	settingsContent { "content" };
-
-	// CRT layout
-	std::unordered_map<juce::String, juce::Component*> crtSettingsComponentMap;
+	// The shared settings panel; the page layout positions it by its
+	// component name "settings"
+	GUI_CRTSettings	settingsPanel;
 
 	gin::LayoutSupport	crtLayout { *this, [] ( const juce::String& typeName ) { return componentFactory ( typeName ); } };
-
-	void updateDisablers ();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_CRT )
 };

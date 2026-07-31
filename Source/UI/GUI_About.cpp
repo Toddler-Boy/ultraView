@@ -1,4 +1,5 @@
 #include "GUI_About.h"
+#include "Config/DataSource.h"
 #include "Globals/constants.h"
 
 //-----------------------------------------------------------------------------
@@ -14,7 +15,10 @@ GUI_About::GUI_About ()
 	link.setName ( "link" );
 	link.setFont ( UI::font ( 20.0f, 700 ), false, juce::Justification::centredLeft );
 
-	icon.mipMap.setImage ( paths::getDataRoot ( "UI/png/ultraView.png" ) );
+	{
+		const auto	png = datasource::loadData ( "UI/png/ultraView.png" );
+		icon.mipMap.setImage ( png.getData (), png.getSize () );
+	}
 
 	about.addAndMakeVisible ( icon );
 	about.addAndMakeVisible ( title );
@@ -44,8 +48,8 @@ GUI_About::GUI_About ()
 
 void GUI_About::resized ()
 {
-	layout.setLayout ( { paths::getDataRoot ( "UI/layouts/constants.json" ),
-						 paths::getDataRoot ( "UI/layouts/screens/about.json" ) } );
+	UI::setLayout ( layout, {	"UI/layouts/constants.json",
+								"UI/layouts/screens/about.json" } );
 }
 //-----------------------------------------------------------------------------
 
@@ -57,7 +61,6 @@ void GUI_About::updateColors ()
 
 void GUI_About::loadContent ()
 {
-	const auto	str = paths::getDataRoot ( "UI/about.txt" ).loadFileAsString ();
-	scrollTextViewer.setText ( str );
+	scrollTextViewer.setText ( datasource::loadText ( "UI/about.txt" ) );
 }
 //-----------------------------------------------------------------------------

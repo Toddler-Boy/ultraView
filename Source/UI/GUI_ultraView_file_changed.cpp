@@ -1,46 +1,39 @@
 #include "GUI_ultraView.h"
 
+#include "Config/DataSource.h"
+
 //-----------------------------------------------------------------------------
 
 void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher::FileSystemEvent event )
 {
-	//	Z_INFO ( file.getFullPathName () );
-	//	Z_INFO ( juce::String ( int ( event ) ) );
-
 	if ( file.isDirectory () )
 		return;
 
 	//
-	// Change happened inside our data-folder
+	// Change happened inside the naked factory data (developer mode; in pak
+	// mode dataRoot stays invalid and nothing matches)
 	//
 	if ( file.isAChildOf ( dataRoot ) )
 	{
 		auto	parent = file.getRelativePathFrom ( dataRoot ).replaceCharacter ( '\\', '/' );
 
-		// Theme
-		if ( parent.startsWithIgnoreCase ( "Themes/" ) )
+		// Factory theme
+		if ( parent.startsWithIgnoreCase ( "UI/themes/" ) )
 		{
 			if ( event != gin::FileSystemWatcher::fileUpdated )
 				return;
 
-			// Reload theme
-			auto	themeName = preferences->get<juce::String> ( "UI", "theme" );
-			auto	themeFile = theme->getRoot ().getChildFile ( themeName + ".ini" );
-
-			if ( file == themeFile )
+			if ( file == theme->resolve ( preferences->get<juce::String> ( "ui/theme" ) ) )
 				loadTheme ();
 
 			return;
 		}
 
-		// Overlays
-		if ( parent.startsWithIgnoreCase ( "Overlays/" ) )
+		// Overlay profile tweaks (textures and shaders reload through lime's
+		// own watcher in the naked layout)
+		if ( parent.startsWithIgnoreCase ( "CRTEmulation/" ) )
 		{
-			if ( event != gin::FileSystemWatcher::fileUpdated )
-				return;
-
-			// Reload monitor profile
-			if ( parent.endsWithIgnoreCase ( ".yml" ) )
+			if ( event == gin::FileSystemWatcher::fileUpdated && parent.endsWithIgnoreCase ( ".yml" ) )
 				mainScreen.crt.reloadOverlayProfile ();
 
 			return;
@@ -85,6 +78,32 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 				return;
 
 			loadGamesDatabase ();
+			return;
+		}
+
+		return;
+	}
+
+	//
+	// Change happened inside the user data folder
+	//
+	if ( file.isAChildOf ( userRoot ) )
+	{
+		auto	parent = file.getRelativePathFrom ( userRoot ).replaceCharacter ( '\\', '/' );
+
+		// User themes: any event reloads, so deleting the active user theme
+		// reverts to the code defaults live
+		if ( parent.startsWithIgnoreCase ( "Themes/" ) )
+		{
+			loadTheme ();
+			return;
+		}
+
+		// User CRT content merges over the factory set through the content
+		// loader; the CRT page maps the change back to its nominal path
+		if ( parent.startsWithIgnoreCase ( "Overlays/" ) || parent.startsWithIgnoreCase ( "CRT Masks/" ) )
+		{
+			mainScreen.crt.userCRTContentChanged ( parent, event );
 			return;
 		}
 

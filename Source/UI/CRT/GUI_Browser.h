@@ -4,14 +4,14 @@
 
 #include "UI/Badge/GUI_ultraView_badge.h"
 
-#include "UI/Components/GUI_Label.h"
+#include "ultra-shared/UI/Components/GUI_Label.h"
 #include "UI/Components/GUI_SearchBar.h"
-#include "UI/Components/GUI_SettingsBox.h"
-#include "UI/Components/GUI_SVG_Button.h"
+#include "ultra-shared/UI/Components/GUI_SettingsBox.h"
+#include "ultra-shared/UI/Components/GUI_SVG_Button.h"
 
 #include "GUI_ListBox.h"
 
-#include "Globals/Settings.h"
+#include "Config/Settings.h"
 
 //-----------------------------------------------------------------------------
 

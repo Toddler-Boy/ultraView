@@ -1,14 +1,15 @@
 #include "GUI_Overlay.h"
 
+#include "Config/DataSource.h"
 #include "Globals/constants.h"
 
-#include "UI/Misc/VIC2_Render.h"
+#include "ultra-shared/Video/VIC2_Render.h"
 
 //-----------------------------------------------------------------------------
 
 GUI_Overlay::GUI_Overlay ()
 	: CRTEmulation ( true, 2000,
-					 paths::getDataRoot ( "CRTEmulation" ),
+					 datasource::getCRTRoot (),
 					 resolutions {	VIC2_Render::outerUnscaledWidth, VIC2_Render::outerUnscaledHeight,
 									VIC2_Render::outerUnscaledWidth * 4, VIC2_Render::outerUnscaledHeight * 4 } )
 {

@@ -1,0 +1,58 @@
+# Owned by the ultra-shared submodule (Source/ultra-shared/Data); the copy in
+# Data/UI/strings is configure-synced by CMake, edit it only in the submodule.
+# Strings appends this to the app's language file.
+
+# CRT settings
+crt:
+  settings:
+    overlay:
+      header: Overlay
+      bitmap: Bitmap
+      daytime: Time of day
+      bezel: Bezel
+      shadow: Shadow
+      zoom: Zoom
+      dust: Dust
+      bloom: Bloom
+      chromatic-aberration: Aberration
+      grain: Grain
+
+    system:
+      header: System
+
+    crt:
+      header: CRT Emulation
+      jailbars: Jailbars
+      jailbars-tip: Faint vertical bars from the VIC-II chip's uneven output, visible on a real C64's picture.
+      noise: Noise
+      sharpening: Fringing
+      sharpening-tip: Over-sharpens edges in brightness only, leaving thin light and dark outlines.
+      luma-blur: Luma Blur
+      chroma-blur: Chroma Blur
+      crosstalk: Crosstalk
+      crosstalk-tip: Imperfect separation of brightness and color in the composite signal, letting each bleed into the other.
+      hannover: Hannover
+      rainbowing: Rainbowing
+      drift: Drift
+
+      curve: Curvature
+      bleed: Color bleed
+      h-wave: Deflection
+      convergence: Alignment
+      expansion: Expansion
+      h-wave-tip: Slight horizontal waver from the imperfect magnetic deflection steering the electron beam.
+      scanlines: Scanlines
+      mask: Mask
+      mask-tip: The grille or dot pattern of the screen surface that splits the image into red, green and blue.
+      mask-pattern: Mask type
+      phosphor-decay: Decay
+      vignette: Vignette
+      adjacent: Adjacent
+      halation: Halation
+      halation-tip: The soft glow bright areas spread into the surrounding dark, as light scatters in the tube glass.
+      ambient: Ambient
+      reflection: Reflection
+
+    webcam:
+      header: Webcam
+      device: Camera

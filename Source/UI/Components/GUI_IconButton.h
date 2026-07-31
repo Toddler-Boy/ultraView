@@ -2,8 +2,8 @@
 
 #include <JuceHeader.h>
 
-#include "Globals/Icons.h"
-#include "Globals/Strings.h"
+#include "ultra-shared/Resources/Icons.h"
+#include "ultra-shared/Resources/Strings.h"
 
 #include <chrono>
 

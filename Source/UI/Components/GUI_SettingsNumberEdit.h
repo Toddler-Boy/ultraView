@@ -2,10 +2,10 @@
 
 #include <JuceHeader.h>
 
-#include "Globals/Preferences.h"
-#include "Globals/Strings.h"
+#include "Config/Preferences.h"
+#include "ultra-shared/Resources/Strings.h"
 
-#include "UI/Components/GUI_Label.h"
+#include "ultra-shared/UI/Components/GUI_Label.h"
 
 //-----------------------------------------------------------------------------
 

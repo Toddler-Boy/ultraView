@@ -1,6 +1,6 @@
 #include <JuceHeader.h>
 
-#include "GUI_ComboBox.h"
+#include "ultra-shared/UI/Components/GUI_ComboBox.h"
 
 //-----------------------------------------------------------------------------
 

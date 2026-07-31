@@ -2,4 +2,4 @@
 JuceLibraryCode
 Builds
 bin
-Builds
+/Installer/win/stage

@@ -34,15 +34,15 @@ GUI_SettingsNumberEdit::GUI_SettingsNumberEdit ( const juce::String& setSection,
 
 	number.onFocusLost = [ this ]
 	{
-		preferences->set ( settingSection, settingName, number.getText ().getIntValue () );
+		preferences->set ( settingSection + "/" + settingName, number.getText ().getIntValue () );
 	};
 }
 //-----------------------------------------------------------------------------
 
 void GUI_SettingsNumberEdit::resized ()
 {
-	layout.setLayout ( {	paths::getDataRoot ( "UI/layouts/constants.json" ),
-							paths::getDataRoot ( "UI/layouts/components/settings-number.json" ) } );
+	UI::setLayout ( layout, {	"UI/layouts/constants.json",
+								"UI/layouts/components/settings-number.json" } );
 
 	lookAndFeelChanged ();
 }
@@ -60,6 +60,6 @@ void GUI_SettingsNumberEdit::lookAndFeelChanged ()
 
 void GUI_SettingsNumberEdit::restorePreference ()
 {
-	number.setText ( juce::String ( preferences->get<int> ( settingSection, settingName ) ), juce::dontSendNotification );
+	number.setText ( juce::String ( preferences->get<int> ( settingSection + "/" + settingName ) ), juce::dontSendNotification );
 }
 //-----------------------------------------------------------------------------

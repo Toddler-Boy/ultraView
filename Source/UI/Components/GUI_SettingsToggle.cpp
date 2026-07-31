@@ -19,7 +19,7 @@ GUI_SettingsToggle::GUI_SettingsToggle ( const juce::String& setSection, const j
 
 	toggle.onClick = [ this ]
 	{
-		preferences->set ( settingSection, settingName, toggle.getToggleState () );
+		preferences->set ( settingSection + "/" + settingName, toggle.getToggleState () );
 
 		UI::sendGlobalMessage ( "settingChanged {} {}", settingSection, settingName );
 	};
@@ -30,13 +30,13 @@ GUI_SettingsToggle::GUI_SettingsToggle ( const juce::String& setSection, const j
 
 void GUI_SettingsToggle::resized ()
 {
-	layout.setLayout ( {	paths::getDataRoot ( "UI/layouts/constants.json" ),
-							paths::getDataRoot ( "UI/layouts/components/settings-toggle.json" ) } );
+	UI::setLayout ( layout, {	"UI/layouts/constants.json",
+								"UI/layouts/components/settings-toggle.json" } );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_SettingsToggle::restorePreference ()
 {
-	toggle.setToggleState ( preferences->get<bool> ( settingSection, settingName ), juce::dontSendNotification );
+	toggle.setToggleState ( preferences->get<bool> ( settingSection + "/" + settingName ), juce::dontSendNotification );
 }
 //-----------------------------------------------------------------------------

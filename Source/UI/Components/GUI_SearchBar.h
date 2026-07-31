@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 
 #include "GUI_TextEditorEx.h"
-#include "GUI_SVG_Button.h"
+#include "ultra-shared/UI/Components/GUI_SVG_Button.h"
 
 //----------------------------------------------------------------------------------
 

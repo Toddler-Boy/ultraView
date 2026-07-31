@@ -1,7 +1,7 @@
 #include "C64u_Scanner.h"
 #include "NetworkHardwareChecker.h"
 
-#include "Globals/Settings.h"
+#include "Config/Settings.h"
 
 //-----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ C64uScanner::C64uScanner () : juce::Thread ( "C64uScanner" )
 
 	const juce::SharedResourcePointer<Settings>	settings;
 
-	const auto	password = settings->get<juce::String> ( "Network", "password" );
+	const auto	password = settings->get<juce::String> ( "network/password" );
 	if ( password.isNotEmpty () )
 		request = "GET /v1/info HTTP/1.1\r\nX-Password: " + password + "\r\n\r\n";
 }

@@ -13,3 +13,6 @@
 [submodule "Data/CRTEmulation"]
 	path = Data/CRTEmulation
 	url = https://github.com/Toddler-Boy/CRTEmulation-Data.git
+[submodule "Source/ultra-shared"]
+	path = Source/ultra-shared
+	url = https://github.com/Toddler-Boy/ultra-shared.git

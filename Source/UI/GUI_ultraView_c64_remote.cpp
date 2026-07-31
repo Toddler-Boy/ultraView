@@ -1,5 +1,7 @@
 #include "GUI_ultraView.h"
 
+#include "Config/DataSource.h"
+
 //-----------------------------------------------------------------------------
 
 void GUI_ultraView::c64_reboot ()
@@ -43,8 +45,7 @@ void GUI_ultraView::loadGamesDatabase ()
 {
 	gamesDatabase.clear ();
 
-	const auto	gamesFile = paths::getDataRoot ( "Data/Games.csv" );
-	const auto	csv = gamesFile.loadFileAsString ().toLowerCase ();
+	const auto	csv = datasource::loadText ( "Data/Games.csv" ).toLowerCase ();
 	const auto	lines = juce::StringArray::fromLines ( csv );
 
 	const auto	columns = juce::StringArray::fromTokens ( lines[ 0 ], ",", "" );

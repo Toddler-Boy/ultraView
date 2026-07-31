@@ -3,51 +3,11 @@
 #include <JuceHeader.h>
 
 #include "constants.h"
-#include "Icons.h"
-#include "Preferences.h"
-#include "Settings.h"
-#include "Strings.h"
 
-#include "UI/SID_LookAndFeel.h"
+#include "UI/GUI_LookAndFeel.h"
 
 #include <regex>
 
-//-----------------------------------------------------------------------------
-
-namespace UI
-{
-	juce::ActionBroadcaster*	ab = nullptr;
-
-	juce::Colour	startColor;
-	juce::Colour	endColor;
-}
-//-----------------------------------------------------------------------------
-
-void UI::setActionBroadCaster ( juce::ActionBroadcaster* _ab ) noexcept
-{
-	ab = _ab;
-}
-//-----------------------------------------------------------------------------
-
-void UI::setShades ( const juce::Colour col1, const juce::Colour col2 ) noexcept
-{
-	startColor = col1;
-	endColor = col2;
-}
-//-----------------------------------------------------------------------------
-
-juce::Colour UI::getShade ( const float blend ) noexcept
-{
-	return startColor.interpolatedWith ( endColor, blend );
-}
-//-----------------------------------------------------------------------------
-
-juce::Colour UI::getColorFromName ( const juce::String& name, const float brightness )
-{
-	auto	hash = float ( double ( name.hashCode64 () ) / double ( std::numeric_limits<int64_t>::max () ) );
-
-	return juce::Colour::fromHSV ( hash, 0.5f, brightness, 1.0f );
-}
 //-----------------------------------------------------------------------------
 
 juce::String UI::getHumanNumber ( int64_t number, const char thousand_separator )
@@ -74,68 +34,9 @@ juce::String UI::getHumanNumber ( int64_t number, const char thousand_separator 
 }
 //-----------------------------------------------------------------------------
 
-float UI::easeInOutQuad ( float t )
-{
-	const auto	sqr = t * t;
-	return sqr / ( 2.0f * ( sqr - t ) + 1.0f );
-}
-//-----------------------------------------------------------------------------
-
-juce::Colour UI::getColorWithPerceivedBrightness ( juce::Colour input, const float targetL ) noexcept
-{
-	auto	low = 0.0f;
-	auto	high = 1.0f;
-	auto	bestMatch = input;
-
-	// 8 iterations gives ~0.0039 precision
-	for ( auto i = 0; i < 8; ++i )
-	{
-		const auto	midV = ( low + high ) * 0.5f;
-		const auto	testCol = input.withBrightness ( midV );
-		const auto	currentL = testCol.getPerceivedBrightness ();
-
-		if ( std::abs ( currentL - targetL ) <= 0.005f )
-			return testCol;
-
-		if ( currentL < targetL )
-			low = midV;
-		else
-			high = midV;
-
-		bestMatch = testCol;
-	}
-
-	// If the color is still too dark, try adjusting saturation instead of brightness
-	if ( bestMatch.getPerceivedBrightness () < targetL - 0.005f )
-	{
-		auto	lowS = 0.0f;
-		auto	highS = bestMatch.getSaturation ();
-
-		for ( auto i = 0; i < 8; ++i )
-		{
-			const auto	midS = ( lowS + highS ) * 0.5f;
-			const auto	testCol = bestMatch.withSaturation ( midS );
-			const auto	currentL = testCol.getPerceivedBrightness ();
-
-			if ( std::abs ( currentL - targetL ) <= 0.005f )
-				return testCol;
-
-			if ( currentL < targetL )
-				highS = midS;
-			else
-				lowS = midS;
-
-			bestMatch = testCol;
-		}
-	}
-
-	return bestMatch;
-}
-//-----------------------------------------------------------------------------
-
 juce::Font UI::font ( const float height, const int weight )
 {
-	auto&	laf = static_cast<SID_LookAndFeel&> ( juce::LookAndFeel::getDefaultLookAndFeel () );
+	auto&	laf = static_cast<GUI_LookAndFeel&> ( juce::LookAndFeel::getDefaultLookAndFeel () );
 
 	return laf.font ( height, weight );
 }
@@ -143,162 +44,9 @@ juce::Font UI::font ( const float height, const int weight )
 
 juce::Font UI::monoFont ( const float height )
 {
-	auto&	laf = static_cast<SID_LookAndFeel&> ( juce::LookAndFeel::getDefaultLookAndFeel () );
+	auto&	laf = static_cast<GUI_LookAndFeel&> ( juce::LookAndFeel::getDefaultLookAndFeel () );
 
 	return laf.monoFontWithHeight ( height );
-}
-//-----------------------------------------------------------------------------
-
-std::pair<std::unique_ptr<juce::Drawable>, int> UI::getSVG ( const juce::String& svgName )
-{
-	auto	svgFile = paths::getDataRoot ( "UI/svg/" + svgName + ".svg" );
-	auto	svgStr = svgFile.loadFileAsString ();
-	jassert ( svgStr.isNotEmpty () );
-
-	auto	svg = juce::XmlDocument::parse ( svgStr );
-	jassert ( svg );
-
-	auto	viewBoxSize = 0;
-	if ( auto vbStr = svg->getStringAttribute ( "viewBox" ); vbStr.isNotEmpty () )
-	{
-		auto	vb = juce::Rectangle<int>::fromString ( vbStr );
-		viewBoxSize = std::max ( vb.getWidth (), vb.getHeight () );
-	}
-	else if ( auto w = svg->getIntAttribute ( "width" ), h = svg->getIntAttribute ( "height" ); w > 0 && h > 0 )
-	{
-		viewBoxSize = std::max ( w, h );
-	}
-
-	jassert ( viewBoxSize > 0 );
-
-	return { juce::Drawable::createFromSVG ( *svg ), viewBoxSize };
-}
-//-----------------------------------------------------------------------------
-
-juce::Path& UI::getScaledPath ( const juce::String& resourceName, juce::Rectangle<float> rect, juce::RectanglePlacement placement /*= 0*/, float padding /* = 0.0f */ )
-{
-	padding *= std::min ( rect.getWidth (), rect.getHeight () );
-	rect.reduce ( padding, padding );
-
-	//
-	// Cache
-	//
-	struct cacheEntry
-	{
-		juce::Rectangle<float>		rect;
-		juce::RectanglePlacement	placement;
-		juce::Path					path;
-	};
-
-	static juce::HashMap<juce::String, cacheEntry>	paths;
-
-	// Already in cache?
-	if ( paths.contains ( resourceName ) )
-	{
-		auto&	p = paths.getReference ( resourceName );
-
-		// Cache matches sizes?
-		if ( p.rect == rect && p.placement == placement )
-			return p.path;
-	}
-
-	auto	[ drawable, _ ] = getSVG ( resourceName );
-
-	//
-	// Convert SVG to scaled path
-	//
-	drawable->setTransformToFit ( rect, placement );
-	auto	path = drawable->getOutlineAsPath ();
-
-	//
-	// Store in cache
-	//
-	paths.set ( resourceName, { rect, placement, path } );
-	return paths.getReference ( resourceName ).path;
-}
-//-----------------------------------------------------------------------------
-
-juce::Path& UI::getScaledPathWithSize ( const juce::String& resourceName, juce::Rectangle<float> rect, juce::RectanglePlacement placement /*= 0*/, float padding /* = 0.0f */ )
-{
-	padding *= std::min ( rect.getWidth (), rect.getHeight () );
-	rect.reduce ( padding, padding );
-
-	//
-	// Cache
-	//
-	struct cacheEntry
-	{
-		juce::Rectangle<float>		rect;
-		juce::RectanglePlacement	placement;
-		juce::Path					path;
-	};
-
-	static juce::HashMap<juce::String, cacheEntry>	paths;
-
-	// Already in cache?
-	if ( paths.contains ( resourceName ) )
-	{
-		auto& p = paths.getReference ( resourceName );
-
-		// Cache matches sizes?
-		if ( p.rect == rect && p.placement == placement )
-			return p.path;
-	}
-
-	auto [ drawable, orgSize ] = getSVG ( resourceName );
-
-	//
-	// Convert SVG to scaled path
-	//
-	{
-		const auto	p = drawable->getOutlineAsPath ();
-		const auto	b = p.getBounds ();
-		const auto	newSize = std::max ( rect.getWidth (), rect.getHeight () ) / orgSize;
-
-		auto	newX = b.getWidth () * 0.5f * newSize;
-		auto	newY = b.getHeight () * 0.5f * newSize;
-
-		if ( placement.testFlags ( juce::RectanglePlacement::xMid ) )
-			newX = rect.getCentreX ();
-
-		if ( placement.testFlags ( juce::RectanglePlacement::yMid ) )
-			newY = rect.getCentreY ();
-
-		auto	trans = juce::AffineTransform::translation ( b.getWidth () * -0.5f - b.getX (), b.getHeight () * -0.5f - b.getY () )
-						.scaled ( newSize )
-						.translated ( newX, newY );
-
-		drawable->setTransform ( trans );
-	}
-
-	auto	path = drawable->getOutlineAsPath ();
-
-	//
-	// Store in cache
-	//
-	paths.set ( resourceName, { rect, placement, path } );
-	return paths.getReference ( resourceName ).path;
-}
-//-----------------------------------------------------------------------------
-
-juce::File paths::getDataRoot ( juce::String path )
-{
-	#if JUCE_MAC
-        auto    ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "Application Support/ultraView" );
-    #elif JUCE_WINDOWS
-		auto	ret = juce::File::getSpecialLocation ( juce::File::commonApplicationDataDirectory ).getChildFile ( "ultraView" );
-	#elif JUCE_LINUX
-		auto	ret = juce::File ( "/usr/share/ultraView" );
-	#else
-		// Unsupported platform
-		jassertfalse;
-		auto	ret = juce::File();
-	#endif
-
-	if ( path.isNotEmpty () )
-		ret = ret.getChildFile ( path );
-
-	return ret;
 }
 //-----------------------------------------------------------------------------
 
@@ -446,34 +194,6 @@ int helpers::strnatcmp ( const char* const a, const char* const b )
 	}
 
 	std::unreachable ();
-}
-//-----------------------------------------------------------------------------
-
-void helpers::buildComponentMap ( std::unordered_map<juce::String, juce::Component*>& compMap, juce::Component* parent, const juce::String& pName )
-{
-	// Loop over all children recursivly and build a map of component-names
-	for ( auto comp : parent->getChildren () )
-	{
-		auto	fullName = pName.isNotEmpty () ? pName + "/" + comp->getName () : comp->getName ();
-
-		if ( fullName.endsWithChar ( '/' ) )
-			continue;
-
-		// Special handling for Viewports
-		if ( auto vp = dynamic_cast<juce::Viewport*> ( comp ) )
-		{
-			compMap[ fullName ] = comp;
-
-			comp = vp->getViewedComponent ();
-			buildComponentMap ( compMap, vp->getViewedComponent (), pName.isNotEmpty () ? pName + "/" + vp->getName () + "/" + comp->getName () : vp->getName () + "/" + comp->getName () );
-			continue;
-		}
-
-		jassert ( compMap.find ( fullName ) == compMap.end () ); // Duplicate component name!
-
-		compMap[ fullName ] = comp;
-		buildComponentMap ( compMap, comp, fullName);
-	}
 }
 //-----------------------------------------------------------------------------
 

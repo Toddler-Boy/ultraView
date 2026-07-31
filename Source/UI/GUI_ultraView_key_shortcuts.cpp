@@ -1,5 +1,5 @@
 #include "GUI_ultraView.h"
-#include "SID_LookAndFeel.h"
+#include "GUI_LookAndFeel.h"
 
 //-----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 	}
 	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::shiftModifier, 0 ) )
 	{
-		auto&	laf = static_cast<SID_LookAndFeel&> ( getLookAndFeel () );
+		auto&	laf = static_cast<GUI_LookAndFeel&> ( getLookAndFeel () );
 
 		// Toggle log-window
 		const lime::LoggerOptions opts {

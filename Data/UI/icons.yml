@@ -35,3 +35,9 @@ crt:
       saturation:  crt/saturation
 
 delete: xmark-solid-full
+
+# Factory vs user rows in the theme / overlay / mask pick lists
+theme-factory: dice-d6-solid-full
+theme-user:    user-solid-full
+crt-factory:   dice-d6-solid-full
+crt-user:      user-solid-full

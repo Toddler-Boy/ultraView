@@ -16,7 +16,9 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 	else if ( cmd == "settingChanged" )
 	{
 		if ( params[ 0 ] == "ui" && params[ 1 ] == "allow-screensaver" )
-			juce::Desktop::setScreenSaverEnabled ( preferences->get<bool> ( params[ 0 ], params[ 1 ] ) );
+			juce::Desktop::setScreenSaverEnabled ( preferences->get<bool> ( "ui/allow-screensaver" ) );
+		else if ( params[ 0 ] == "ui" && params[ 1 ] == "theme" )
+			loadTheme ();
 	}
 	else if ( cmd == "restoreState" )
 	{

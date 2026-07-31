@@ -62,7 +62,7 @@ GUI_Browser::GUI_Browser ()
 	changePath.bckAlpha[ 1 ] = 0.1f;
 	changePath.margin = 6.0f;
 
-	const auto	curPathStr = settings->get<juce::String> ( "Paths/apps" );
+	const auto	curPathStr = settings->get<juce::String> ( "paths/apps" );
 	if ( curPathStr.isEmpty () )
 	{
 		curPath.setText ( "No path set" );
@@ -89,7 +89,7 @@ GUI_Browser::GUI_Browser ()
 
 	changePath.onClick = [ this ]
 	{
-		const auto	curPathStr = settings->get<juce::String> ( "Paths/apps" );
+		const auto	curPathStr = settings->get<juce::String> ( "paths/apps" );
 		lastBrowsedDir = juce::File ( curPathStr );
 
 		directoryChooser = std::make_unique<juce::FileChooser> ( "Select a directory to scan for games", lastBrowsedDir, "*.crt;*.prg" );
@@ -100,7 +100,7 @@ GUI_Browser::GUI_Browser ()
 			{
 				const auto	selectedDir = results[ 0 ];
 
-				settings->set ( "Paths/apps", selectedDir.getFullPathName () );
+				settings->set ( "paths/apps", selectedDir.getFullPathName () );
 
 				curPath.setText ( selectedDir.getFullPathName () );
 				curPath.setColor ( UI::colors::text );
@@ -138,7 +138,7 @@ void GUI_Browser::run ()
 
 	juce::Array<juce::File> directoriesToScan;
 
-	const auto	curPathStr = settings->get<juce::String> ( "Paths/apps" );
+	const auto	curPathStr = settings->get<juce::String> ( "paths/apps" );
 	directoriesToScan.add ( juce::File ( curPathStr ) );
 
 	while ( directoriesToScan.size () > 0 )

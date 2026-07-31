@@ -3,9 +3,9 @@
 #include <atomic>
 
 #include "UI/GUI_ultraView.h"
-#include "UI/SID_LookAndFeel.h"
+#include "UI/GUI_LookAndFeel.h"
 
-#include "Globals/Settings.h"
+#include "Config/Settings.h"
 #include "Globals/constants.h"
 
 #if JUCE_WINDOWS || JUCE_MAC
@@ -80,7 +80,7 @@ public:
 
 			// Restore state
 			{
-				const auto	pos = settings->get<juce::String> ( "UI", "window-position" );
+				const auto	pos = settings->get<juce::String> ( "ui/window-position" );
 				restoreWindowStateFromString ( pos );
 
 				// First start, center window and set size
@@ -159,7 +159,7 @@ public:
 	private:
 		void saveState ()
 		{
-			settings->set ( "UI", "window-position", getWindowStateAsString () );
+			settings->set ( "ui/window-position", getWindowStateAsString () );
 		}
 
 		void setBorderColor ()
@@ -177,7 +177,7 @@ public:
 
 private:
 	std::unique_ptr<MainWindow> mainWindow;
-	SID_LookAndFeel				laf;
+	GUI_LookAndFeel				laf;
 };
 //-----------------------------------------------------------------------------
 

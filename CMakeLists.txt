@@ -129,14 +129,29 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 target_sources (ultraView PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
 
-# Install Data folder to /Library/Application Support/ultraView (macOS)
-if (APPLE)
-	install (DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Data/"
-			 DESTINATION "/Library/Application Support/ultraView"
-			 PATTERN "!src" EXCLUDE)
-endif ()
+# Shared UI data owned by the ultra-shared submodule, configure-synced into
+# Data/UI so dev hot-reload works on real files and the pak packs them; the
+# synced copies are committed like any other data file. configure_file only
+# rewrites on a content change and re-runs configure when the source changes
+foreach (shared_data IN ITEMS layouts/crt-settings.json strings/crt-settings.yml)
+	configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/UI/${shared_data}
+					${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/${shared_data} COPYONLY)
+endforeach ()
 
-target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
+# Data-validity probe list: everything under Data/UI is essential, so
+# FilePaths.cpp #includes this generated list instead of hand-maintaining it.
+# CONFIGURE_DEPENDS re-runs the glob when Data/UI contents change; the file is
+# only rewritten when the list actually differs
+file (GLOB_RECURSE ui_data_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/Data CONFIGURE_DEPENDS
+	  ${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/*)
+# SVGs stay out: missing ones degrade to placeholder icons
+list (FILTER ui_data_files EXCLUDE REGEX "(^UI/svg/|Thumbs\\.db|desktop\\.ini|\\.DS_Store)")
+list (SORT ui_data_files)
+list (TRANSFORM ui_data_files REPLACE "^(.+)$" "\t\"\\1\",")
+list (JOIN ui_data_files "\n" ui_manifest)
+file (CONFIGURE OUTPUT generated/ui-manifest.h CONTENT "// Generated from Data/UI by CMake - do not edit\n${ui_manifest}\n" @ONLY)
+
+target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 target_link_libraries (ultraView PRIVATE
 
@@ -202,6 +217,17 @@ if (APPLE)
 		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] ON)
 	target_compile_options(ultraView PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
 	target_link_libraries(ultraView PUBLIC "-framework AVFoundation" "-framework CoreMedia" "-framework SystemConfiguration")
+
+	# The whole data set ships inside the bundle as Resources/Data.pak, where
+	# datasource reads it: images stored (they carry their own compression),
+	# the rest weakest deflate. Runs on every build, before any code-signing.
+	# Source-only files (bitmap PSDs, submodule .git pointers) stay out
+	add_custom_command(TARGET ultraView POST_BUILD
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Data
+		COMMAND rm -rf $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak
+		COMMAND zip -q -0 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -i "*.png" "*.jpg" -x "*/!src/*" ".*" "*/.*"
+		COMMAND zip -q -1 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -x "*.png" "*.jpg" "*/!src/*" ".*" "*/.*" "*/Thumbs.db" "Thumbs.db"
+		VERBATIM)
 endif()
 
 if (WIN32)

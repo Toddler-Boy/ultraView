@@ -1,7 +1,9 @@
 #include "GUI_ultraView.h"
 
-#include "SID_LookAndFeel.h"
+#include "GUI_LookAndFeel.h"
 
+#include "Config/DataSource.h"
+#include "Config/FilePaths.h"
 #include "Globals/constants.h"
 
 //-----------------------------------------------------------------------------
@@ -206,7 +208,7 @@ void GUI_ultraView::updateColors ()
 
 void GUI_ultraView::loadTheme ()
 {
-	auto	themeName = preferences->get<juce::String> ( "UI", "theme" );
+	auto	themeName = preferences->get<juce::String> ( "ui/theme" );
 
 	theme->load ( themeName );
 
@@ -215,74 +217,30 @@ void GUI_ultraView::loadTheme ()
 }
 //-----------------------------------------------------------------------------
 
-namespace
-{
-	bool allPathsValid ( const juce::StringArray& arr, const juce::File& root )
-	{
-		for ( const auto& f : arr )
-		{
-			if ( f.endsWithChar ( '/' ) )
-			{
-				if ( ! root.getChildFile ( f ).isDirectory () )
-					return false;
-			}
-			else
-			{
-				if ( ! root.getChildFile ( f ).existsAsFile () )
-					return false;
-			}
-		}
-
-		return true;
-	}
-}
-//-----------------------------------------------------------------------------
-
 bool GUI_ultraView::isDataRootValid () const
 {
-	if ( ! dataRoot.isDirectory () )
-	{
-		Z_ERR ( "ultraView data folder is missing" );
-		return false;
-	}
-
-	static const juce::StringArray	arr = {
-		"CRTEmulation/Shaders/",
-
-		"Themes/",
-
-		"UI/",
-		"UI/fonts/",
-		"UI/layouts/",
-		"UI/strings/",
-		"UI/svg/",
-		"UI/icons.yml",
-	};
-
-	const auto	dataValid = allPathsValid ( arr, dataRoot );
-
-	if ( ! dataValid )
-	{
-		Z_ERR ( "ultraView data folder is incomplete (missing folders or files) " + dataRoot.getFullPathName () );
-		jassertfalse; // This should never happen in a release build, but it's good to catch during development
-	}
-
-	return dataValid;
+	return datasource::isValid ();
 }
 //-----------------------------------------------------------------------------
 
 void GUI_ultraView::setDataRoot ()
 {
-	dataRoot = paths::getDataRoot ();
-
-	if ( ! isDataRootValid () )
+	if ( ! datasource::isValid () )
+	{
+		Z_ERR ( "ultraView data is missing or incomplete: " + datasource::describe () );
 		return;
+	}
+
+	Z_INFO ( "Data: " << datasource::describe () );
 
 	folderWatcher.removeAllFolders ();
 
-	theme->setRoot ( dataRoot.getChildFile ( "Themes/" ) );
-
-	folderWatcher.addFolder ( dataRoot );
+	// Factory data only exists as watchable files in the naked developer layout
+	if ( ! datasource::isPak () )
+	{
+		dataRoot = datasource::getDevFile ();
+		folderWatcher.addFolder ( dataRoot );
+	}
 
 	loadGamesDatabase ();
 }
@@ -292,9 +250,15 @@ void GUI_ultraView::setUserRoot ()
 {
 	folderWatcher.removeFolder ( userRoot );
 
-	userRoot = settings->get<juce::String> ( "Paths", "user" );
+	userRoot = settings->get<juce::String> ( "paths/user" );
+	userRoot.createDirectory ();
 
 	preferences->setRoot ( userRoot );
+	theme->setUserRoot ( filepaths::getUserThemesPath () );
+
+	// Materialize the user content folders so the watcher covers them
+	filepaths::getUserOverlaysPath ();
+	filepaths::getUserCRTMasksPath ();
 
 	folderWatcher.addFolder ( userRoot );
 }

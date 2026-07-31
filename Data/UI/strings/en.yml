@@ -9,83 +9,14 @@ actions:
   reboot:       Reset
   poweroff:     Power off
 
-# Browser
+# The crt/settings strings live in UI/strings/crt-settings.yml (configure-synced
+# from the ultra-shared submodule); Strings appends them to this file
+
+# Browser and theme picker (ultraView-only parts of the CRT page)
 crt:
   settings:
     browse:
       header: Browse CRT & PRG
 
-# CRT settings
-crt:
-  settings:
-    overlay:
-      header: Overlay
-      bitmap: Bitmap
-      daytime: Time of day
-      bezel: Bezel rflctns
-      shadow: Shadow
-      zoom: Zoom
-      dust: Dust
-      bloom: Bloom
-      chromatic-aberration: Chrmtc Abrrtn
-      grain: Grain
-
-    stream:
-      header: C64u Streaming
-
-    system:
-      header: System
-
-    crt:
-      header: CRT Emulation
-      jailbars: Jailbars
-      sharpening: Fringing
-      luma-blur: Luma Blur
-      chroma-blur: Chroma Blur
-      crosstalk: Crosstalk
-      crosstalk: Crosstalk
-      sub-carrier: Sub-carrier
-      interference: Interference
-      noise: Noise
-
-      curve: Curvature
-      bleed: Color bleed
-      h-wave: H-Wave
-      scanlines: Scanlines
-      mask: Mask
-      mask-pattern: Mask ptrn
-      glow: Halation
-      ambient: Ambient
-      phosphor-decay: Phsphr Dcy
-      vignette: Vignette
-      reflection: Reflection
-
-    webcam:
-      header: Webcam
-
-# Settings
-settings:
-  header:
-    settings: Settings
-    storage: Storage
-    playback: Playback
-    song-lengths: Song Lengths
-    emulation: SID Emulation
-    audio-fx: Audio Enhancements
-    user-interface: User Interface
-
-  location:
-    hvsc: High Voltage SID Collection
-    user: My data (Playlists, Likes, Preferences, User-tunes etc.)
-
-  browse: Change location
-
-  sound_output: Sound output device
-
-  fx:
-    stereo-processing:      Stereo processing
-    stereo-processing-help: Multi-chip tunes get selectively narrowed.
-
-  ui:
-    allow-screensaver:      System screensaver
-    allow-screensaver-help: Allows system screensaver.
+    theme:
+      header: Theme

@@ -11,11 +11,11 @@
 #include "UI/GUI_Main.h"
 #include "UI/GUI_About.h"
 
-#include "Globals/Icons.h"
-#include "Globals/Preferences.h"
-#include "Globals/Settings.h"
-#include "Globals/Strings.h"
-#include "Globals/Theme.h"
+#include "ultra-shared/Resources/Icons.h"
+#include "Config/Preferences.h"
+#include "Config/Settings.h"
+#include "ultra-shared/Resources/Strings.h"
+#include "ultra-shared/Resources/Theme.h"
 
 #include "Network/AsyncNetwork.h"
 #include "Network/C64u_Scanner.h"

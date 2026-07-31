@@ -4,8 +4,8 @@
 
 #include "UI/Misc/GUI_ListboxMouseMoveHover.h"
 
-#include "Globals/Icons.h"
-#include "Globals/Strings.h"
+#include "ultra-shared/Resources/Icons.h"
+#include "ultra-shared/Resources/Strings.h"
 
 //-----------------------------------------------------------------------------
 

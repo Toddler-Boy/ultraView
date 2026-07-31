@@ -2,11 +2,11 @@
 
 #include <JuceHeader.h>
 
-#include "UI/Components/GUI_Label.h"
-#include "UI/Components/GUI_Toggle.h"
+#include "ultra-shared/UI/Components/GUI_Label.h"
+#include "ultra-shared/UI/Components/GUI_Toggle.h"
 
-#include "Globals/Preferences.h"
-#include "Globals/Strings.h"
+#include "Config/Preferences.h"
+#include "ultra-shared/Resources/Strings.h"
 
 //-----------------------------------------------------------------------------
 
