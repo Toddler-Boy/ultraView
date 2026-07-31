@@ -23,6 +23,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=.\bin
 OutputBaseFilename={#MyAppName}_{#MyAppVersion}
+OutputManifestFile=manifest.txt
 Compression=lzma/ultra
 SolidCompression=true
 ShowLanguageDialog=auto
@@ -48,8 +49,14 @@ WizardSmallImageFile=..\..\icons\windows_big.png
 Name: english; MessagesFile: compiler:Default.isl
 
 [Files]
+; Data.pak sits next to the exe, where the installed-location probe looks
 Source: "stage\ultraView.exe"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly
-Source: "stage\Data\*";       DestDir: "{commonappdata}\ultraView"; Excludes: "!src,!src\*"; Flags: ignoreversion overwritereadonly recursesubdirs createallsubdirs
+Source: "stage\Data.pak";      DestDir: "{app}"; Flags: ignoreversion overwritereadonly
+
+[InstallDelete]
+; 1.0.x shipped a naked Data tree into ProgramData; nothing reads it anymore
+Type: filesandordirs; Name: "{commonappdata}\ultraView"
+Type: filesandordirs; Name: "{app}\Data"
 
 [Icons]
 Name: "{group}\{#MyAppName}";           Filename: "{app}\ultraView.exe"

@@ -43,9 +43,6 @@ if [ "$OS_NAME" = "Darwin" ]; then
     echo "$APPLICATION" | base64 -D -o /tmp/Application.p12
     security import /tmp/Application.p12 -t agg -k Keys.keychain -P "$P12_PASS" -A -T /usr/bin/codesign
 
-    echo "$INSTALLER" | base64 -D -o /tmp/Installer.p12
-    security import /tmp/Installer.p12 -t agg -k Keys.keychain -P "$P12_PASS" -A -T /usr/bin/productsign
-
     security list-keychains -s Keys.keychain
     security default-keychain -s Keys.keychain
     security unlock-keychain -p "$KC_PASS" Keys.keychain
@@ -76,69 +73,40 @@ if [ "$OS_NAME" = "Darwin" ]; then
 </plist>
 ENTEOF
 
-  # Codesign the app
+  # Codesign the app (the whole data set lives inside the bundle and gets
+  # sealed with it)
   if [ -n "${APPLICATION:-}" ]; then
     codesign -s "$DEV_APP_ID" --options=runtime --timestamp --entitlements "$ENTITLEMENTS" --force --deep -v "$APP_PATH"
   else
     echo "Skipping codesign — APPLICATION secret not set"
   fi
 
-  # Stage Data for pkg
-  PKG_STAGE="$ROOT/ci/bin/pkg_root"
-  rm -rf "$PKG_STAGE"
-  mkdir -p "$PKG_STAGE/Applications"
-  mkdir -p "$PKG_STAGE/Library/Application Support/ultraView"
-  cp -R "$APP_PATH" "$PKG_STAGE/Applications/"
-  rsync -a --exclude='!src' "$ROOT/Data/" "$PKG_STAGE/Library/Application Support/ultraView/"
+  # Stage the drag-install image: the app plus an Applications link. Optional
+  # Finder styling (background bitmap, icon layout) comes from a hand-arranged
+  # window committed as Installer/macOS/dmg-style
+  DMG_STAGE="$ROOT/ci/bin/dmg_root"
+  rm -rf "$DMG_STAGE"
+  mkdir -p "$DMG_STAGE"
+  cp -R "$APP_PATH" "$DMG_STAGE/"
+  ln -s /Applications "$DMG_STAGE/Applications"
 
-  # Build component pkg
-  pkgbuild \
-    --root "$PKG_STAGE" \
-    --identifier "com.hartmann.ultraView" \
-    --version "1.0" \
-    "$ROOT/ci/bin/ultraView-component.pkg"
-
-  # Build product pkg with fixed title
-  cat > "$ROOT/ci/bin/distribution.xml" <<DISTEOF
-<?xml version="1.0" encoding="utf-8"?>
-<installer-gui-script minSpecVersion="1">
-    <title>ultraView</title>
-    <pkg-ref id="com.hartmann.ultraView"/>
-    <options customize="never" require-scripts="false"/>
-    <choices-outline>
-        <line choice="default">
-            <line choice="com.hartmann.ultraView"/>
-        </line>
-    </choices-outline>
-    <choice id="default"/>
-    <choice id="com.hartmann.ultraView" visible="false">
-        <pkg-ref id="com.hartmann.ultraView"/>
-    </choice>
-    <pkg-ref id="com.hartmann.ultraView" version="1.0">ultraView-component.pkg</pkg-ref>
-</installer-gui-script>
-DISTEOF
-
-  productbuild \
-    --distribution "$ROOT/ci/bin/distribution.xml" \
-    --package-path "$ROOT/ci/bin" \
-    "$ROOT/ci/bin/ultraView-unsigned.pkg"
-
-  rm "$ROOT/ci/bin/ultraView-component.pkg" "$ROOT/ci/bin/distribution.xml"
-
-  # Sign the pkg
-  if [ -n "${INSTALLER:-}" ]; then
-    productsign --sign "$DEV_INST_ID" "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView_$ver.pkg"
-    rm "$ROOT/ci/bin/ultraView-unsigned.pkg"
-  else
-    mv "$ROOT/ci/bin/ultraView-unsigned.pkg" "$ROOT/ci/bin/ultraView_$ver.pkg"
-    echo "Skipping pkg signing — INSTALLER secret not set"
+  if [ -d "$ROOT/Installer/macOS/dmg-style" ]; then
+    cp -R "$ROOT/Installer/macOS/dmg-style/." "$DMG_STAGE/"
   fi
 
-  rm -rf "$PKG_STAGE"
+  hdiutil create -volname "ultraView" -srcfolder "$DMG_STAGE" -ov -format UDZO "$ROOT/ci/bin/ultraView_$ver.dmg"
+  rm -rf "$DMG_STAGE"
 
-  # Notarize the pkg
+  # Sign the dmg
+  if [ -n "${APPLICATION:-}" ]; then
+    codesign -s "$DEV_APP_ID" --timestamp "$ROOT/ci/bin/ultraView_$ver.dmg"
+  else
+    echo "Skipping dmg signing — APPLICATION secret not set"
+  fi
+
+  # Notarize the dmg
   if [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
-    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView_$ver.pkg" 2>&1) || NOTARY_FAILED=1
+    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView_$ver.dmg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
     SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { print \$2; exit }")
     if [ "${NOTARY_FAILED:-0}" = "1" ] && [ -n "$SUBMISSION_ID" ]; then
@@ -146,7 +114,7 @@ DISTEOF
       xcrun notarytool log "$SUBMISSION_ID" --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" || true
       exit 1
     fi
-    xcrun stapler staple "$ROOT/ci/bin/ultraView_$ver.pkg"
+    xcrun stapler staple "$ROOT/ci/bin/ultraView_$ver.dmg"
   else
     echo "Skipping notarization — APPLE_USER / APPLE_PASS not set"
   fi
@@ -174,7 +142,19 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   rm -rf "$STAGE"
   mkdir -p "$STAGE"
   cp "$ROOT/Builds/vs/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
-  cp -R "$ROOT/Data" "$STAGE/Data"
+
+  # Data.pak: images carry their own compression and get stored, the rest gets
+  # the weakest deflate
+  (
+    cd "$ROOT/Data"
+    find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$STAGE/_pakfiles.txt"
+    grep -iE '\.(png|jpg)$' "$STAGE/_pakfiles.txt" > "$STAGE/_pakimages.txt"
+    grep -ivE '\.(png|jpg)$' "$STAGE/_pakfiles.txt" > "$STAGE/_pakrest.txt"
+    # -mcu=on: always UTF-8 entry names, the reader assumes them
+    7z a -tzip -mx=0 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakimages.txt" > /dev/null
+    7z a -tzip -mx=1 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakrest.txt" > /dev/null
+    rm "$STAGE"/_pak*.txt
+  )
 
   # Azure Trusted Signing
   uuid_re='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
@@ -238,4 +218,19 @@ METAEOF
   fi
 
   cp "$EXE_OUT" "$ROOT/ci/bin/"
+
+  # Portable variant: the same signed exe plus Data.pak in a store-only zip,
+  # extract-and-run from anywhere
+  ZIP_ROOT="$ROOT/ci/bin/zip_root"
+  rm -rf "$ZIP_ROOT"
+  mkdir -p "$ZIP_ROOT/ultraView"
+  cp "$STAGE/ultraView.exe" "$STAGE/Data.pak" "$ZIP_ROOT/ultraView/"
+
+  ZIP_OUT="$ROOT/ci/bin/ultraView_${ver}_portable.zip"
+  if command -v 7z > /dev/null 2>&1; then
+    (cd "$ZIP_ROOT" && 7z a -tzip -mx=0 "$ZIP_OUT" ultraView)
+  else
+    powershell.exe -NoProfile -Command "Compress-Archive -Path '$(cygpath -w "$ZIP_ROOT/ultraView")' -DestinationPath '$(cygpath -w "$ZIP_OUT")' -CompressionLevel NoCompression"
+  fi
+  rm -rf "$ZIP_ROOT"
 fi

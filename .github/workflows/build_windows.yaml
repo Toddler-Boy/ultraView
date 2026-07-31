@@ -32,5 +32,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraView-windows
-          path: ci/bin/ultraView_*.exe
+          path: |
+            ci/bin/ultraView_*.exe
+            ci/bin/ultraView_*_portable.zip
           archive: false
