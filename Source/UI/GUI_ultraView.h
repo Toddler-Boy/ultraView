@@ -11,6 +11,8 @@
 #include "UI/GUI_Main.h"
 #include "UI/GUI_About.h"
 
+#include "ultra-shared/UI/Components/GUI_FatalError.h"
+
 #include "ultra-shared/Resources/Icons.h"
 #include "Config/Preferences.h"
 #include "Config/Settings.h"
@@ -110,6 +112,10 @@ private:
 
 	GUI_Main		mainScreen;
 	GUI_About		aboutScreen;
+
+	#if ! JUCE_MAC
+		GUI_FatalError	fatalError;
+	#endif
 
 	gin::FileSystemWatcher	folderWatcher;
 

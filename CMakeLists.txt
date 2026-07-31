@@ -231,7 +231,8 @@ if (APPLE)
 endif()
 
 if (WIN32)
-	target_compile_options(ultraView PRIVATE -Wno-missing-braces /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-mfma /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations -showFilenames)
+	# -Wno-c23-extensions: opts into #embed from C++ (GUI_FatalError.png)
+	target_compile_options(ultraView PRIVATE -Wno-missing-braces -Wno-c23-extensions /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-mfma /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations -showFilenames)
 endif()
 
 if (WIN32)
@@ -243,7 +244,7 @@ endif()
 
 if(UNIX AND NOT APPLE)
 	target_link_libraries (ultraView PRIVATE curl)
-	target_compile_options(ultraView PRIVATE $<$<CONFIG:Debug>:-g -O0>)
+	target_compile_options(ultraView PRIVATE -Wno-c23-extensions $<$<CONFIG:Debug>:-g -O0>)
 endif()
 
 if (WIN32)

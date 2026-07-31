@@ -5,6 +5,11 @@
 
 bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 {
+	#if ! JUCE_MAC
+		if ( fatalError.isVisible () )
+			return false;
+	#endif
+
 	if ( key == juce::KeyPress ( juce::KeyPress::F12Key, juce::ModifierKeys::noModifiers, 0 ) )
 	{
 		showRasterTime = ! showRasterTime;
