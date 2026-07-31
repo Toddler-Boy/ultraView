@@ -257,8 +257,8 @@ void GUI_ultraView::setUserRoot ()
 	theme->setUserRoot ( filepaths::getUserThemesPath () );
 
 	// Materialize the user content folders so the watcher covers them
-	filepaths::getUserOverlaysPath ();
-	filepaths::getUserCRTMasksPath ();
+	std::ignore = filepaths::getUserOverlaysPath ();
+	std::ignore = filepaths::getUserCRTMasksPath ();
 
 	folderWatcher.addFolder ( userRoot );
 }
