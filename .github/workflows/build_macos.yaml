@@ -4,7 +4,9 @@ jobs:
   build:
     name: Build macOS
     runs-on: macos-latest
-    timeout-minutes: 15
+    # Must outlast the build plus notarytool's own 30-minute timeout;
+    # first submissions from a new team can sit in Apple's queue for a while
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
         with:
