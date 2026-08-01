@@ -7,7 +7,8 @@
 		{ "compH": 24 },
 		{ "togS": { "w": 38, "h": 24 } },
 		{ "togSpc": 8 },
-		{ "settingsW": "276 + 16" }
+		{ "settingsW": "276 + 16" },
+		{ "dlgPad": 16 }
 	],
 
 	// Macros
@@ -112,6 +113,21 @@
 								}
 							]
 						}
+					]
+				}
+			]
+		},
+
+		// The preset-save dialog: a click-swallowing veil over the whole panel,
+		// "body" is the visible drop-shadowed box, its children cascade with it
+		{ "id": "preset-save", "bounds": "0, 0, parW, parH",
+			"components": [
+				{ "id": "body", "x": 0, "y": "getY('/viewport/content/crt') + getY('/viewport/content/crt/disabler') + getB('/viewport/content/crt/disabler/preset') - viewY + 8", "w": "parW - 22", "pH": "maxY + dlgPad",
+					"components": [
+						{ "id": "title", "x": "dlgPad", "y": 4, "r": "parW - 48", "h": 24 },
+						{ "id": "name", "x": "dlgPad", "y": "prevB + 10", "r": "parW - dlgPad", "h": 32 },
+						{ "id": "save", "r": "parW - dlgPad", "y": "prevB + 14", "w": 92, "h": 32 },
+						{ "id": "close", "r": "parW - dlgPad / 2", "y": "getY('title') - 4" }
 					]
 				}
 			]

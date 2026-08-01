@@ -18,7 +18,8 @@
 	X(chip_history,		"chip-states/history-padding",		2.0f) \
 	X(chip_filter_mode,	"chip-states/filter-mode-padding",	4.0f) \
 	X(chip_waveform,	"chip-states/waveform-padding",		6.0f) \
-	X(chip_control,		"chip-states/control-padding",		2.0f)
+	X(chip_control,		"chip-states/control-padding",		2.0f) \
+	X(dialog_entry,		"dialog/entry-padding",				8.0f)
 
 namespace UI::paddings
 {

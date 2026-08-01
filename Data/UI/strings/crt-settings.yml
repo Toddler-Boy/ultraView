@@ -25,6 +25,11 @@ crt:
       preset: Preset
       preset-custom: Custom
       preset-save: Save preset...
+      preset-save-title: Save preset
+      preset-save-action: Save
+      preset-replace-title: Replace preset?
+      preset-replace: Replace the existing preset "{}"?
+      preset-cancel: Cancel
       jailbars: Jailbars
       jailbars-tip: Faint vertical bars from the VIC-II chip's uneven output, visible on a real C64's picture.
       noise: Noise

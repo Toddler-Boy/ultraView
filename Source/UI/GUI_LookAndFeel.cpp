@@ -1,7 +1,7 @@
 #include "GUI_LookAndFeel.h"
 
 #include "ultra-shared/Video/colodore.h"
-#include "Components/GUI_DesktopDropshadow.h"
+#include "ultra-shared/UI/Components/GUI_DesktopDropshadow.h"
 #include "ultra-shared/UI/Components/GUI_Toggle.h"
 
 #include "ultra-shared/Video/VIC2_Render.h"

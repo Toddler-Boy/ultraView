@@ -20,6 +20,7 @@
 	X(drop_down,		"drop-down/corner",			5.0f) \
 	X(menu_body,		"menu/corner",				8.0f) \
 	X(menu_highlight,	"menu/highlight-corner",	5.0f) \
+	X(dialog_body,		"dialog/corner",			10.0f) \
 	X(text_editor,		"text-editor/corner",		2.5f) \
 	X(settings_box,		"settings/box-corner",		10.0f) \
 	X(transport_bubble,	"transport/bubble-corner",	4.0f) \

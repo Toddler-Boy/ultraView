@@ -55,7 +55,9 @@
 	X(grid_mini_info,	"grid-mini/info-font",		12.0f,	600) \
 	X(grid_big_title,	"grid-big/title-font",		15.4f,	700) \
 	X(grid_big_authors,	"grid-big/authors-font",	10.8f,	500) \
-	X(settings_location, "settings/location-font",	14.0f,	500)
+	X(settings_location, "settings/location-font",	14.0f,	500) \
+	X(dialog_title,		"dialog/title-font",		16.0f,	700) \
+	X(dialog_entry,		"dialog/entry-font",		15.0f,	500)
 
 namespace UI::fonts
 {

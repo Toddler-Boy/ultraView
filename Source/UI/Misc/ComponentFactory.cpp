@@ -1,8 +1,8 @@
 #include "ComponentFactory.h"
 
-#include "UI/Components/GUI_AudioDeviceSelector.h"
-#include "UI/Components/GUI_SettingsNumberEdit.h"
-#include "UI/Components/GUI_SettingsToggle.h"
+#include "ultra-shared/UI/Components/GUI_AudioDeviceSelector.h"
+#include "ultra-shared/UI/Components/GUI_SettingsNumberEdit.h"
+#include "ultra-shared/UI/Components/GUI_SettingsToggle.h"
 #include "ultra-shared/UI/Components/GUI_Label.h"
 #include "ultra-shared/UI/SharedComponentFactory.h"
 
