@@ -104,8 +104,11 @@ ENTEOF
     echo "Skipping dmg signing — APPLICATION secret not set"
   fi
 
-  # Notarize the dmg
-  if [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
+  # Notarize the dmg — releases only, so every dev push doesn't cost an Apple
+  # submission (NOTARIZE comes from the workflow on v* tags)
+  if [ "${NOTARIZE:-}" != "1" ]; then
+    echo "Skipping notarization — not a release tag"
+  elif [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
     # First submissions from a new team can sit in Apple's queue for well over
     # 30 minutes, so give notarytool a generous wait budget
     SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 100m "$ROOT/ci/bin/ultraView_$ver.dmg" 2>&1) || NOTARY_FAILED=1

@@ -26,6 +26,9 @@ jobs:
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
           APPLE_USER: ${{ secrets.APPLE_USER }}
+          # Only releases (v* tags) get notarized; every other push still
+          # builds and signs the dmg
+          NOTARIZE: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
