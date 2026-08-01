@@ -51,7 +51,8 @@ if [ "$OS_NAME" = "Darwin" ]; then
   fi
 
   cd "$ROOT"
-  cmake --preset xcode
+  # CI releases are universal; local dev builds stay arm-only for speed
+  cmake --preset xcode -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
   cmake --build --preset xcode --config Release --parallel
 
   APP_PATH="$ROOT/Builds/xcode/ultraView_artefacts/Release/ultraView.app"
