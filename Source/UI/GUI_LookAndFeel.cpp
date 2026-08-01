@@ -6,7 +6,7 @@
 
 #include "ultra-shared/Video/VIC2_Render.h"
 
-#include "Config/DataSource.h"
+#include "ultra-shared/Config/DataSource.h"
 #include "Globals/constants.h"
 
 constexpr auto	tooltipFontSize = 18.0f;

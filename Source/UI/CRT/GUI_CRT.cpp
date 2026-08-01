@@ -2,7 +2,7 @@
 
 #include "GUI_CRT.h"
 
-#include "Config/DataSource.h"
+#include "ultra-shared/Config/DataSource.h"
 #include "Globals/constants.h"
 #include "ultra-shared/Helpers/ComponentUtils.h"
 

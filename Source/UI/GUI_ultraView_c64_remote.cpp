@@ -1,6 +1,6 @@
 #include "GUI_ultraView.h"
 
-#include "Config/DataSource.h"
+#include "ultra-shared/Config/DataSource.h"
 
 //-----------------------------------------------------------------------------
 

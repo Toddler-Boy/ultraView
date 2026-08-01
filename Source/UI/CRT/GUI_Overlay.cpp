@@ -1,6 +1,6 @@
 #include "GUI_Overlay.h"
 
-#include "Config/DataSource.h"
+#include "ultra-shared/Config/DataSource.h"
 #include "Globals/constants.h"
 
 #include "ultra-shared/Video/VIC2_Render.h"
