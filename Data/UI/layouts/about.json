@@ -1,21 +1,25 @@
 // Owned by the ultra-shared submodule (Source/ultra-shared/Data); the copy in
 // Data/UI/layouts is configure-synced by CMake, edit it only in the submodule.
-// GUI_About loads this for its own component tree.
+// GUI_About is a full-window overlay; "body" is the visible drop-shadowed
+// panel, all content clips to it.
 {
 	"constants": [
-		{ "margin": 30 }
+		{ "panelW": 620 },
+		{ "vpad": 48 },
+		{ "pad": 24 }
 	],
 
 	"components": [
-		{ "id": "about", "cx": "parW2", "y": "margin", "w": 600, "h": 140,
+		{ "id": "body", "cx": "parW2", "y": "vpad", "w": "panelW", "b": "parB - vpad",
 			"components": [
-				{ "id": "icon", "x": 20, "y": 20, "w": 100, "h": 100 },
-				{ "id": "title", "x": "prevR + 15", "y": "prevY + 10", "r": "parW", "h": 24 },
+				{ "id": "icon", "x": "pad", "y": "pad", "w": 100, "h": 100 },
+				{ "id": "title", "x": "prevR + 15", "y": "prevY + 10", "r": "parW - pad", "h": 24 },
 				{ "id": "copyright", "yd": 2 },
-				{ "id": "link", "yd": 2 }
+				{ "id": "link", "yd": 2 },
+
+				{ "id": "scrollText", "x": "pad", "y": "getB('icon') + 20", "r": "parW - pad", "b": "parB - vpad - pad" },
+				{ "id": "close", "r": "parW - 8", "y": 8 }
 			]
-		},
-		{ "id": "scrollText", "x": "prevX", "y": "prevB + margin", "w": "prevW + 20", "b": "parB - margin" },
-		{ "id": "close", "x": "prevR - 16", "y": "getY('about') - 6" }
+		}
 	]
 }
