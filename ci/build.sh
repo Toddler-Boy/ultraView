@@ -231,18 +231,12 @@ METAEOF
 
   cp "$EXE_OUT" "$ROOT/ci/bin/"
 
-  # Portable variant: the same signed self-contained exe in a store-only zip
+  # Portable variant: the signed self-contained exe alone in a store-only zip
   # (the zip is just transport — browsers dislike naked exe downloads)
-  ZIP_ROOT="$ROOT/ci/bin/zip_root"
-  rm -rf "$ZIP_ROOT"
-  mkdir -p "$ZIP_ROOT/ultraView"
-  cp "$STAGE/ultraView.exe" "$ZIP_ROOT/ultraView/"
-
   ZIP_OUT="$ROOT/ci/bin/ultraView_${ver}_portable.zip"
   if command -v 7z > /dev/null 2>&1; then
-    (cd "$ZIP_ROOT" && 7z a -tzip -mx=0 "$ZIP_OUT" ultraView)
+    (cd "$STAGE" && 7z a -tzip -mx=0 "$ZIP_OUT" ultraView.exe)
   else
-    powershell.exe -NoProfile -Command "Compress-Archive -Path '$(cygpath -w "$ZIP_ROOT/ultraView")' -DestinationPath '$(cygpath -w "$ZIP_OUT")' -CompressionLevel NoCompression"
+    powershell.exe -NoProfile -Command "Compress-Archive -Path '$(cygpath -w "$STAGE/ultraView.exe")' -DestinationPath '$(cygpath -w "$ZIP_OUT")' -CompressionLevel NoCompression"
   fi
-  rm -rf "$ZIP_ROOT"
 fi
