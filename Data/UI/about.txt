@@ -10,7 +10,7 @@ implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Third-Party Libraries & Open Source Notices:
 
-1. JUCE Framework (8.0.13)
+1. JUCE Framework ({})
    https://github.com/juce-framework/JUCE
    Copyright © 2026, Raw Material Software Limited
    GNU Affero General Public License v3.0
