@@ -99,6 +99,13 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 			return;
 		}
 
+		// User CRT presets are plain files read directly, no pak/lime coupling
+		if ( parent.startsWithIgnoreCase ( "CRT Presets/" ) )
+		{
+			mainScreen.crt.userCRTPresetsChanged ();
+			return;
+		}
+
 		// User CRT content merges over the factory set through the content
 		// loader; the CRT page maps the change back to its nominal path
 		if ( parent.startsWithIgnoreCase ( "Overlays/" ) || parent.startsWithIgnoreCase ( "CRT Masks/" ) )

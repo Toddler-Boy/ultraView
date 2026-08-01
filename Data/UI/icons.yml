@@ -20,7 +20,6 @@ crt:
   settings_close: sliders-solid-full
 
   about_open:     info-solid-full
-  about_close:    xmark-solid-full
 
   settings:
     tv:
@@ -33,6 +32,9 @@ crt:
       brightness:  crt/brightness
       contrast:    crt/contrast
       saturation:  crt/saturation
+
+about:
+  close: xmark-solid-full
 
 delete: xmark-solid-full
 

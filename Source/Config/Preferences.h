@@ -48,10 +48,11 @@ private:
 			{ "tv",			"overscan",				25 },
 
 			{ "crt",		"emulation",			true },
+			{ "crt",		"preset",				"$DATA$/Default" },
 
-			{ "crt",		"jailbars",				30 },
+			{ "crt",		"jailbars",				50 },
 
-			{ "crt",		"noise",				15 },
+			{ "crt",		"noise",				10 },
 			{ "crt",		"sharpening",			30 },
 			{ "crt",		"luma-blur",			50 },
 			{ "crt",		"chroma-blur",			50 },
@@ -68,16 +69,16 @@ private:
 			{ "crt",		"convergence",			20 },
 			{ "crt",		"h-wave",				50 },
 			{ "crt",		"expansion",			50 },
-			{ "crt",		"scanlines",			50 },
-			{ "crt",		"mask",					50 },
-			{ "crt",		"mask-bitmap",			"Shadow Mask EDP" },
+			{ "crt",		"scanlines",			35 },
+			{ "crt",		"mask",					25 },
+			{ "crt",		"mask-bitmap",			"Slot Mask" },
 			{ "crt",		"phosphor-decay",		40 },
 
 			{ "crt",		"adjacent",				50 },
 			{ "crt",		"halation",				50 },
-			{ "crt",		"ambient",				60 },
+			{ "crt",		"ambient",				50 },
 
-			{ "crt",		"vignette",				15 },
+			{ "crt",		"vignette",				50 },
 			{ "crt",		"reflection",			50 },
 
 			{ "webcam",		"enabled",				true },

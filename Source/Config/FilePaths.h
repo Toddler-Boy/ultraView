@@ -26,9 +26,11 @@ namespace filepaths
 
 	// User content: real folders merged over the pak-backed factory set (user
 	// overlays shadow whole folders, user masks shadow single files); themes
-	// list as the $USER$ group of the theme selector
+	// list as the $USER$ group of the theme selector, presets are plain files
+	// read directly
 	[[ nodiscard ]] juce::File getUserThemesPath ();
 	[[ nodiscard ]] juce::File getUserOverlaysPath ();
 	[[ nodiscard ]] juce::File getUserCRTMasksPath ();
+	[[ nodiscard ]] juce::File getUserCRTPresetsPath ();
 }
 //-----------------------------------------------------------------------------

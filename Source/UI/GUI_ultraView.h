@@ -9,7 +9,7 @@
 #include "UI/GUI_TooltipWindow.h"
 
 #include "UI/GUI_Main.h"
-#include "UI/GUI_About.h"
+#include "ultra-shared/UI/GUI_About.h"
 
 #include "ultra-shared/UI/Components/GUI_FatalError.h"
 

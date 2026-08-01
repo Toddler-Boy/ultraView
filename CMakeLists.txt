@@ -133,9 +133,23 @@ source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${sour
 # Data/UI so dev hot-reload works on real files and the pak packs them; the
 # synced copies are committed like any other data file. configure_file only
 # rewrites on a content change and re-runs configure when the source changes
-foreach (shared_data IN ITEMS layouts/crt-settings.json strings/crt-settings.yml)
+foreach (shared_data IN ITEMS layouts/about.json layouts/crt-settings.json strings/crt-settings.yml)
 	configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/UI/${shared_data}
 					${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/${shared_data} COPYONLY)
+endforeach ()
+
+# The About screen's icon is the canonical app icon, synced from icons/ so it
+# ships in the pak without a second committed copy drifting out of date
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
+				${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/png/about-icon.png COPYONLY)
+
+# Shared factory CRT presets, same scheme (a preset added to the submodule
+# appears here on the next configure; stale copies of deleted presets must be
+# removed by hand)
+file (GLOB shared_presets CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/CRTEmulation/Presets/*.yml)
+foreach (preset IN LISTS shared_presets)
+	get_filename_component (preset_name ${preset} NAME)
+	configure_file (${preset} ${CMAKE_CURRENT_SOURCE_DIR}/Data/CRTEmulation/Presets/${preset_name} COPYONLY)
 endforeach ()
 
 # Data-validity probe list: everything under Data/UI is essential, so

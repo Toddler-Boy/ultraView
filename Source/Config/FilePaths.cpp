@@ -86,6 +86,12 @@ juce::File filepaths::getUserCRTMasksPath ()
 }
 //-----------------------------------------------------------------------------
 
+juce::File filepaths::getUserCRTPresetsPath ()
+{
+	return getUserPath ( "CRT Presets" );
+}
+//-----------------------------------------------------------------------------
+
 juce::String filepaths::markerFor ( const root which )
 {
 	switch ( which )

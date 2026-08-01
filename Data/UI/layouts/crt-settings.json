@@ -60,7 +60,9 @@
 								{ "id": "label", "factory": "crt-header(crt)", "xd": "togSpc", "w": "parW - prevR - togSpc * 2" },
 								{ "id": "disabler", "factory": "disabler", "bounds": "0, prevB + bentoGap, parW, 0", "pH": "maxY",
 									"components": [
-										{ "id": "jailbars", "factory": "crt-slider-label(crt, jailbars)", "x": "bentoMargin", "y": 0, "r": "parW - bentoGap", "h": "compH" },
+										{ "id": "preset", "factory": "selector", "x": "bentoMargin + 78", "y": 0, "r": "parW - bentoGap", "h": 28 },
+
+										{ "id": "jailbars", "factory": "crt-slider-label(crt, jailbars)", "x": "bentoMargin", "y": "prevB + compGap", "r": "parW - bentoGap", "h": "compH" },
 
 										{ "id": "noise", "factory": "crt-slider-label(crt, noise)", "yd": "compGap" },
 										{ "id": "sharpening", "factory": "crt-slider-label(crt, sharpening)", "yd": "compGap" },
@@ -101,6 +103,7 @@
 											]
 										},
 
+										{ "id": "label-preset", "factory": "crt-label(crt/settings/crt/preset)", "macro": "label(preset)" },
 										{ "id": "label-mask-bitmap", "factory": "crt-label(crt/settings/crt/mask-pattern)", "macro": "label(mask-bitmap)" },
 
 										{ "id": "line", "factory": "line", "x": "bentoGap", "macro": "centerY(drift, curve, -1)", "r": "parW", "h": 1 },

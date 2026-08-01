@@ -1,3 +1,6 @@
+// Owned by the ultra-shared submodule (Source/ultra-shared/Data); the copy in
+// Data/UI/layouts is configure-synced by CMake, edit it only in the submodule.
+// GUI_About loads this for its own component tree.
 {
 	"constants": [
 		{ "margin": 30 }

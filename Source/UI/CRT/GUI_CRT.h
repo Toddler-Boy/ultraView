@@ -35,6 +35,9 @@ public:
 	// relative to the user root); hot-reload live tweaks or rescan pick lists
 	void userCRTContentChanged ( const juce::String& relPath, gin::FileSystemWatcher::FileSystemEvent event );
 
+	// A file under the user CRT Presets folder changed: rebuild the pick lists
+	void userCRTPresetsChanged ()	{	settingsPanel.refreshCRTPickLists ();	}
+
 	bool isBrowserVisible () const { return browserVisible; }
 	void showBrowser ( const bool visible );
 	void refreshBrowserEntries ();
