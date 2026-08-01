@@ -106,9 +106,11 @@ ENTEOF
 
   # Notarize the dmg
   if [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
-    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView_$ver.dmg" 2>&1) || NOTARY_FAILED=1
+    # First submissions from a new team can sit in Apple's queue for well over
+    # 30 minutes, so give notarytool a generous wait budget
+    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 100m "$ROOT/ci/bin/ultraView_$ver.dmg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
-    SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { print \$2; exit }")
+    SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { if (!id) id = \$2 } END { print id }")
     if [ "${NOTARY_FAILED:-0}" = "1" ]; then
       # No submission id = rejected before upload (bad credentials/team id),
       # the notarytool output above is the whole story
