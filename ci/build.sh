@@ -109,9 +109,13 @@ ENTEOF
     SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 30m "$ROOT/ci/bin/ultraView_$ver.dmg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
     SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { print \$2; exit }")
-    if [ "${NOTARY_FAILED:-0}" = "1" ] && [ -n "$SUBMISSION_ID" ]; then
-      echo "Notarization failed — fetching log for $SUBMISSION_ID"
-      xcrun notarytool log "$SUBMISSION_ID" --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" || true
+    if [ "${NOTARY_FAILED:-0}" = "1" ]; then
+      # No submission id = rejected before upload (bad credentials/team id),
+      # the notarytool output above is the whole story
+      if [ -n "$SUBMISSION_ID" ]; then
+        echo "Notarization failed — fetching log for $SUBMISSION_ID"
+        xcrun notarytool log "$SUBMISSION_ID" --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" || true
+      fi
       exit 1
     fi
     xcrun stapler staple "$ROOT/ci/bin/ultraView_$ver.dmg"

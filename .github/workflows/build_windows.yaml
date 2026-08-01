@@ -28,11 +28,18 @@ jobs:
           AZURE_ACCOUNT_NAME: ${{ secrets.AZURE_ACCOUNT_NAME }}
           AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
 
-      - name: Upload Artifact
+      # archive: false serves the raw file but allows only one file per
+      # artifact, hence one upload per deliverable
+      - name: Upload installer
         uses: actions/upload-artifact@v7
         with:
-          name: ultraView-windows
-          path: |
-            ci/bin/ultraView_*.exe
-            ci/bin/ultraView_*_portable.zip
+          name: ultraView-windows-installer
+          path: ci/bin/ultraView_*.exe
+          archive: false
+
+      - name: Upload portable
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultraView-windows-portable
+          path: ci/bin/ultraView_*_portable.zip
           archive: false
