@@ -162,6 +162,12 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
     rm "$STAGE"/_pak*.txt
   )
 
+  # The pak rides appended to the exe (zip is end-anchored, so the file stays
+  # both a valid PE and a valid zip), making the exe fully self-contained.
+  # Order matters: signing afterwards seals code and data under one signature
+  cat "$STAGE/Data.pak" >> "$STAGE/ultraView.exe"
+  rm "$STAGE/Data.pak"
+
   # Azure Trusted Signing
   uuid_re='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
   WIN_SIGN=0
@@ -225,12 +231,12 @@ METAEOF
 
   cp "$EXE_OUT" "$ROOT/ci/bin/"
 
-  # Portable variant: the same signed exe plus Data.pak in a store-only zip,
-  # extract-and-run from anywhere
+  # Portable variant: the same signed self-contained exe in a store-only zip
+  # (the zip is just transport — browsers dislike naked exe downloads)
   ZIP_ROOT="$ROOT/ci/bin/zip_root"
   rm -rf "$ZIP_ROOT"
   mkdir -p "$ZIP_ROOT/ultraView"
-  cp "$STAGE/ultraView.exe" "$STAGE/Data.pak" "$ZIP_ROOT/ultraView/"
+  cp "$STAGE/ultraView.exe" "$ZIP_ROOT/ultraView/"
 
   ZIP_OUT="$ROOT/ci/bin/ultraView_${ver}_portable.zip"
   if command -v 7z > /dev/null 2>&1; then

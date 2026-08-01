@@ -208,10 +208,17 @@ namespace
 			// all, so there is nothing to probe
 			return fromPak ( juce::File::getSpecialLocation ( juce::File::currentApplicationFile ).getChildFile ( "Contents/Resources/Data.pak" ) );
 		#elif JUCE_WINDOWS
-			// A pak next to the exe is the one user layout, and it wins over
-			// everything: dropping one beside a dev build tests the release path.
-			// A pak that exists but doesn't parse fails hard on purpose
-			if ( const auto pak = juce::File::getSpecialLocation ( juce::File::currentExecutableFile ).getSiblingFile ( "Data.pak" ); pak.existsAsFile () )
+			// Release: the pak rides appended to the exe and is the sole valid
+			// source — anything on disk is ignored, and a tail that doesn't
+			// parse fails hard instead of falling back. A dev exe carries no
+			// zip tail and probes on
+			const auto	exe = juce::File::getSpecialLocation ( juce::File::currentExecutableFile );
+			if ( PakFile::hasZipTail ( exe ) )
+				return fromPak ( exe );
+
+			// A pak next to a dev exe tests the pak code path. One that exists
+			// but doesn't parse fails hard on purpose
+			if ( const auto pak = exe.getSiblingFile ( "Data.pak" ); pak.existsAsFile () )
 				return fromPak ( pak );
 
 			// Developer: naked Data in the working directory (the repo checkout)
@@ -219,13 +226,9 @@ namespace
 				if ( auto d = juce::File::getCurrentWorkingDirectory ().getChildFile ( "Data" ); filepaths::hasDataContent ( d ) )
 					return fromFolder ( d );
 
-			// Installed
-			if ( auto pak = juce::File::getSpecialLocation ( juce::File::globalApplicationsDirectory ).getChildFile ( "ultraView/Data.pak" ); pak.existsAsFile () )
-				return fromPak ( pak );
-
-			// No data anywhere: keep the portable pak as the nominal source, a
-			// valid absolute path that fails the content check
-			return fromPak ( juce::File::getSpecialLocation ( juce::File::currentExecutableFile ).getSiblingFile ( "Data.pak" ) );
+			// No data anywhere: keep the exe as the nominal source, a valid
+			// absolute path that fails the content check
+			return fromPak ( exe );
 		#elif JUCE_LINUX
 			return fromFolder ( juce::File ( "/usr/share/ultraView" ) );
 		#else

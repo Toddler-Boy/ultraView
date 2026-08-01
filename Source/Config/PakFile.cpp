@@ -21,6 +21,60 @@ namespace
 
 		return prefix + "/";
 	}
+	//-----------------------------------------------------------------------------
+
+	struct EOCD
+	{
+		int			numEntries = 0;
+		juce::int64	cdSize = 0;
+		juce::int64	cdOffset = 0;
+		juce::int64	base = 0;	// Bytes in front of the zip: the host exe when appended
+	};
+
+	// End-of-central-directory record: 22 fixed bytes plus an optional comment
+	// of up to 64K, found by scanning backwards for its signature. A candidate
+	// only counts when its geometry fits the file, so stray signature bytes in
+	// code or in the Authenticode blob a signed exe carries behind the real
+	// record get skipped. 0xFFFF/0xFFFFFFFF mean zip64, which nothing on our
+	// side produces
+	[[ nodiscard ]] bool findEOCD ( juce::FileInputStream& in, EOCD& out )
+	{
+		const auto	fileSize = in.getTotalLength ();
+		const auto	tailSize = juce::jmin ( fileSize, juce::int64 ( 65557 ) );
+		if ( tailSize < 22 )
+			return false;
+
+		juce::MemoryBlock	tail;
+		in.setPosition ( fileSize - tailSize );
+		if ( juce::int64 ( in.readIntoMemoryBlock ( tail, tailSize ) ) != tailSize )
+			return false;
+
+		const auto	t = static_cast<const uint8_t*> ( tail.getData () );
+
+		for ( auto i = int ( tailSize ) - 22; i >= 0; --i )
+		{
+			if ( u32 ( t + i ) != 0x06054b50 )
+				continue;
+
+			const auto	numEntries = int ( u16 ( t + i + 10 ) );
+			const auto	cdSize = juce::int64 ( u32 ( t + i + 12 ) );
+			const auto	cdOffset = juce::int64 ( u32 ( t + i + 16 ) );
+
+			if ( numEntries == 0xFFFF || cdOffset == 0xFFFFFFFF )
+				continue;
+
+			// The central directory ends right where the record starts; its
+			// distance to the zip-relative offset it claims is the host size
+			const auto	base = ( fileSize - tailSize + i ) - cdSize - cdOffset;
+			if ( base < 0 )
+				continue;
+
+			out = { numEntries, cdSize, cdOffset, base };
+			return true;
+		}
+
+		return false;
+	}
 }
 //-----------------------------------------------------------------------------
 
@@ -34,53 +88,22 @@ bool PakFile::open ( const juce::File& _pakFile )
 	if ( ! in.openedOk () )
 		return false;
 
-	const auto	fileSize = in.getTotalLength ();
-
-	//
-	// End-of-central-directory record: 22 fixed bytes plus an optional comment
-	// of up to 64K, found by scanning backwards for its signature
-	//
-	const auto	tailSize = juce::jmin ( fileSize, juce::int64 ( 65557 ) );
-	if ( tailSize < 22 )
-		return false;
-
-	juce::MemoryBlock	tail;
-	in.setPosition ( fileSize - tailSize );
-	if ( juce::int64 ( in.readIntoMemoryBlock ( tail, tailSize ) ) != tailSize )
-		return false;
-
-	const auto	t = static_cast<const uint8_t*> ( tail.getData () );
-
-	auto	eocd = -1;
-	for ( auto i = int ( tailSize ) - 22; i >= 0; --i )
-		if ( u32 ( t + i ) == 0x06054b50 )
-		{
-			eocd = i;
-			break;
-		}
-
-	if ( eocd < 0 )
+	EOCD	eocd;
+	if ( ! findEOCD ( in, eocd ) )
 	{
 		Z_ERR ( "No end-of-central-directory in " << pakFile.getFullPathName () );
 		return false;
 	}
 
-	const auto	numEntries = int ( u16 ( t + eocd + 10 ) );
-	const auto	cdSize = juce::int64 ( u32 ( t + eocd + 12 ) );
-	const auto	cdOffset = juce::int64 ( u32 ( t + eocd + 16 ) );
-
-	// 0xFFFF/0xFFFFFFFF mean zip64, which nothing on our side produces
-	if ( numEntries == 0xFFFF || cdOffset == 0xFFFFFFFF || cdOffset + cdSize > fileSize )
-	{
-		Z_ERR ( "Unsupported central directory in " << pakFile.getFullPathName () );
-		return false;
-	}
+	const auto	numEntries = eocd.numEntries;
+	const auto	cdSize = eocd.cdSize;
 
 	//
-	// Central directory: 46 fixed bytes per entry plus name/extra/comment
+	// Central directory: 46 fixed bytes per entry plus name/extra/comment.
+	// Every offset the zip stores is relative to its own start, hence + base
 	//
 	juce::MemoryBlock	cd;
-	in.setPosition ( cdOffset );
+	in.setPosition ( eocd.base + eocd.cdOffset );
 	if ( juce::int64 ( in.readIntoMemoryBlock ( cd, cdSize ) ) != cdSize )
 		return false;
 
@@ -123,10 +146,19 @@ bool PakFile::open ( const juce::File& _pakFile )
 		}
 
 		lookup[ lowerKey ( path ) ] = entries.size ();
-		entries.push_back ( { path, headerOffset, compressedSize, uncompressedSize, method == 8 } );
+		entries.push_back ( { path, eocd.base + headerOffset, compressedSize, uncompressedSize, method == 8 } );
 	}
 
 	return isValid ();
+}
+//-----------------------------------------------------------------------------
+
+bool PakFile::hasZipTail ( const juce::File& file )
+{
+	juce::FileInputStream	in ( file );
+	EOCD					eocd;
+
+	return in.openedOk () && findEOCD ( in, eocd );
 }
 //-----------------------------------------------------------------------------
 

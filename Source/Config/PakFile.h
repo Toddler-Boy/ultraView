@@ -14,8 +14,15 @@
 class PakFile final
 {
 public:
-	// Parse the central directory. Any error leaves the pak invalid
+	// Parse the central directory. Any error leaves the pak invalid. The zip
+	// may sit appended to a host file (the release exe): all offsets shift by
+	// the host's size, which the end-anchored format lets us recover
 	bool open ( const juce::File& _pakFile );
+
+	// True when the file ends in a plausible central directory — the appended
+	// pak marker. Parsing can still fail afterwards; that's a hard error, not
+	// a reason to fall back to loose files
+	[[ nodiscard ]] static bool hasZipTail ( const juce::File& file );
 
 	[[ nodiscard ]] bool isValid () const				{	return ! entries.empty ();	}
 	[[ nodiscard ]] const juce::File& getFile () const	{	return pakFile;	}

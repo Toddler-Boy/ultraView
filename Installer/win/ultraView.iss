@@ -49,14 +49,15 @@ WizardSmallImageFile=..\..\icons\windows_big.png
 Name: english; MessagesFile: compiler:Default.isl
 
 [Files]
-; Data.pak sits next to the exe, where the installed-location probe looks
+; The exe carries its data appended, nothing else to install
 Source: "stage\ultraView.exe"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly
-Source: "stage\Data.pak";      DestDir: "{app}"; Flags: ignoreversion overwritereadonly
 
 [InstallDelete]
 ; 1.0.x shipped a naked Data tree into ProgramData; nothing reads it anymore
 Type: filesandordirs; Name: "{commonappdata}\ultraView"
 Type: filesandordirs; Name: "{app}\Data"
+; Older versions installed a loose Data.pak, which the app now ignores
+Type: files; Name: "{app}\Data.pak"
 
 [Icons]
 Name: "{group}\{#MyAppName}";           Filename: "{app}\ultraView.exe"
