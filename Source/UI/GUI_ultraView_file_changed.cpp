@@ -23,7 +23,7 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 			if ( event != gin::FileSystemWatcher::fileUpdated )
 				return;
 
-			if ( file == theme->resolve ( preferences->get<juce::String> ( "ui/theme" ) ) )
+			if ( file == theme->resolve ( "$DATA$/default" ) )
 				loadTheme ();
 
 			return;

@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-#include "Helpers/MessageRouter.h"
+#include "ultra-shared/Helpers/MessageRouter.h"
 
 //-----------------------------------------------------------------------------
 

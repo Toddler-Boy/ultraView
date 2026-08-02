@@ -216,9 +216,8 @@ void GUI_ultraView::updateColors ()
 
 void GUI_ultraView::loadTheme ()
 {
-	auto	themeName = preferences->get<juce::String> ( "ui/theme" );
-
-	theme->load ( themeName );
+	// ultraView has no theme selector: the default theme is the theme
+	theme->load ( "$DATA$/default" );
 
 	updateColors ();
 	sendLookAndFeelChange ();

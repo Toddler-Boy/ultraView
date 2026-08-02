@@ -42,20 +42,13 @@ public:
 	}
 
 private:
+	// No app-own settings: the theme is fixed and the screen never sleeps
+	// (C64u sessions have no PC input). The CRT-emulation block (overlay, tv,
+	// crt, webcam) is shared with ultraSID, keys and values identical by
+	// construction
 	[[ nodiscard ]] static std::vector<YamlFile::value> getDefaultValues ()
 	{
-		std::vector<YamlFile::value>	out
-		{
-			{ "ui",			"allow-screensaver",	false },
-			{ "ui",			"theme",				"$DATA$/default" },
-		};
-
-		// The CRT-emulation block (overlay, tv, crt, webcam) is shared with
-		// ultraSID, keys and values identical by construction
-		const auto	shared = sharedpreferences::getDefaultValues ();
-		out.insert ( out.end (), shared.begin (), shared.end () );
-
-		return out;
+		return sharedpreferences::getDefaultValues ();
 	}
 };
 //-----------------------------------------------------------------------------

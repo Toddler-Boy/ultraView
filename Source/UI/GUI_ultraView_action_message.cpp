@@ -15,10 +15,8 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 	}
 	else if ( cmd == "settingChanged" )
 	{
-		if ( params[ 0 ] == "ui" && params[ 1 ] == "allow-screensaver" )
-			juce::Desktop::setScreenSaverEnabled ( preferences->get<bool> ( "ui/allow-screensaver" ) );
-		else if ( params[ 0 ] == "ui" && params[ 1 ] == "theme" )
-			loadTheme ();
+		// The screen never sleeps (Main.cpp, a C64u session has no PC input)
+		// and the theme is fixed, so no ui setting needs a reaction anymore
 	}
 	else if ( cmd == "restoreState" )
 	{
