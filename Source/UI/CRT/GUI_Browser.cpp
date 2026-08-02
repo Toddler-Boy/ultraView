@@ -20,7 +20,7 @@ GUI_Browser::GUI_Browser ()
 		{
 			listbox.setRowData ( browserEntryPtrs );
 
-			info.setText ( "Showing all " + juce::String ( browserEntryPtrs.size () ) + " entries." );
+			info.setText ( "Showing all " + textutils::getHumanNumber ( int64_t ( browserEntryPtrs.size () ) ) + " entries." );
 		}
 		else
 		{
@@ -125,7 +125,7 @@ void GUI_Browser::refreshBrowserEntries ()
 	if ( isThreadRunning () )
 		return;
 
-	info.setText ( "Found " + juce::String ( browserEntryPtrs.size () ) + " entries" );
+	info.setText ( "Found " + textutils::getHumanNumber ( int64_t ( browserEntryPtrs.size () ) ) + " entries" );
 	listbox.setRowData ( browserEntryPtrs );
 }
 //-----------------------------------------------------------------------------
