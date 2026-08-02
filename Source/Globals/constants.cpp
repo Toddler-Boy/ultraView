@@ -10,30 +10,6 @@
 
 //-----------------------------------------------------------------------------
 
-juce::String UI::getHumanNumber ( int64_t number, const char thousand_separator )
-{
-	char	dst[ 64 ];
-	auto	p = &dst[ sizeof ( dst ) - 1 ];	// points to terminating 0
-	*p = 0;
-
-	auto	cnt = 0;
-	do
-	{
-		if ( cnt++ == 3 )
-		{
-			cnt = 1;
-			*--p = thousand_separator;
-		}
-
-		*--p = '0' + char ( number % 10 );
-		number /= 10;
-
-	} while ( number != 0 );
-
-	return juce::String ( p );
-}
-//-----------------------------------------------------------------------------
-
 juce::Font UI::font ( const float height, const int weight )
 {
 	auto&	laf = static_cast<GUI_LookAndFeel&> ( juce::LookAndFeel::getDefaultLookAndFeel () );
@@ -91,19 +67,6 @@ std::string helpers::createActionMessage ( const juce::String& command, const ju
 		str += a.quoted () + " ";
 
 	return ( command + " " + str.dropLastCharacters ( 1 ) ).toStdString ();
-}
-//-----------------------------------------------------------------------------
-
-juce::StringArray helpers::getFilteredStrings ( const juce::StringArray& arr, const juce::StringArray& ext )
-{
-	juce::StringArray	filteredResults;
-
-	for ( const auto& item : arr )
-		for ( const auto& suffix : ext )
-			if ( item.endsWithIgnoreCase ( suffix ) )
-				filteredResults.add ( item );
-
-	return filteredResults;
 }
 //-----------------------------------------------------------------------------
 

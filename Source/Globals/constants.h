@@ -36,7 +36,6 @@ namespace UI
 			broadcaster->sendActionMessage ( formatted );
 	}
 
-	[[ nodiscard ]] juce::String getHumanNumber ( int64_t number, const char thousand_separator = ',' );
 
 	// Height-based fonts for the app's own UI; shared code uses the point-based
 	// UI::font ( role ) / UI::fontSized ()
@@ -58,7 +57,6 @@ namespace helpers
 {
 	std::pair<juce::String, juce::StringArray> parseActionMessage ( const juce::String& message );
 	std::string createActionMessage ( const juce::String& command, const juce::StringArray& args );
-	juce::StringArray getFilteredStrings ( const juce::StringArray& arr, const juce::StringArray& ext );
 
 	inline std::string strToLower ( std::string str )
 	{

@@ -1,6 +1,7 @@
 #include "GUI_Browser.h"
 
 #include "Globals/constants.h"
+#include "ultra-shared/Helpers/TextUtils.h"
 
 //-----------------------------------------------------------------------------
 
@@ -49,7 +50,7 @@ GUI_Browser::GUI_Browser ()
 			if ( filteredEntries.empty () )
 				info.setText ( "No matches found." );
 			else
-				info.setText ( "Found " + juce::String ( filteredEntries.size () ) + " of " + juce::String ( browserEntryPtrs.size () ) + " matches." );
+				info.setText ( "Found " + textutils::getHumanNumber ( int64_t ( filteredEntries.size () ) ) + " of " + textutils::getHumanNumber ( int64_t ( browserEntryPtrs.size () ) ) + " matches." );
 		}
 	};
 
