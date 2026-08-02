@@ -5,7 +5,7 @@
 #include "UI/Components/GUI_IconButton.h"
 #include "ultra-shared/UI/Components/GUI_SVG_Button.h"
 
-#include "Network/C64u_UDP_Receiver.h"
+#include "ultra-shared/Network/C64u_UDP_Receiver.h"
 
 #include "Globals/constants.h"
 

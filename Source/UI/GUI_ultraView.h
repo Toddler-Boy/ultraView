@@ -19,9 +19,9 @@
 #include "ultra-shared/Resources/Strings.h"
 #include "ultra-shared/Resources/Theme.h"
 
-#include "Network/AsyncNetwork.h"
-#include "Network/C64u_Scanner.h"
-#include "Network/C64u_UDP_Receiver.h"
+#include "ultra-shared/Network/AsyncNetwork.h"
+#include "ultra-shared/Network/C64u_Scanner.h"
+#include "ultra-shared/Network/C64u_UDP_Receiver.h"
 
 //-----------------------------------------------------------------------------
 
