@@ -12,11 +12,8 @@ actions:
 # The crt/settings strings live in UI/strings/crt-settings.yml (configure-synced
 # from the ultra-shared submodule); Strings appends them to this file
 
-# Browser and theme picker (ultraView-only parts of the CRT page)
+# Browser (ultraView-only part of the CRT page)
 crt:
   settings:
     browse:
       header: Browse CRT & PRG
-
-    theme:
-      header: Theme

@@ -39,14 +39,7 @@
 			]
 		},
 
-		// The panel's own tree comes from the shared crt-settings.json; the
-		// theme picker sits below it, an ultraView-only bento
-		{ "id": "settings", "x": "prevR + bentoGap", "y": "prevY", "r": "parW - bentoGap", "b": "parB - bentoGap - 72" },
-		{ "id": "theme-box", "factory": "bento", "x": "prevX", "y": "prevB + bentoGap", "r": "prevR", "b": "parB - bentoGap",
-			"components": [
-				{ "id": "label", "factory": "crt-header(theme)", "x": "bentoMargin", "y": "bentoGap", "r": "parW - bentoMargin", "h": 22 },
-				{ "id": "theme", "factory": "theme-selector", "x": "bentoMargin", "y": "prevB + 2", "r": "parW - bentoMargin", "h": 28 }
-			]
-		}
+		// The panel's own tree comes from the shared crt-settings.json
+		{ "id": "settings", "x": "prevR + bentoGap", "y": "prevY", "r": "parW - bentoGap", "b": "parB - bentoGap" }
 	]
 }
