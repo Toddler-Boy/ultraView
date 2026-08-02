@@ -75,6 +75,7 @@
 										{ "id": "drift", "factory": "crt-slider-label(crt, drift)", "yd": "compGap" },
 
 										{ "id": "curve", "factory": "crt-slider-label(crt, curve, true)", "yd": "bentoGap * 3" },
+										{ "id": "rotation", "factory": "crt-slider-label(crt, rotation, true)", "yd": "compGap" },
 										{ "id": "bleed", "factory": "crt-slider-label(crt, bleed, true)", "yd": "compGap" },
 										{ "id": "bleed-green", "factory": "xypad(crt, bleed-green, 44ff44)", "cx": "parW2", "y": "prevB + bentoGap", "w": 48, "h": 48 },
 										{ "id": "bleed-red", "factory": "xypad(crt, bleed-red, ff6666)", "xd": -4 },
