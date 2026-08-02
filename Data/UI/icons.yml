@@ -32,6 +32,7 @@ crt:
       brightness:  crt/brightness
       contrast:    crt/contrast
       saturation:  crt/saturation
+      zoom:        magnifying-glass-solid-full
 
 about:
   close: xmark-solid-full

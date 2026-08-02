@@ -99,6 +99,7 @@
 												{ "id": "brightness", "factory": "crt-slider-icon(webcam, brightness)", "x": "bentoMargin", "y": 0, "r": "parW", "h": "compH" },
 												{ "id": "contrast", "factory": "crt-slider-icon(webcam, contrast)", "yd": "compGap" },
 												{ "id": "saturation", "factory": "crt-slider-icon(webcam, saturation)", "yd": "compGap" },
+												{ "id": "zoom", "factory": "crt-slider-icon(webcam, zoom)", "yd": "compGap" },
 												{ "id": "device", "factory": "selector", "x": "bentoMargin + 78", "y": "prevB + compGap", "r": "parW - bentoGap", "h": 28 },
 												{ "id": "label-device", "factory": "crt-label(crt/settings/webcam/device)", "macro": "label(device)" }
 											]
