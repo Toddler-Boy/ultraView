@@ -5,7 +5,7 @@ Headline changes only. Small fixes and internal work are not listed.
 ## 1.1.0 (2026-08-03)
 
 - ultraView is now a single portable executable. No installer: download, run, done.
-- The macOS build is universal (Apple Silicon + Intel).
+- The macOS build is universal (Apple Silicon + Intel) and requires macOS 14 or newer.
 - Automatic reconnection: ultraView keeps looking for the C64 Ultimate, whether
   it was turned on late or disappeared mid-session. Until a signal is found,
   the screen shows proper TV static.
