@@ -135,6 +135,12 @@ public:
 		{
 			juce::DocumentWindow::moved ();
 
+			// Pre-visible moves are construction artifacts (macOS pushes the
+			// window below the menu bar); saving one would clobber the stored
+			// position before the constructor restores it
+			if ( ! isVisible () )
+				return;
+
 			if ( auto cc = getContentComponent () )
 			{
 				cc->moved ();
