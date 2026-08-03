@@ -1,10 +1,10 @@
 # Changelog
 
-Headline changes only — small fixes and internal work are not listed.
+Headline changes only. Small fixes and internal work are not listed.
 
-## 1.1.0 — unreleased
+## 1.1.0 (unreleased)
 
-- ultraView is now a single portable executable. No installer — download, run, done.
+- ultraView is now a single portable executable. No installer: download, run, done.
 - The macOS build is universal (Apple Silicon + Intel).
 - Automatic reconnection: ultraView keeps looking for the C64 Ultimate, whether
   it was turned on late or disappeared mid-session. Until a signal is found,
