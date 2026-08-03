@@ -251,6 +251,8 @@ endif()
 
 if (WIN32)
 	set_target_properties(ultraView PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
+	# The debugger starts in the repo root, where the naked dev Data lives
+	set_target_properties(ultraView PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 	set_property(TARGET ultraView APPEND_STRING PROPERTY LINK_FLAGS_DEBUG " /INCREMENTAL:NO")
 	set_target_properties(ultraView PROPERTIES LINK_FLAGS "/ignore:4099")
 	target_link_libraries (ultraView PRIVATE mfplat mf mfuuid Mfreadwrite Shlwapi iphlpapi)
