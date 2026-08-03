@@ -6,6 +6,9 @@ Headline changes only — small fixes and internal work are not listed.
 
 - ultraView is now a single portable executable. No installer — download, run, done.
 - The macOS build is universal (Apple Silicon + Intel).
+- Automatic reconnection: ultraView keeps looking for the C64 Ultimate, whether
+  it was turned on late or disappeared mid-session. Until a signal is found,
+  the screen shows proper TV static.
 - CRT presets: pick a factory look from the new drop-down or save your own.
 - The CRT emulation gained additional parameters.
 - The screen no longer goes to sleep while ultraView is running.
