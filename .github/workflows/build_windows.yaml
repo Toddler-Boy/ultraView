@@ -1,5 +1,12 @@
 name: Build Windows
 on: [push]
+
+# A newer push makes the running build pointless; tag runs have their own
+# group, so releases are never cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build Windows
