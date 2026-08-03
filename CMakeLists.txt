@@ -143,15 +143,6 @@ endforeach ()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
 				${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/png/about-icon.png COPYONLY)
 
-# Shared factory CRT presets, same scheme (a preset added to the submodule
-# appears here on the next configure; stale copies of deleted presets must be
-# removed by hand)
-file (GLOB shared_presets CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/CRTEmulation/Presets/*.yml)
-foreach (preset IN LISTS shared_presets)
-	get_filename_component (preset_name ${preset} NAME)
-	configure_file (${preset} ${CMAKE_CURRENT_SOURCE_DIR}/Data/CRTEmulation/Presets/${preset_name} COPYONLY)
-endforeach ()
-
 # Data-validity probe list: everything under Data/UI is essential, so
 # FilePaths.cpp #includes this generated list instead of hand-maintaining it.
 # CONFIGURE_DEPENDS re-runs the glob when Data/UI contents change; the file is
