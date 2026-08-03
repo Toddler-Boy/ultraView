@@ -44,3 +44,9 @@ theme-factory: dice-d6-solid-full
 theme-user:    user-solid-full
 crt-factory:   dice-d6-solid-full
 crt-user:      user-solid-full
+
+# Look-and-feel primitives
+laf:
+  combo_arrow:   angle-down-solid-full
+  check:         check-solid-full
+  submenu_arrow: chevron-right-solid-full
