@@ -2,7 +2,7 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
-## 1.1.0 (unreleased)
+## 1.1.0 (2026-08-03)
 
 - ultraView is now a single portable executable. No installer: download, run, done.
 - The macOS build is universal (Apple Silicon + Intel).
@@ -12,6 +12,7 @@ Headline changes only. Small fixes and internal work are not listed.
 - CRT presets: pick a factory look from the new drop-down or save your own.
 - The CRT emulation gained additional parameters.
 - The screen no longer goes to sleep while ultraView is running.
+- Fixed the window position and size not being restored on macOS.
 - Settings moved to a new format and start fresh. When upgrading from 1.0.x,
   you can delete the old folders:
   - Windows: `C:\ProgramData\ultraView` and `%APPDATA%\ultraView`
