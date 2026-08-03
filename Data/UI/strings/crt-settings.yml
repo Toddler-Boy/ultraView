@@ -53,8 +53,6 @@ crt:
       expansion: Expansion
       h-wave-tip: Slight horizontal waver from the imperfect magnetic deflection steering the electron beam.
       scanlines: Scanlines
-      scanline-shape: Shape
-      scanline-shape-tip: Morphs the scanline profile from the soft beam falloff to a hard square, where every second line simply darkens.
       mask: Mask
       mask-tip: The grille or dot pattern of the screen surface that splits the image into red, green and blue.
       mask-pattern: Mask type
