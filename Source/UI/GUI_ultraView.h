@@ -32,6 +32,7 @@ class GUI_ultraView final
 	, public juce::ActionBroadcaster
 	, private gin::FileSystemWatcher::Listener
 	, private juce::ActionListener
+	, private juce::Timer
 {
 public:
 	GUI_ultraView ();
@@ -88,6 +89,22 @@ private:
 
 	void findC64OnNetwork ();
 	void setupNetworking ();
+
+	// juce::Timer: the reconnect tick, a no-op while the stream is alive
+	void timerCallback () override;
+
+	void reconnectTick ();
+	void setTitleStatus ( const juce::String& status );
+
+	std::atomic<bool>	netReceiving = false;
+	std::atomic<bool>	netScanning = false;
+	std::atomic<bool>	netProbing = false;
+	std::atomic<int>	probeFailures = 0;
+
+	// The "ip (hostname)" the title shows while the stream is alive; the
+	// receiver thread restores it on regained data
+	juce::CriticalSection	titleLock;
+	juce::String			connectedTitle;
 
 	void c64_reboot ();
 	void c64_run ( const juce::String& type, const juce::MemoryBlock& crtData, const juce::String& filename );

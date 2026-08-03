@@ -84,13 +84,13 @@ GUI_Overlay::GUI_Overlay ()
 		setIndexTextureSource ( c64uBuffer[ finishedBufferIndex ] );
 	};
 
-	c64uReceiver.onStatusChange = [] ( bool receiving )
+	c64uReceiver.onStatusChange = [ this ] ( bool receiving )
 	{
-		if ( receiving )
-			juce::Logger::writeToLog ( "[I]C64u UDP receiver started receiving data (video)" );
-		else
-			lime::Logger::writeToLog ( "[W]C64u UDP receiver stopped receiving data (video)" );
+		setSignalLost ( ! receiving );
 	};
+
+	// Snow until the first frame arrives
+	setSignalLost ( true );
 }
 //-----------------------------------------------------------------------------
 

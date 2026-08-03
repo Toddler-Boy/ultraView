@@ -59,17 +59,25 @@ GUI_ultraView::GUI_ultraView ()
 			streamFifo.write ( c64uBuffer );
 	};
 
-	c64uReceiver.onStatusChange = [] ( bool receiving )
+	c64uReceiver.onStatusChange = [ this ] ( bool receiving )
 	{
+		netReceiving = receiving;
+
 		if ( receiving )
-			juce::Logger::writeToLog ( "[I]C64u UDP receiver started receiving data (audio)" );
+		{
+			const juce::ScopedLock	sl ( titleLock );
+			setTitleStatus ( connectedTitle );
+		}
 		else
-			juce::Logger::writeToLog ( "[W]C64u UDP receiver stopped receiving data (audio)" );
+		{
+			setTitleStatus ( strings->get ( "network/waiting" ) );
+		}
 	};
 
 	// Setup network
 	{
 		findC64OnNetwork ();
+		startTimer ( 5000 );
 	}
 }
 //-----------------------------------------------------------------------------
