@@ -70,10 +70,18 @@
 										{ "id": "luma-blur", "factory": "crt-slider-label(crt, luma-blur)", "yd": "compGap" },
 										{ "id": "chroma-blur", "factory": "crt-slider-label(crt, chroma-blur)", "yd": "compGap" },
 										{ "id": "crosstalk", "factory": "crt-slider-label(crt, crosstalk)", "yd": "compGap" },
-										{ "id": "phase", "factory": "crt-slider-label(crt, phase, true, 50, 0.1)", "yd": "compGap" },
-										{ "id": "hannover", "factory": "crt-slider-label(crt, hannover)", "yd": "compGap" },
-										{ "id": "rainbowing", "factory": "crt-slider-label(crt, rainbowing)", "yd": "compGap" },
-										{ "id": "drift", "factory": "crt-slider-label(crt, drift)", "yd": "compGap" },
+										{ "id": "pal-only", "factory": "disabler", "bounds": "0, prevB, parW, 0", "pH": "maxY",
+											"components": [
+												{ "id": "phase", "factory": "crt-slider-label(crt, phase, true, 50, 0.1)", "x": "bentoMargin", "y": "compGap", "r": "parW - bentoGap", "h": "compH" },
+												{ "id": "hannover", "factory": "crt-slider-label(crt, hannover)", "yd": "compGap" }
+											]
+										},
+										{ "id": "ntsc-only", "factory": "disabler", "bounds": "0, prevB, parW, 0", "pH": "maxY",
+											"components": [
+												{ "id": "rainbowing", "factory": "crt-slider-label(crt, rainbowing)", "x": "bentoMargin", "y": "compGap", "r": "parW - bentoGap", "h": "compH" }
+											]
+										},
+										{ "id": "drift", "factory": "crt-slider-label(crt, drift)", "x": "bentoMargin", "y": "prevB + compGap", "r": "parW - bentoGap", "h": "compH" },
 
 										{ "id": "curve", "factory": "crt-slider-label(crt, curve, true)", "yd": "bentoGap * 3" },
 										{ "id": "rotation", "factory": "crt-slider-label(crt, rotation, true)", "yd": "compGap" },
