@@ -138,21 +138,39 @@ void GUI_LookAndFeel::positionComboBoxText ( juce::ComboBox& box, juce::Label& l
 }
 //----------------------------------------------------------------------------------
 
+// The selected row's menu image; the closed box shows it as a leading icon
+static const juce::Drawable* selectedComboIcon ( juce::ComboBox& box )
+{
+	const auto	id = box.getSelectedId ();
+	if ( id == 0 )
+		return nullptr;
+
+	for ( juce::PopupMenu::MenuItemIterator it ( *box.getRootMenu (), true ); it.next (); )
+		if ( const auto& item = it.getItem (); item.itemID == id )
+			return item.image.get ();
+
+	return nullptr;
+}
+//-------------------------------------------------------------------------------------------------
+
 void GUI_LookAndFeel::drawLabel ( juce::Graphics& g, juce::Label& l )
 {
+	auto	textArea = l.getLocalBounds ();
+
 	// Make sure the correct color is used
 	if ( auto box = dynamic_cast<juce::ComboBox*> ( l.getParentComponent () ) )
 	{
 		g.setColour ( box->findColour ( juce::ComboBox::textColourId, true ) );
 		g.setFont ( getComboBoxFont ( *box ) );
+
+		if ( selectedComboIcon ( *box ) != nullptr )
+			textArea.removeFromLeft ( box->getHeight () - l.getX () );
 	}
 	else
 	{
 		g.setColour ( l.findColour ( juce::Label::textColourId, true ) );
 		g.setFont ( l.getFont () );
 	}
-
-	const auto	textArea = l.getLocalBounds ();
 
 	auto text = l.getText ();
 
@@ -171,6 +189,10 @@ void GUI_LookAndFeel::drawComboBox ( juce::Graphics& g, int width, int height, b
 
 	g.setColour ( backCol );
 	g.fillRoundedRectangle ( boxBounds, 5.0f );
+
+	// Leading icon
+	if ( auto icon = selectedComboIcon ( box ) )
+		icon->drawWithin ( g, boxBounds.withWidth ( boxBounds.getHeight () ).reduced ( boxBounds.getHeight () * 0.3f ), juce::RectanglePlacement::centred, 1.0f );
 
 	// Draw arrow
 	const bool	drawArrow = box.getProperties ().getWithDefault ( "drawArrow", true );
