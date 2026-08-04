@@ -33,7 +33,7 @@ public:
 
 	void initialise ( const juce::String& /*commandLine*/ ) override
 	{
-		mainWindow = std::make_unique<MainWindow> ( getApplicationName () + " " + getApplicationVersion (), laf );
+		mainWindow = std::make_unique<MainWindow> ( helpers::appTitle (), laf );
 	}
 	//-----------------------------------------------------------------------------
 

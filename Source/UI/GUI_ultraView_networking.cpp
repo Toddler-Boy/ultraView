@@ -1,11 +1,13 @@
 #include "GUI_ultraView.h"
 
+#include "Globals/constants.h"
+
 //-----------------------------------------------------------------------------
 
 void GUI_ultraView::setTitleStatus ( const juce::String& status )
 {
 	juce::MessageManager::callAsync ( [ this, status ] {
-		getTopLevelComponent ()->setName ( ProjectInfo::projectName + juce::String ( " " ) + ProjectInfo::versionString + juce::String ( " - " ) + status );
+		getTopLevelComponent ()->setName ( helpers::appTitle () + " - " + status );
 	} );
 }
 //-----------------------------------------------------------------------------
