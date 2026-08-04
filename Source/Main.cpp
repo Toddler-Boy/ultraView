@@ -103,6 +103,7 @@ public:
 			ultra->sendActionMessage ( "restoreState" );
 
 			setVisible ( true );
+			bringWindowToForeground ( getWindowHandle () );
 		}
 
 		~MainWindow () override
