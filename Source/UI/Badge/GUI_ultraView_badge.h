@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 
 #include "GUI_ultraView_logo.h"
-#include "GUI_Stripes.h"
+#include "ultra-shared/UI/Components/GUI_Stripes.h"
 
 //-----------------------------------------------------------------------------
 

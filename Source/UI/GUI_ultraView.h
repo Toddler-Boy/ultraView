@@ -8,7 +8,7 @@
 
 #include "Misc/FX_Helpers.h"
 
-#include "UI/GUI_TooltipWindow.h"
+#include "ultra-shared/UI/Components/GUI_TooltipWindow.h"
 
 #include "UI/GUI_Main.h"
 #include "ultra-shared/UI/GUI_About.h"
