@@ -138,6 +138,30 @@ if (WIN32)
 	target_compile_options (fmt PRIVATE /clang:-fno-finite-math-only)
 endif ()
 
+# Silence compiler warnings inside FetchContent dependencies — their code, their
+# warnings. Skips INTERFACE targets (nothing is compiled for those).
+if(MSVC OR CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+  # /W0, not /w: the VS generator maps /W0 to the vcxproj WarningLevel element,
+  # while /w lands in AdditionalOptions and collides with MSBuild's default
+  # warning level (cl warning D9025)
+  set(_dep_no_warnings /W0)
+else()
+  set(_dep_no_warnings -w)
+endif()
+foreach(_t fmt melatonin_inspector melatonin_blur)
+  if(TARGET ${_t})
+    get_target_property(_type ${_t} TYPE)
+    if(NOT _type STREQUAL "INTERFACE_LIBRARY")
+      get_target_property(_t_opts ${_t} COMPILE_OPTIONS)
+      if(_t_opts)
+        list(FILTER _t_opts EXCLUDE REGEX "^[-/][Ww]")
+        set_target_properties(${_t} PROPERTIES COMPILE_OPTIONS "${_t_opts}")
+      endif()
+      target_compile_options(${_t} PRIVATE ${_dep_no_warnings})
+    endif()
+  endif()
+endforeach()
+
 # JUCE
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
