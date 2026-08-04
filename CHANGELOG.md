@@ -2,6 +2,11 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.1.1 (2026-08-04)
+
+- The macOS requirement dropped from macOS 14 to macOS 11 (Big Sur).
+- Numbers now use your region's digit grouping on macOS (61,165 instead of 61165).
+
 ## 1.1.0 (2026-08-03)
 
 - ultraView is now a single portable executable. No installer: download, run, done.
