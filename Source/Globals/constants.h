@@ -1,6 +1,6 @@
 #pragma once
 
-#include <format>
+#include <fmt/format.h>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -11,9 +11,9 @@
 #include "UI/ui-colors.h"
 
 template <>
-struct std::formatter<juce::String> : std::formatter<std::string_view> {
-	auto format ( const juce::String& s, std::format_context& ctx ) const {
-		return std::formatter<string_view>::format ( std::string ( s.toStdString () ), ctx );
+struct fmt::formatter<juce::String> : fmt::formatter<std::string_view> {
+	auto format ( const juce::String& s, fmt::format_context& ctx ) const {
+		return fmt::formatter<std::string_view>::format ( std::string ( s.toStdString () ), ctx );
 	}
 };
 
@@ -29,8 +29,8 @@ namespace UI
 	template<typename... Args>
 	void sendGlobalMessage ( std::string_view fmt_str, Args&&... args )
 	{
-		auto	format_args = std::make_format_args ( args... );
-		auto	formatted = std::vformat ( fmt_str, format_args );
+		auto	format_args = fmt::make_format_args ( args... );
+		auto	formatted = fmt::vformat ( fmt_str, format_args );
 
 		if ( auto* broadcaster = ab.load () )
 			broadcaster->sendActionMessage ( formatted );
@@ -55,6 +55,9 @@ namespace UI
 
 namespace helpers
 {
+	// Window base title: app + version, plus the config suffix outside Release
+	[[ nodiscard ]] juce::String appTitle ();
+
 	std::pair<juce::String, juce::StringArray> parseActionMessage ( const juce::String& message );
 	std::string createActionMessage ( const juce::String& command, const juce::StringArray& args );
 

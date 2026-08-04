@@ -1,5 +1,3 @@
-#include <format>
-
 #include <JuceHeader.h>
 
 #include "constants.h"
@@ -8,6 +6,20 @@
 
 #include <regex>
 
+//-----------------------------------------------------------------------------
+
+juce::String helpers::appTitle ()
+{
+	auto	title = juce::String ( ProjectInfo::projectName ) + " " + ProjectInfo::versionString;
+
+	#if ULTRA_DEVELOPMENT
+		title += " - development";
+	#elif JUCE_DEBUG
+		title += " - debug";
+	#endif
+
+	return title;
+}
 //-----------------------------------------------------------------------------
 
 juce::Font UI::font ( const float height, const int weight )
