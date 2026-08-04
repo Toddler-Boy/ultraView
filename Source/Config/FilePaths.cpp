@@ -7,14 +7,11 @@
 
 bool filepaths::isDeveloperMode ()
 {
-	static const bool enabled = []
-	{
-		const auto value = juce::SystemStats::getEnvironmentVariable ( "ULTRASID_DEVELOPER_MODE", "" );
-
-		return juce::MD5 ( value.toUTF8 () ).toHexString () == "085663f5bcbd242d43e8eaad5dcbfe80";
-	} ();
-
-	return enabled;
+#if ULTRA_DEVELOPMENT
+	return true;
+#else
+	return false;
+#endif
 }
 //-----------------------------------------------------------------------------
 

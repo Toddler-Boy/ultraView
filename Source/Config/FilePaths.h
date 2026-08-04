@@ -12,9 +12,8 @@ namespace filepaths
 
 	[[ nodiscard ]] juce::String markerFor ( const root which );
 
-	// The ULTRASID_DEVELOPER_MODE environment variable (MD5 of its value must
-	// match), gating developer features and the naked data-root probe; one
-	// switch covers both apps
+	// Development builds only: gates dev features like the factory-data
+	// watcher and the curation controls
 	[[ nodiscard ]] bool isDeveloperMode ();
 
 	// Every entry exists under root: trailing '/' = directory, otherwise file

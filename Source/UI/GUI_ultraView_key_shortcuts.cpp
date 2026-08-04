@@ -22,6 +22,7 @@ bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 	{
 		toggleFullscreen ();
 	}
+#if ULTRA_INSPECTOR
 	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::ctrlModifier, 0 ) )
 	{
 		// Toggle inspector
@@ -38,6 +39,7 @@ bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 			inspector = nullptr;
 		}
 	}
+#endif
 	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::shiftModifier, 0 ) )
 	{
 		auto&	laf = static_cast<GUI_LookAndFeel&> ( getLookAndFeel () );

@@ -2,7 +2,9 @@
 
 #include <JuceHeader.h>
 
-#include <melatonin_inspector/melatonin_inspector.h>
+#if ULTRA_INSPECTOR
+	#include <melatonin_inspector/melatonin_inspector.h>
+#endif
 
 #include "Misc/FX_Helpers.h"
 
@@ -171,7 +173,9 @@ private:
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
 	bool	showRasterTime = false;
 
+#if ULTRA_INSPECTOR
 	std::unique_ptr<melatonin::Inspector>	inspector;
+#endif
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_ultraView )
 };

@@ -8,7 +8,7 @@ set (CMAKE_VERBOSE_MAKEFILE OFF)
 set (CMAKE_XCODE_GENERATE_SCHEME ON)
 set (CMAKE_XCODE_ATTRIBUTE_SHOW_ENVIRONMENT_BUILD_SETTINGS NO)
 set (CMAKE_XCODE_ATTRIBUTE_COMPILER_INDEX_STORE_ENABLE NO)
-set (CMAKE_CONFIGURATION_TYPES Debug Release)
+set (CMAKE_CONFIGURATION_TYPES Debug Release Development)
 set_property (GLOBAL PROPERTY DEBUG_CONFIGURATIONS "Debug")
 
 if (WIN32)
@@ -29,6 +29,13 @@ project (
 Include (FetchContent)
 
 include (CMakeDependentOption)
+
+# Development = Release plus dev-only features (naked Data folder, inspector);
+# custom configs start with empty flags, so inherit the Release set wholesale
+set (CMAKE_C_FLAGS_DEVELOPMENT "${CMAKE_C_FLAGS_RELEASE}")
+set (CMAKE_CXX_FLAGS_DEVELOPMENT "${CMAKE_CXX_FLAGS_RELEASE}")
+set (CMAKE_EXE_LINKER_FLAGS_DEVELOPMENT "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+set (CMAKE_SHARED_LINKER_FLAGS_DEVELOPMENT "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 
 set_property (DIRECTORY APPEND PROPERTY LABELS ultraView)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ultraView)
@@ -65,9 +72,15 @@ set (JUCE_ENABLE_MODULE_SOURCE_GROUPS ON)
 set (JUCE_BUILD_EXTRAS OFF)
 set (JUCE_BUILD_EXAMPLES OFF)
 
-add_subdirectory (modules/JUCE)
+# Soft pin on develop: the fixes land there months before a tagged release
+FetchContent_Declare (JUCE
+					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+					GIT_TAG origin/develop
+					GIT_SHALLOW TRUE
+					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE)
+FetchContent_MakeAvailable (JUCE)
 
-set_property (DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/modules/JUCE" APPEND PROPERTY LABELS JUCE)
+set_property (DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/JUCE" APPEND PROPERTY LABELS JUCE)
 
 # Binary Data (icons)
 if(WIN32)
@@ -90,13 +103,16 @@ foreach ( module_name IN ITEMS lime_Logger lime_ShaderToyComponent lime_YamlConf
 	set_property (TARGET "${module_name}" APPEND PROPERTY LABELS Lime)
 endforeach()
 
-# Melatonin Inspector
-FetchContent_Declare (melatonin_inspector
-					GIT_REPOSITORY https://github.com/sudara/melatonin_inspector.git
-					GIT_TAG origin/main
-					GIT_SHALLOW TRUE
-					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/melatonin_inspector)
-FetchContent_MakeAvailable (melatonin_inspector)
+# Melatonin Inspector: dev tooling, Development config only, and Windows only,
+# the sole dev platform (Xcode cannot exclude an interface module per config)
+if (WIN32)
+	FetchContent_Declare (melatonin_inspector
+						GIT_REPOSITORY https://github.com/sudara/melatonin_inspector.git
+						GIT_TAG origin/main
+						GIT_SHALLOW TRUE
+						SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/melatonin_inspector)
+	FetchContent_MakeAvailable (melatonin_inspector)
+endif ()
 
 # Melatonin Blur
 FetchContent_Declare (melatonin_blur
@@ -105,6 +121,22 @@ FetchContent_Declare (melatonin_blur
 					GIT_SHALLOW TRUE
 					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/melatonin_blur)
 FetchContent_MakeAvailable (melatonin_blur)
+
+# fmt replaces std::format (features land overnight instead of every three
+# years); hard pin on a release, bumped deliberately
+set (FMT_INSTALL OFF)
+FetchContent_Declare (fmt
+					GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+					GIT_TAG 12.2.0
+					GIT_SHALLOW TRUE
+					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/fmt)
+FetchContent_MakeAvailable (fmt)
+if (WIN32)
+	# no C++20 modules - clang-cl has no /scanDependencies. The inherited
+	# /fp:fast would strip the inf/nan handling fmt's float paths rely on
+	set_target_properties (fmt PROPERTIES VS_PLATFORM_TOOLSET ClangCL CXX_SCAN_FOR_MODULES OFF)
+	target_compile_options (fmt PRIVATE /clang:-fno-finite-math-only)
+endif ()
 
 # JUCE
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -190,8 +222,9 @@ target_link_libraries (ultraView PRIVATE
 
     					juce::juce_recommended_config_flags
 
-						melatonin_inspector
 						melatonin_blur
+
+						fmt::fmt
 					)
 
 juce_generate_juce_header (ultraView)
@@ -212,6 +245,10 @@ target_compile_definitions (ultraView PRIVATE
 								DONT_SET_USING_JUCE_NAMESPACE=1
 								_CRT_SECURE_NO_WARNINGS
 								GIN_HAS_SIMD=0
+								$<$<CONFIG:Development>:ULTRA_DEVELOPMENT=1>
+								# Debug/Development read the naked repo Data folder, baked in
+								# so the exe runs from anywhere; Release is pak-only
+								$<$<NOT:$<CONFIG:Release>>:ULTRA_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Data">
 							)
 
 if (APPLE)
@@ -219,19 +256,22 @@ if (APPLE)
 		XCODE_ATTRIBUTE_INFOPLIST_KEY_NSCameraUsageDescription "Add users reflection to CRT screen"
 		XCODE_ATTRIBUTE_CLANG_LINK_OBJC_RUNTIME OFF
 		XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING[variant=Release] ON
-		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] ON)
+		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] ON
+		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Development] ON)
 	target_compile_options(ultraView PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
 	target_link_libraries(ultraView PUBLIC "-framework AVFoundation" "-framework CoreMedia" "-framework SystemConfiguration")
 
 	# The whole data set ships inside the bundle as Resources/Data.pak, where
 	# datasource reads it: images stored (they carry their own compression),
-	# the rest weakest deflate. Runs on every build, before any code-signing.
-	# Source-only files (bitmap PSDs, submodule .git pointers) stay out
+	# the rest weakest deflate. Release only (Debug/Development read the repo
+	# Data folder); the non-Release commands degrade to argument-eating `true`.
+	# Runs before any code-signing. Source-only files (bitmap PSDs, submodule
+	# .git pointers) stay out
 	add_custom_command(TARGET ultraView POST_BUILD
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Data
-		COMMAND rm -rf $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak
-		COMMAND zip -q -0 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -i "*.png" "*.jpg" -x "*/!src/*" ".*" "*/.*"
-		COMMAND zip -q -1 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -x "*.png" "*.jpg" "*/!src/*" ".*" "*/.*" "*/Thumbs.db" "Thumbs.db"
+		COMMAND $<IF:$<CONFIG:Release>,rm,true> -rf $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak
+		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -0 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -i "*.png" "*.jpg" -x "*/!src/*" ".*" "*/.*"
+		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -1 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -x "*.png" "*.jpg" "*/!src/*" ".*" "*/.*" "*/Thumbs.db" "Thumbs.db"
 		VERBATIM)
 endif()
 
@@ -247,6 +287,10 @@ if (WIN32)
 	set_property(TARGET ultraView APPEND_STRING PROPERTY LINK_FLAGS_DEBUG " /INCREMENTAL:NO")
 	set_target_properties(ultraView PROPERTIES LINK_FLAGS "/ignore:4099")
 	target_link_libraries (ultraView PRIVATE mfplat mf mfuuid Mfreadwrite Shlwapi iphlpapi)
+	# The inspector compiles and links into Development only; ULTRA_INSPECTOR
+	# gates its include, member and key handler
+	target_link_libraries (ultraView PRIVATE $<$<CONFIG:Development>:melatonin_inspector>)
+	target_compile_definitions (ultraView PRIVATE $<$<CONFIG:Development>:ULTRA_INSPECTOR=1>)
 endif()
 
 if(UNIX AND NOT APPLE)
