@@ -2,10 +2,9 @@
 
 #include <JuceHeader.h>
 
-#include "UI/Misc/GUI_ListboxMouseMoveHover.h"
-
 #include "ultra-shared/Resources/Icons.h"
 #include "ultra-shared/Resources/Strings.h"
+#include "ultra-shared/UI/Components/GUI_ListBoxMouseMoveHover.h"
 
 //-----------------------------------------------------------------------------
 

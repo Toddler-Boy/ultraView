@@ -76,5 +76,4 @@ namespace helpers
 namespace paths
 {
 	juce::File getAppDataPath ( const juce::String& file );
-	juce::File getSearchtermsPath ();
 }

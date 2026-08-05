@@ -14,9 +14,9 @@ browser:
   password_show: tabler/eye
   password_hide: tabler/eye-off
 
-search:
-  lens:    font-awesome/magnifying-glass-solid-full
-  history: font-awesome/clock-rotate-left-solid-full
+search_bar:
+  search: font-awesome/magnifying-glass-solid-full
+  clear:  font-awesome/xmark-solid-full
 
 crt:
   browser_open:   browse-games
@@ -42,8 +42,6 @@ crt:
 
 about:
   close: font-awesome/xmark-solid-full
-
-delete: font-awesome/xmark-solid-full
 
 # Factory vs user rows in the theme / overlay / mask pick lists
 theme-factory: font-awesome/dice-d6-solid-full

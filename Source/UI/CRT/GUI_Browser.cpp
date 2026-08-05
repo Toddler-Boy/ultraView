@@ -32,8 +32,6 @@ GUI_Browser::GUI_Browser ()
 	passwordBox.addAndMakeVisible ( passwordEye );
 	addAndMakeVisible ( passwordBox );
 
-	searchBar.enableSearchHistory ( false );
-
 	searchBar.onTextChange = [ this ]
 	{
 		searchString = searchBar.getTextEditor ().getText ().toLowerCase ();

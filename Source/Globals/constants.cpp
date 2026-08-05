@@ -49,12 +49,6 @@ juce::File paths::getAppDataPath ( const juce::String& file )
 }
 //-----------------------------------------------------------------------------
 
-juce::File paths::getSearchtermsPath ()
-{
-	return getAppDataPath ( "searchterms.csv" );
-}
-//-----------------------------------------------------------------------------
-
 std::pair<juce::String, juce::StringArray> helpers::parseActionMessage ( const juce::String& message )
 {
 	auto	parts = juce::StringArray::fromTokens ( message, " ", "\"" );
