@@ -2,9 +2,8 @@
 
 #include "constants.h"
 
+#include "ultra-shared/Helpers/Regex.h"
 #include "ultra-shared/UI/GUI_LookAndFeel.h"
-
-#include <regex>
 
 //-----------------------------------------------------------------------------
 
@@ -184,35 +183,13 @@ int helpers::romanToInt ( std::string s )
 
 std::string helpers::normalizeGamesString ( const std::string& input )
 {
-	auto	output = input;
+	// Replace Roman numerals, standalone words only, with their decimal equivalents
+	const regex::Pattern	romanRegex ( R"((\s)([ivxlcdm]+)(?=$|[\s]))" );
 
-	// Replace Roman numerals with their decimal equivalents
+	auto	output = romanRegex.replaceAll ( input, [] ( const std::vector<std::string>& groups )
 	{
-		// Regex for Roman numerals as standalone words
-		std::regex	romanregex ( R"((\s)([ivxlcdm]+)(?=$|[\s]))" );
-
-		auto	words_begin = std::sregex_iterator ( input.begin (), input.end (), romanregex );
-		auto	words_end = std::sregex_iterator ();
-
-		auto	offset = 0;
-
-		for ( auto i = words_begin; i != words_end; ++i )
-		{
-			const auto& match = *i;
-
-			const auto	prefix = match[ 1 ].str ();
-			const auto	romanPart = match[ 2 ].str ();
-
-			if ( romanPart.empty () )
-				continue;
-
-			auto	decimal = std::to_string ( romanToInt ( romanPart ) );
-			auto	replacement = prefix + decimal;
-
-			output.replace ( match.position () + offset, match.length (), replacement );
-			offset += int ( replacement.length () - match.length () );
-		}
-	}
+		return groups[ 1 ] + std::to_string ( romanToInt ( groups[ 2 ] ) );
+	} );
 
 	// Remove dots in name and replace underscores with spaces
 	{

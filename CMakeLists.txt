@@ -131,6 +131,17 @@ FetchContent_Declare (fmt
 					GIT_SHALLOW TRUE
 					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/fmt)
 FetchContent_MakeAvailable (fmt)
+
+# boost::regex, standalone and header-only (BOOST_REGEX_STANDALONE): no other
+# boost libs, nothing to build. SOURCE_SUBDIR points nowhere so its own CMake
+# never runs; hard pin on a release, bumped deliberately
+FetchContent_Declare (boost_regex
+					GIT_REPOSITORY https://github.com/boostorg/regex.git
+					GIT_TAG boost-1.88.0
+					GIT_SHALLOW TRUE
+					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/boost_regex
+					SOURCE_SUBDIR nonexistent)
+FetchContent_MakeAvailable (boost_regex)
 if (WIN32)
 	# no C++20 modules - clang-cl has no /scanDependencies. The inherited
 	# /fp:fast would strip the inf/nan handling fmt's float paths rely on
@@ -212,7 +223,7 @@ list (TRANSFORM ui_data_files REPLACE "^(.+)$" "\t\"\\1\",")
 list (JOIN ui_data_files "\n" ui_manifest)
 file (CONFIGURE OUTPUT generated/ui-manifest.h CONTENT "// Generated from Data/UI by CMake - do not edit\n${ui_manifest}\n" @ONLY)
 
-target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/generated)
+target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/generated ${boost_regex_SOURCE_DIR}/include)
 
 target_link_libraries (ultraView PRIVATE
 
@@ -269,6 +280,7 @@ target_compile_definitions (ultraView PRIVATE
 								DONT_SET_USING_JUCE_NAMESPACE=1
 								_CRT_SECURE_NO_WARNINGS
 								GIN_HAS_SIMD=0
+								BOOST_REGEX_STANDALONE
 								$<$<CONFIG:Development>:ULTRA_DEVELOPMENT=1>
 								# Debug/Development read the naked repo Data folder, baked in
 								# so the exe runs from anywhere; Release is pak-only
