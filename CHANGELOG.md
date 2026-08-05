@@ -2,6 +2,12 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.1.2 (2026-08-05)
+
+- New password field above the browser, for password-protected C64 Ultimates.
+  The title bar tells you when a password is required.
+- Fixed the window opening behind other applications on Windows.
+
 ## 1.1.1 (2026-08-04)
 
 - The macOS requirement dropped from macOS 14 to macOS 11 (Big Sur).
