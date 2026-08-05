@@ -51,6 +51,8 @@ private:
 
 	GUI_SVG_Button	clearSearch { "delete", { "delete" } };
 
+	juce::SharedResourcePointer<Icons>	icons;
+
 	bool	showSearchHistory = true;
 	bool	expanded = false;
 	int		originalHeight = 0;

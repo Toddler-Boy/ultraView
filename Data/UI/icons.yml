@@ -3,25 +3,29 @@
 # The parser will fail if you go beyond this extremely simple format.
 #
 actions:
-  menu_button:  bars-solid-full
-  pause:        pause-solid-full
-  resume:       play-solid-full
-  reboot:       arrow-rotate-left-solid-full
-  poweroff:     power-off-solid-full
+  menu_button:  font-awesome/bars-solid-full
+  pause:        font-awesome/pause-solid-full
+  resume:       font-awesome/play-solid-full
+  reboot:       font-awesome/arrow-rotate-left-solid-full
+  poweroff:     font-awesome/power-off-solid-full
 
 browser:
-  path: folder-open-solid-full
+  path: font-awesome/folder-open-solid-full
   password_show: tabler/eye
   password_hide: tabler/eye-off
+
+search:
+  lens:    font-awesome/magnifying-glass-solid-full
+  history: font-awesome/clock-rotate-left-solid-full
 
 crt:
   browser_open:   browse-games
   browser_close:  browse-games
 
-  settings_open:  sliders-solid-full
-  settings_close: sliders-solid-full
+  settings_open:  font-awesome/sliders-solid-full
+  settings_close: font-awesome/sliders-solid-full
 
-  about_open:     info-solid-full
+  about_open:     font-awesome/info-solid-full
 
   settings:
     tv:
@@ -34,21 +38,21 @@ crt:
       brightness:  crt/brightness
       contrast:    crt/contrast
       saturation:  crt/saturation
-      zoom:        magnifying-glass-solid-full
+      zoom:        font-awesome/magnifying-glass-solid-full
 
 about:
-  close: xmark-solid-full
+  close: font-awesome/xmark-solid-full
 
-delete: xmark-solid-full
+delete: font-awesome/xmark-solid-full
 
 # Factory vs user rows in the theme / overlay / mask pick lists
-theme-factory: dice-d6-solid-full
-theme-user:    user-solid-full
-crt-factory:   dice-d6-solid-full
-crt-user:      user-solid-full
+theme-factory: font-awesome/dice-d6-solid-full
+theme-user:    font-awesome/user-solid-full
+crt-factory:   font-awesome/dice-d6-solid-full
+crt-user:      font-awesome/user-solid-full
 
 # Look-and-feel primitives
 laf:
-  combo_arrow:   angle-down-solid-full
-  check:         check-solid-full
-  submenu_arrow: chevron-right-solid-full
+  combo_arrow:   font-awesome/angle-down-solid-full
+  check:         font-awesome/check-solid-full
+  submenu_arrow: font-awesome/chevron-right-solid-full

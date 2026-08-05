@@ -71,7 +71,7 @@ public:
 			const auto	rect = juce::Rectangle<float> ( gap, 0.0f, h, h );
 
 			g.setColour ( txtCol.withMultipliedAlpha ( 0.5f ) );
-			g.fillPath ( UI::getScaledPath ( "clock-rotate-left-solid-full", rect, 0, 0.3f ) );
+			g.fillPath ( UI::getScaledPath ( icons->get ( "search/history" ), rect, 0, 0.3f ) );
 		}
 
 		// Text
@@ -91,8 +91,10 @@ public:
 	//----------------------------------------------------------------------------------
 
 	GUI_SearchBar&		owner;
-	GUI_SVG_Button		deleteButton { "delete", { "xmark-solid-full" } };
+	GUI_SVG_Button		deleteButton { "delete", { "delete" } };
 	juce::String		text;
+
+	juce::SharedResourcePointer<Icons>	icons;
 
 	gin::LambdaMouseListener	mouseListener;
 	bool						mouseOver = false;
@@ -204,7 +206,7 @@ void GUI_SearchBar::paint ( juce::Graphics& g )
 		const auto	rect = juce::Rectangle<float> ( radius * 0.33f, 0.0f, getEditorHeight (), getEditorHeight () );
 
 		g.setColour ( col );
-		g.fillPath ( UI::getScaledPath ( "magnifying-glass-solid-full", rect, 0, 0.3f ) );
+		g.fillPath ( UI::getScaledPath ( icons->get ( "search/lens" ), rect, 0, 0.3f ) );
 	}
 }
 //-----------------------------------------------------------------------------
