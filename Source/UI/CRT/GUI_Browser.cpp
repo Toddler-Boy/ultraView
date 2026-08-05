@@ -11,6 +11,27 @@ GUI_Browser::GUI_Browser ()
 {
 	addAndMakeVisible ( badge );
 
+	passwordField.setIndents ( 8, 0 );
+	passwordField.setText ( settings->get<juce::String> ( "network/password" ), juce::dontSendNotification );
+
+	const auto	passwordFont = UI::font ( 16.0f, 600 );
+	passwordField.setFont ( passwordFont );
+	passwordField.applyFontToAllText ( passwordFont );
+	lookAndFeelChanged ();
+
+	passwordField.onReturnKey = [ this ] {	applyPassword ();	};
+	passwordField.onFocusLost = [ this ] {	applyPassword ();	};
+
+	// The click already advanced the stage: 1 shows the open eye and the text
+	passwordEye.onClick = [ this ]
+	{
+		passwordField.setPasswordCharacter ( passwordEye.getStage () == 0 ? 0x2022 : 0 );
+	};
+
+	passwordBox.addAndMakeVisible ( passwordField );
+	passwordBox.addAndMakeVisible ( passwordEye );
+	addAndMakeVisible ( passwordBox );
+
 	searchBar.enableSearchHistory ( false );
 
 	searchBar.onTextChange = [ this ]
@@ -117,6 +138,26 @@ GUI_Browser::GUI_Browser ()
 GUI_Browser::~GUI_Browser ()
 {
 	stopThread ( -1 );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Browser::lookAndFeelChanged ()
+{
+	passwordField.setTextToShowWhenEmpty ( strings->get ( "crt/settings/browse/password" ),
+										   findColour ( UI::colors::textMuted ) );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Browser::applyPassword ()
+{
+	const auto	password = passwordField.getText ().trim ();
+
+	if ( password == settings->get<juce::String> ( "network/password" ) )
+		return;
+
+	settings->set ( "network/password", password );
+
+	UI::sendGlobalMessage ( "passwordChanged" );
 }
 //-----------------------------------------------------------------------------
 

@@ -8,6 +8,7 @@
 #include "UI/Components/GUI_SearchBar.h"
 #include "ultra-shared/UI/Components/GUI_SettingsBox.h"
 #include "ultra-shared/UI/Components/GUI_SVG_Button.h"
+#include "ultra-shared/UI/Components/GUI_TextEditorEx.h"
 
 #include "GUI_ListBox.h"
 
@@ -27,6 +28,7 @@ private:
 	void run () override;
 
 	juce::SharedResourcePointer<Settings>	settings;
+	juce::SharedResourcePointer<Strings>	strings;
 
 	std::vector<browserEntry>	browserEntries;
 	std::vector<browserEntry*>	browserEntryPtrs;
@@ -36,6 +38,16 @@ private:
 	std::unique_ptr<juce::FileChooser>	directoryChooser;
 
 	GUI_ultraView_Badge	badge;
+
+	// The C64u's optional http password; the eye's second stage reveals the text
+	GUI_SettingsBox	passwordBox { "password" };
+		GUI_TextEditorEx	passwordField { "password-field", 0x2022 };
+		GUI_SVG_Button		passwordEye { "password-eye", { "browser/password_hide", "browser/password_show" } };
+
+	void applyPassword ();
+
+	// juce::Component, re-resolves the placeholder color from the theme
+	void lookAndFeelChanged () override;
 
 	GUI_SettingsBox	background { "background" };
 		GUI_Label			curPath { "", 15.0f, 500 };

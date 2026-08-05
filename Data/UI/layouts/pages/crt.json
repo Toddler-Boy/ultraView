@@ -14,6 +14,12 @@
 						{ "id": "stripes", "x": "getR('logo') + 8", "cy": "parH2", "r": "prevX - 4", "h": "parH2 + 3" }
 					]
 				},
+				{ "id": "password", "x": "bentoGap", "y": "prevB + 10", "r": "parW - bentoGap", "h": 44,
+					"components": [
+						{ "id": "password-field", "x": 10, "cy": "parH2", "r": "parW - 44", "h": 28 },
+						{ "id": "password-eye", "xd": 8, "cy": "parH2", "w": 28, "h": 28 }
+					]
+				},
 				{ "id": "background", "x": "bentoGap", "y": "prevB + 10", "r": "parW - bentoGap", "b": "parH",
 					"components": [
 						{ "id": "label-browse", "factory": "crt-header(browse)", "x": 10, "y": "prevB + 10", "r": "parW - 10", "h": 28 },

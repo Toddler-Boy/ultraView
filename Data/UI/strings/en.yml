@@ -12,6 +12,7 @@ actions:
 network:
   searching:  Searching the network for a C64 Ultimate...
   waiting:    Waiting for the C64 Ultimate...
+  password-required:  The C64 Ultimate requires a password
 
 # The crt/settings strings live in UI/strings/crt-settings.yml (configure-synced
 # from the ultra-shared submodule); Strings appends them to this file
@@ -21,3 +22,4 @@ crt:
   settings:
     browse:
       header: Browse CRT & PRG
+      password: C64 Ultimate password (optional)

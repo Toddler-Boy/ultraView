@@ -19,9 +19,18 @@ void GUI_ultraView::findC64OnNetwork ()
 	netScanning = true;
 	setTitleStatus ( strings->get ( "network/searching" ) );
 
-	c64uScanner.scan ( [ this ] ( const juce::String& ip )
+	c64uScanner.scan ( [ this ] ( const juce::String& ip, const bool passwordRequired )
 	{
 		netScanning = false;
+
+		if ( passwordRequired )
+		{
+			// Remember the machine so the probe loop watches it; rescanning
+			// can't help until the password matches
+			settings->set ( "network/last-ip", ip );
+			setTitleStatus ( strings->get ( "network/password-required" ) );
+			return;
+		}
 
 		if ( ip.isEmpty () )
 		{
@@ -80,6 +89,14 @@ void GUI_ultraView::reconnectTick ()
 	network.get ( "v1/info", {}, [ this, lastIP ] ( const juce::var& result, const int httpCode )
 	{
 		netProbing = false;
+
+		// A refusal means the machine is there; keep watching it instead of
+		// sweeping the network
+		if ( httpCode == 403 )
+		{
+			setTitleStatus ( strings->get ( "network/password-required" ) );
+			return;
+		}
 
 		if ( httpCode < 200 || httpCode >= 300 )
 		{

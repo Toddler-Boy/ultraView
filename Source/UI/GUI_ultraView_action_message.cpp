@@ -22,6 +22,14 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 	{
 		restoreState ();
 	}
+	else if ( cmd == "passwordChanged" )
+	{
+		network.setC64uPassword ( settings->get<juce::String> ( "network/password" ) );
+
+		// Retry right away instead of waiting out the tick
+		probeFailures = 0;
+		reconnectTick ();
+	}
 	else if ( cmd == "stream-status" )
 	{
 		Z_INFO ( "Stream status " << params[ 0 ] << " " << params[ 1 ] );

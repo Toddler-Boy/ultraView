@@ -74,8 +74,11 @@ GUI_ultraView::GUI_ultraView ()
 		}
 	};
 
-	// Setup network
+	// Setup network; priming the password first also logs its state right at
+	// startup, where support logs need it
 	{
+		network.setC64uPassword ( settings->get<juce::String> ( "network/password" ) );
+
 		findC64OnNetwork ();
 		startTimer ( 5000 );
 	}

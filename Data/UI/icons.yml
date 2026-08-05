@@ -11,6 +11,8 @@ actions:
 
 browser:
   path: folder-open-solid-full
+  password_show: tabler/eye
+  password_hide: tabler/eye-off
 
 crt:
   browser_open:   browse-games
