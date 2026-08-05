@@ -67,4 +67,12 @@ Name: "{commondesktop}\{#MyAppName}";   Filename: "{app}\ultraView.exe"; Tasks: 
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Run]
+; Firewall: the C64u pushes UDP streams to us, so the exe needs an inbound allow
+; rule on every profile (the first-launch prompt skips Public networks).
+; Delete first so reinstalls don't stack duplicate rules.
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""ultraView"""; Flags: runhidden; StatusMsg: "Configuring Windows Firewall..."
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""ultraView"" dir=in action=allow program=""{app}\ultraView.exe"" protocol=udp remoteip=localsubnet profile=any"; Flags: runhidden; StatusMsg: "Configuring Windows Firewall..."
 Filename: "{app}\ultraView.exe"; WorkingDir: "{app}"; Description: "Launch ultraView"; Flags: runasoriginaluser postinstall nowait skipifsilent
+
+[UninstallRun]
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""ultraView"""; Flags: runhidden; RunOnceId: "RemoveFirewallRule"
