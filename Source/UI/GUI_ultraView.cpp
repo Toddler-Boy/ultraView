@@ -3,6 +3,7 @@
 #include "ultra-shared/UI/GUI_LookAndFeel.h"
 
 #include "ultra-shared/Config/DataSource.h"
+#include "ultra-shared/Helpers/PlatformHelper.h"
 #include "Config/FilePaths.h"
 #include "Globals/constants.h"
 
@@ -74,6 +75,11 @@ GUI_ultraView::GUI_ultraView ()
 	// startup, where support logs need it
 	{
 		network.setC64uPassword ( settings->get<juce::String> ( "network/password" ) );
+
+		// A cancelled firewall prompt from an earlier run left a block rule
+		// pinned to this exe: no stream data can ever arrive, say so right away
+		if ( firewallBlocksThisApp () )
+			showFirewallNotice ();
 
 		findC64OnNetwork ();
 		startTimer ( 5000 );

@@ -88,6 +88,8 @@ private:
 
 	void findC64OnNetwork ();
 	void setupNetworking ();
+	void healStreams ();
+	void showFirewallNotice ();
 
 	// juce::Timer: the reconnect tick, a no-op while the stream is alive
 	void timerCallback () override;
@@ -99,6 +101,12 @@ private:
 	std::atomic<bool>	netScanning = false;
 	std::atomic<bool>	netProbing = false;
 	std::atomic<int>	probeFailures = 0;
+
+	// Stream targets as the C64u reported them; a receiver still silent when
+	// the watchdog fires gets retargeted to this machine (healStreams)
+	juce::String		videoStreamTarget, audioStreamTarget;
+	juce::TimedCallback	healWatchdog { [ this ] { healStreams (); } };
+	bool				firewallNoticeShown = false;
 
 	// The "ip (hostname)" the title shows while the stream is alive; the
 	// receiver thread restores it on regained data

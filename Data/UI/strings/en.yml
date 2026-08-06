@@ -13,6 +13,12 @@ network:
   searching:  Searching the network for a C64 Ultimate...
   waiting:    Waiting for the C64 Ultimate...
   password-required:  The C64 Ultimate requires a password
+  blocked-title:        No stream data
+  blocked-windows:      The C64 Ultimate accepted the stream request, but no data is arriving. Windows Firewall is most likely blocking ultraView. Click "Change settings" in the firewall panel, then tick the checkbox next to ultraView.
+  blocked-mac:          The C64 Ultimate accepted the stream request, but no data is arriving. Please allow ultraView under Local Network in the system privacy settings.
+  blocked-open-windows: Open Firewall Settings
+  blocked-open-mac:     Open System Settings
+  blocked-close:        Close
 
 # The crt/settings strings live in UI/strings/crt-settings.yml (configure-synced
 # from the ultra-shared submodule); Strings appends them to this file

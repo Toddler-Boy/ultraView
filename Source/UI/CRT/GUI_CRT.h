@@ -47,6 +47,7 @@ public:
 	void setBackgroundColour ( const juce::Colour& bckCol );
 
 	void setStreamAddress ( const juce::String& address ) { overlay.setStreamAddress ( address ); }
+	bool isStreamStalled () const { return overlay.isStreamStalled (); }
 	void setFirstLuma ( const bool isFirstLuma );
 
 	void showRasterTime ( const bool show );
