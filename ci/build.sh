@@ -153,7 +153,17 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   mkdir -p "$STAGE"
   cp "$ROOT/Builds/vs/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
 
-  # Data.pak: images carry their own compression and get stored, the rest gets
+  # Data.pak: the ultra-shared Data tree packs first, so app entries would win
+  # a name clash (matching the naked-mode precedence); it is tiny and
+  # text-only, one weakest-deflate pass
+  (
+    cd "$ROOT/Source/ultra-shared/Data"
+    find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$STAGE/_pakshared.txt"
+    7z a -tzip -mx=1 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakshared.txt" > /dev/null
+    rm "$STAGE/_pakshared.txt"
+  )
+
+  # App tree: images carry their own compression and get stored, the rest gets
   # the weakest deflate
   (
     cd "$ROOT/Data"

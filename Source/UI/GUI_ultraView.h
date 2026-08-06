@@ -127,6 +127,7 @@ private:
 	juce::SharedResourcePointer<Theme>			theme;
 
 	juce::File	dataRoot;
+	juce::File	sharedDataRoot;
 	juce::File	userRoot;
 
 	GUI_Main		mainScreen;

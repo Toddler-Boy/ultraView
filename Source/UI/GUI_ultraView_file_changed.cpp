@@ -10,12 +10,15 @@ void GUI_ultraView::fileChanged ( const juce::File& file, gin::FileSystemWatcher
 		return;
 
 	//
-	// Change happened inside the naked factory data (developer mode; in pak
-	// mode dataRoot stays invalid and nothing matches)
+	// Change happened inside the naked factory data, under either root (only
+	// watched in developer mode; in pak mode both roots stay invalid and
+	// nothing matches)
 	//
-	if ( file.isAChildOf ( dataRoot ) )
+	const auto	factoryRoot = file.isAChildOf ( dataRoot ) ? dataRoot : sharedDataRoot;
+
+	if ( file.isAChildOf ( factoryRoot ) )
 	{
-		auto	parent = file.getRelativePathFrom ( dataRoot ).replaceCharacter ( '\\', '/' );
+		auto	parent = file.getRelativePathFrom ( factoryRoot ).replaceCharacter ( '\\', '/' );
 
 		// Factory theme
 		if ( parent.startsWithIgnoreCase ( "UI/themes/" ) )

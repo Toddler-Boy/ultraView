@@ -259,11 +259,15 @@ void GUI_ultraView::setDataRoot ()
 
 	folderWatcher.removeAllFolders ();
 
-	// Factory data only exists as watchable files in the naked developer layout
+	// Factory data only exists as watchable files in the naked developer
+	// layout; the ultra-shared Data tree is the second factory root
 	if ( ! datasource::isPak () )
 	{
 		dataRoot = datasource::getDevFile ();
+		sharedDataRoot = datasource::getSharedDevRoot ();
+
 		folderWatcher.addFolder ( dataRoot );
+		folderWatcher.addFolder ( sharedDataRoot );
 	}
 
 	loadGamesDatabase ();

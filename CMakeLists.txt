@@ -196,15 +196,6 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 target_sources (ultraView PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
 
-# Shared UI data owned by the ultra-shared submodule, configure-synced into
-# Data/UI so dev hot-reload works on real files and the pak packs them; the
-# synced copies are committed like any other data file. configure_file only
-# rewrites on a content change and re-runs configure when the source changes
-foreach (shared_data IN ITEMS layouts/about.json layouts/crt-settings.json strings/crt-settings.yml)
-	configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/UI/${shared_data}
-					${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/${shared_data} COPYONLY)
-endforeach ()
-
 # The About screen's icon is the canonical app icon, synced from icons/ so it
 # ships in the pak without a second committed copy drifting out of date
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
@@ -212,10 +203,15 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
 
 # Data-validity probe list: everything under Data/UI is essential, so
 # FilePaths.cpp #includes this generated list instead of hand-maintaining it.
-# CONFIGURE_DEPENDS re-runs the glob when Data/UI contents change; the file is
-# only rewritten when the list actually differs
+# The ultra-shared Data tree contributes its UI files under the same relative
+# paths, probed against the fallback root. CONFIGURE_DEPENDS re-runs the glob
+# when contents change; the file is only rewritten when the list actually
+# differs
 file (GLOB_RECURSE ui_data_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/Data CONFIGURE_DEPENDS
 	  ${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/*)
+file (GLOB_RECURSE shared_ui_data_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data CONFIGURE_DEPENDS
+	  ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/UI/*)
+list (APPEND ui_data_files ${shared_ui_data_files})
 # SVGs stay out: missing ones degrade to placeholder icons
 list (FILTER ui_data_files EXCLUDE REGEX "(^UI/svg/|Thumbs\\.db|desktop\\.ini|\\.DS_Store)")
 list (SORT ui_data_files)
@@ -283,8 +279,10 @@ target_compile_definitions (ultraView PRIVATE
 								BOOST_REGEX_STANDALONE
 								$<$<CONFIG:Development>:ULTRA_DEVELOPMENT=1>
 								# Debug/Development read the naked repo Data folder, baked in
-								# so the exe runs from anywhere; Release is pak-only
+								# so the exe runs from anywhere, with the ultra-shared Data
+								# tree as fallback root; Release is pak-only
 								$<$<NOT:$<CONFIG:Release>>:ULTRA_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Data">
+								$<$<NOT:$<CONFIG:Release>>:ULTRA_SHARED_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data">
 							)
 
 if (APPLE)
@@ -303,10 +301,16 @@ if (APPLE)
 	# the rest weakest deflate. Release only (Debug/Development read the repo
 	# Data folder); the non-Release commands degrade to argument-eating `true`.
 	# Runs before any code-signing. Source-only files (bitmap PSDs, submodule
-	# .git pointers) stay out
+	# .git pointers) stay out. The ultra-shared Data tree packs first, so app
+	# entries would win a name clash (matching the naked-mode precedence); it
+	# is tiny and text-only, one weakest-deflate pass
+	add_custom_command(TARGET ultraView POST_BUILD
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data
+		COMMAND $<IF:$<CONFIG:Release>,rm,true> -rf $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak
+		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -1 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -x "*/!src/*" ".*" "*/.*" "*/Thumbs.db" "Thumbs.db"
+		VERBATIM)
 	add_custom_command(TARGET ultraView POST_BUILD
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Data
-		COMMAND $<IF:$<CONFIG:Release>,rm,true> -rf $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak
 		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -0 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -i "*.png" "*.jpg" -x "*/!src/*" ".*" "*/.*"
 		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -1 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -x "*.png" "*.jpg" "*/!src/*" ".*" "*/.*" "*/Thumbs.db" "Thumbs.db"
 		VERBATIM)
