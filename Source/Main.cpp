@@ -34,6 +34,29 @@ public:
 	void initialise ( const juce::String& /*commandLine*/ ) override
 	{
 		mainWindow = std::make_unique<MainWindow> ( helpers::appTitle (), laf );
+
+		// The Authenticode digest seals code and appended pak in one hash, so
+		// this doubles as a data-integrity check. Off the message thread, the
+		// verify hashes the whole exe. Hard-coded text: a corrupted file must
+		// not source its error message from its own (corrupted) data
+		juce::Thread::launch ( juce::Thread::Priority::low, [ this ]
+		{
+			if ( verifyExecutableSignature () != SignatureState::corrupted )
+				return;
+
+			Z_ERR ( "Executable signature check failed, the file is corrupted" );
+
+			juce::MessageManager::callAsync ( [ this ]
+			{
+				mainWindow->setVisible ( false );
+
+				juce::NativeMessageBox::showMessageBoxAsync ( juce::MessageBoxIconType::WarningIcon,
+					"ultraView is damaged",
+					"The ultraView program file is corrupted. Please download and install it again.",
+					nullptr,
+					juce::ModalCallbackFunction::create ( [] ( int ) { juce::JUCEApplication::quit (); } ) );
+			} );
+		} );
 	}
 	//-----------------------------------------------------------------------------
 
