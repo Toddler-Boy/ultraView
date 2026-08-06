@@ -2,6 +2,12 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.1.3 (2026-08-06)
+
+- Self-healing streams: when the C64 Ultimate is set to stream to a multicast
+  address or another machine, ultraView notices the silence and redirects the
+  streams to itself.
+
 ## 1.1.2 (2026-08-05)
 
 - New password field above the browser, for password-protected C64 Ultimates.

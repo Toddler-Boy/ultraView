@@ -187,6 +187,16 @@ juce_add_gui_app (ultraView
 				  ICON_SMALL "${icon_path_small}"
 				  BUNDLE_ID com.toddlerboy.ultraview)
 
+# JUCE's version-resource command only runs when the rc is missing (its only
+# declared dependency is the icon), so a VERSION bump in an existing tree
+# would keep shipping the old numbers; evict a stale rc so the build remakes it
+if (WIN32)
+	set (version_rc "${CMAKE_BINARY_DIR}/ultraView_artefacts/JuceLibraryCode/ultraView_resources.rc")
+	if (EXISTS "${version_rc}" AND "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" IS_NEWER_THAN "${version_rc}")
+		file (REMOVE "${version_rc}")
+	endif ()
+endif ()
+
 file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/*.c
