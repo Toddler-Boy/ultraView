@@ -32,10 +32,6 @@ GUI_ultraView::GUI_ultraView ()
 	addAndMakeVisible ( mainScreen );
 	addChildComponent ( aboutScreen );
 
-	#if ! JUCE_MAC
-		addChildComponent ( fatalError );
-	#endif
-
 	folderWatcher.coalesceEvents ( 50 );
 	folderWatcher.addListener ( this );
 	theme->setTargetLAF ( getLookAndFeel () );
@@ -154,10 +150,6 @@ void GUI_ultraView::toWindowed ()
 
 void GUI_ultraView::resized ()
 {
-	#if ! JUCE_MAC
-		fatalError.setBounds ( getLocalBounds () );
-	#endif
-
 	mainScreen.setBounds ( getLocalBounds () );
 	aboutScreen.setBounds ( getLocalBounds () );
 
@@ -235,26 +227,8 @@ void GUI_ultraView::loadTheme ()
 }
 //-----------------------------------------------------------------------------
 
-bool GUI_ultraView::isDataRootValid () const
-{
-	return datasource::isValid ();
-}
-//-----------------------------------------------------------------------------
-
 void GUI_ultraView::setDataRoot ()
 {
-	if ( ! datasource::isValid () )
-	{
-		Z_ERR ( "ultraView data is missing or incomplete: " + datasource::describe () );
-
-		#if ! JUCE_MAC
-			fatalError.setVisible ( true );
-			fatalError.toFront ( false );
-		#endif
-
-		return;
-	}
-
 	Z_INFO ( "Data: " << datasource::describe () );
 
 	folderWatcher.removeAllFolders ();

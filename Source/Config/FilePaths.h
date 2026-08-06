@@ -16,14 +16,6 @@ namespace filepaths
 	// watcher and the curation controls
 	[[ nodiscard ]] bool isDeveloperMode ();
 
-	// Every entry exists under root (or fallback, when given): trailing '/' =
-	// directory, otherwise file
-	[[ nodiscard ]] bool allPathsValid ( const juce::StringArray& arr, const juce::File& root, const juce::File& fallback = {} );
-
-	// Does this folder hold a complete naked ultraView data set? A spot check of
-	// the installed structure, not an exhaustive inventory
-	[[ nodiscard ]] bool hasDataContent ( const juce::File& folder );
-
 	// User content: real folders merged over the pak-backed factory set (user
 	// overlays shadow whole folders, user masks shadow single files); themes
 	// list as the $USER$ group of the theme selector, presets are plain files

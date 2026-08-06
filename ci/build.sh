@@ -160,7 +160,6 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
     cd "$ROOT/Source/ultra-shared/Data"
     find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$STAGE/_pakshared.txt"
     7z a -tzip -mx=1 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakshared.txt" > /dev/null
-    rm "$STAGE/_pakshared.txt"
   )
 
   # App tree: images carry their own compression and get stored, the rest gets
@@ -173,8 +172,17 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
     # -mcu=on: always UTF-8 entry names, the reader assumes them
     7z a -tzip -mx=0 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakimages.txt" > /dev/null
     7z a -tzip -mx=1 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakrest.txt" > /dev/null
-    rm "$STAGE"/_pak*.txt
   )
+
+  # Completeness: every listed file made it into the pak. A name clash between
+  # the two trees would collapse into one entry and trip the count
+  expected=$(cat "$STAGE/_pakshared.txt" "$STAGE/_pakfiles.txt" | wc -l)
+  actual=$(7z l -ba "$STAGE/Data.pak" | wc -l)
+  if [ "$expected" -ne "$actual" ]; then
+    echo "Data.pak entry count mismatch: $actual packed, $expected on disk"
+    exit 1
+  fi
+  rm "$STAGE"/_pak*.txt
 
   # The pak rides appended to the exe (zip is end-anchored, so the file stays
   # both a valid PE and a valid zip), making the exe fully self-contained.

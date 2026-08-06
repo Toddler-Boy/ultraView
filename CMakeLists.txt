@@ -201,25 +201,7 @@ source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${sour
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
 				${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/png/about-icon.png COPYONLY)
 
-# Data-validity probe list: everything under Data/UI is essential, so
-# FilePaths.cpp #includes this generated list instead of hand-maintaining it.
-# The ultra-shared Data tree contributes its UI files under the same relative
-# paths, probed against the fallback root. CONFIGURE_DEPENDS re-runs the glob
-# when contents change; the file is only rewritten when the list actually
-# differs
-file (GLOB_RECURSE ui_data_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/Data CONFIGURE_DEPENDS
-	  ${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/*)
-file (GLOB_RECURSE shared_ui_data_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data CONFIGURE_DEPENDS
-	  ${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data/UI/*)
-list (APPEND ui_data_files ${shared_ui_data_files})
-# SVGs stay out: missing ones degrade to placeholder icons
-list (FILTER ui_data_files EXCLUDE REGEX "(^UI/svg/|Thumbs\\.db|desktop\\.ini|\\.DS_Store)")
-list (SORT ui_data_files)
-list (TRANSFORM ui_data_files REPLACE "^(.+)$" "\t\"\\1\",")
-list (JOIN ui_data_files "\n" ui_manifest)
-file (CONFIGURE OUTPUT generated/ui-manifest.h CONTENT "// Generated from Data/UI by CMake - do not edit\n${ui_manifest}\n" @ONLY)
-
-target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/generated ${boost_regex_SOURCE_DIR}/include)
+target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${boost_regex_SOURCE_DIR}/include)
 
 target_link_libraries (ultraView PRIVATE
 
@@ -314,11 +296,16 @@ if (APPLE)
 		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -0 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -i "*.png" "*.jpg" -x "*/!src/*" ".*" "*/.*"
 		COMMAND $<IF:$<CONFIG:Release>,zip,true> -q -1 -r $<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak . -x "*.png" "*.jpg" "*/!src/*" ".*" "*/.*" "*/Thumbs.db" "Thumbs.db"
 		VERBATIM)
+	# Completeness: every live file made it into the pak. A name clash between
+	# the two trees would collapse into one entry and trip the count
+	add_custom_command(TARGET ultraView POST_BUILD
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		COMMAND $<IF:$<CONFIG:Release>,sh,true> -c "expected=$(find Source/ultra-shared/Data Data -type f ! -path '*/!src/*' ! -path '*/.*' ! -name '.*' ! -name 'Thumbs.db' | wc -l); actual=$(zipinfo -1 '$<TARGET_BUNDLE_CONTENT_DIR:ultraView>/Resources/Data.pak' | grep -vc '/$'); [ \"$expected\" -eq \"$actual\" ] || { echo \"Data.pak entry count mismatch: $actual packed, $expected on disk\"; exit 1; }"
+		VERBATIM)
 endif()
 
 if (WIN32)
-	# -Wno-c23-extensions: opts into #embed from C++ (GUI_FatalError.png)
-	target_compile_options(ultraView PRIVATE -Wno-missing-braces -Wno-c23-extensions /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-mfma /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations -showFilenames)
+	target_compile_options(ultraView PRIVATE -Wno-missing-braces /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-mfma /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations -showFilenames)
 endif()
 
 if (WIN32)
@@ -336,7 +323,7 @@ endif()
 
 if(UNIX AND NOT APPLE)
 	target_link_libraries (ultraView PRIVATE curl)
-	target_compile_options(ultraView PRIVATE -Wno-c23-extensions $<$<CONFIG:Debug>:-g -O0>)
+	target_compile_options(ultraView PRIVATE $<$<CONFIG:Debug>:-g -O0>)
 endif()
 
 if (WIN32)

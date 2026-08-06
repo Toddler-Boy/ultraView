@@ -13,7 +13,6 @@
 #include "UI/GUI_Main.h"
 #include "ultra-shared/UI/GUI_About.h"
 
-#include "ultra-shared/UI/Components/GUI_FatalError.h"
 
 #include "ultra-shared/Resources/Icons.h"
 #include "Config/Preferences.h"
@@ -55,8 +54,6 @@ public:
 	// this
 	void setDataRoot ();
 	void setUserRoot ();
-
-	bool isDataRootValid () const;
 
 	// App state
 	void saveState ();
@@ -132,10 +129,6 @@ private:
 
 	GUI_Main		mainScreen;
 	GUI_About		aboutScreen;
-
-	#if ! JUCE_MAC
-		GUI_FatalError	fatalError;
-	#endif
 
 	gin::FileSystemWatcher	folderWatcher;
 
