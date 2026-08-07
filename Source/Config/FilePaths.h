@@ -12,10 +12,6 @@ namespace filepaths
 
 	[[ nodiscard ]] juce::String markerFor ( const root which );
 
-	// Development builds only: gates dev features like the factory-data
-	// watcher and the curation controls
-	[[ nodiscard ]] bool isDeveloperMode ();
-
 	// User content: real folders merged over the pak-backed factory set (user
 	// overlays shadow whole folders, user masks shadow single files); themes
 	// list as the $USER$ group of the theme selector, presets are plain files

@@ -5,16 +5,6 @@
 
 //-----------------------------------------------------------------------------
 
-bool filepaths::isDeveloperMode ()
-{
-#if ULTRA_DEVELOPMENT
-	return true;
-#else
-	return false;
-#endif
-}
-//-----------------------------------------------------------------------------
-
 static juce::File getUserPath ( const juce::String& folder )
 {
 	const juce::SharedResourcePointer<Settings>	settings;
