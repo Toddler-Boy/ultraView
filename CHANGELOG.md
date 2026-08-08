@@ -2,6 +2,10 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.1.5 (2026-08-08)
+
+- Fixed silent audio on macOS.
+
 ## 1.1.4 (2026-08-08)
 
 - Streams now default to unicast, straight to the machine running ultraView.
