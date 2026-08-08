@@ -1,8 +1,8 @@
+#include <algorithm>
+
 #include "GUI_ultraView.h"
 
 //-----------------------------------------------------------------------------
-
-constexpr auto	internalSamplerate = 48000;
 
 void GUI_ultraView::disableAudio ()
 {
@@ -36,6 +36,8 @@ void GUI_ultraView::prepareToPlay ( int samplesPerBlockExpected, double sampleRa
 	// This is used for resampling from the internal samplerate of 48kHz to the output samplerate of the audio device.
 	sampleRate = int ( sampleRate_ );
 
+	Z_INFO ( "Audio device running at " + juce::String ( sampleRate ) + " Hz with " + juce::String ( samplesPerBlockExpected ) + "-sample blocks" );
+
 	// FIFO buffer (for resampling from internal samplerate to output samplerate)
 	resamplingFifo.setSize ( samplesPerBlockExpected, 2, sampleRate );
 	resamplingFifo.setResamplingRatio ( internalSamplerate, double ( sampleRate ) );
@@ -45,7 +47,10 @@ void GUI_ultraView::prepareToPlay ( int samplesPerBlockExpected, double sampleRa
 	const auto	streamBufferSize = int ( std::ceil ( samplesPerBlockExpected * streamRatio ) );
 
 	streamBuffer.setSize ( 2, int ( streamBufferSize * 1.5 ) );
-	streamFifo.setSize ( 2, streamBufferSize * 4 );
+
+	// The receiver only pushes whole packets, so tiny device blocks must not
+	// shrink the FIFO below packet granularity
+	streamFifo.setSize ( 2, std::max ( streamBufferSize * 4, c64uBuffer.getNumSamples () * 4 ) );
 	streamResamplingFifo.setResamplingRatio ( internalSamplerate, sampleRate_ );
 }
 //-----------------------------------------------------------------------------

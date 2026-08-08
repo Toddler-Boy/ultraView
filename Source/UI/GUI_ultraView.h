@@ -118,6 +118,9 @@ private:
 	void c64_forceSystemMode ( const juce::String& mode );
 	void c64_forceJoystickSwapper ( const juce::String& mode );
 
+	// The C64u audio stream's rate; everything before the device runs at it
+	static constexpr auto	internalSamplerate = 48000;
+
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;
 	SmoothedValue			curOutVol;
