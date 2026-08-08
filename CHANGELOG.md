@@ -2,6 +2,12 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.1.4 (2026-08-08)
+
+- Streams now default to unicast, straight to the machine running ultraView.
+  Some consumer routers turn multicast into a network-wide flood.
+- WiFi adapters are now supported for receiving the streams.
+
 ## 1.1.3 (2026-08-06)
 
 - Self-healing streams: when the C64 Ultimate is set to stream to a multicast
