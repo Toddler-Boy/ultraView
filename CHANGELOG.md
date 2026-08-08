@@ -2,6 +2,10 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.1.6 (2026-08-08)
+
+- Closing ultraView now stops the C64 Ultimate's stream instead of leaving it running.
+
 ## 1.1.5 (2026-08-08)
 
 - Fixed silent audio on macOS.
