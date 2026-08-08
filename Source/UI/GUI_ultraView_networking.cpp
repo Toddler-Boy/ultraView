@@ -140,6 +140,15 @@ constexpr auto	blockedVerdictMs = 5000;
 
 //-----------------------------------------------------------------------------
 
+// Swaps the target's machine for our own, keeping an explicit port; the C64u's
+// stored config stays untouched
+static juce::String retargetToOwnIP ( const juce::String& address, const juce::String& ownIP )
+{
+	const auto	port = address.fromFirstOccurrenceOf ( ":", false, false );
+	return port.isEmpty () ? ownIP : ownIP + ":" + port;
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ultraView::setupNetworking ()
 {
 	// Start stream
@@ -148,8 +157,16 @@ void GUI_ultraView::setupNetworking ()
 		if ( httpCode < 200 || httpCode >= 300 )
 			return;
 
-		const auto	videoAddress = result[ "Data Streams" ][ "Stream VIC to" ].toString ();
-		const auto	audioAddress = result[ "Data Streams" ][ "Stream Audio to" ].toString ();
+		auto	videoAddress = result[ "Data Streams" ][ "Stream VIC to" ].toString ();
+		auto	audioAddress = result[ "Data Streams" ][ "Stream Audio to" ].toString ();
+
+		// Multicast targets flood consumer routers, so the streams get aimed
+		// at this machine; the stored targets only contribute their ports
+		if ( const auto ownIP = C64uScanner::localAddressFor ( settings->get<juce::String> ( "network/last-ip" ) ); ownIP.isNotEmpty () )
+		{
+			videoAddress = retargetToOwnIP ( videoAddress, ownIP );
+			audioAddress = retargetToOwnIP ( audioAddress, ownIP );
+		}
 
 		network.put ( "v1/streams/video:start", { "ip", videoAddress } );
 		network.put ( "v1/streams/audio:start", { "ip", audioAddress }, [ this, videoAddress, audioAddress ] ( const juce::var&, const int )
@@ -179,14 +196,7 @@ void GUI_ultraView::healStreams ()
 		return;
 
 	// A target pointing at this machine has nothing left to heal; anything
-	// else (multicast group, another machine) gets pulled over, keeping an
-	// explicit port. The C64u's stored config stays untouched.
-	const auto	retarget = [ &ownIP ] ( const juce::String& address )
-	{
-		const auto	port = address.fromFirstOccurrenceOf ( ":", false, false );
-		return port.isEmpty () ? ownIP : ownIP + ":" + port;
-	};
-
+	// else (multicast group, another machine) gets pulled over
 	auto	healed = false;		// pulled over, judge again next round
 	auto	blocked = false;	// aimed at this machine yet silent: dropped locally
 
@@ -194,7 +204,7 @@ void GUI_ultraView::healStreams ()
 	{
 		if ( videoStreamTarget.upToFirstOccurrenceOf ( ":", false, false ) != ownIP )
 		{
-			videoStreamTarget = retarget ( videoStreamTarget );
+			videoStreamTarget = retargetToOwnIP ( videoStreamTarget, ownIP );
 			Z_LOG ( "Video stream is silent, retargeting it to " + videoStreamTarget );
 
 			network.put ( "v1/streams/video:stop" );
@@ -213,7 +223,7 @@ void GUI_ultraView::healStreams ()
 	{
 		if ( audioStreamTarget.upToFirstOccurrenceOf ( ":", false, false ) != ownIP )
 		{
-			audioStreamTarget = retarget ( audioStreamTarget );
+			audioStreamTarget = retargetToOwnIP ( audioStreamTarget, ownIP );
 			Z_LOG ( "Audio stream is silent, retargeting it to " + audioStreamTarget );
 
 			network.put ( "v1/streams/audio:stop" );
