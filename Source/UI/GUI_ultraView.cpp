@@ -98,6 +98,20 @@ GUI_ultraView::GUI_ultraView ()
 
 GUI_ultraView::~GUI_ultraView ()
 {
+	stopTimer ();
+	healWatchdog.stopTimer ();
+
+	// The C64u has no way to notice the listener is gone and would stream at
+	// this machine forever; wait briefly so the stops leave before teardown
+	{
+		juce::WaitableEvent	sent;
+
+		network.put ( "v1/streams/video:stop" );
+		network.put ( "v1/streams/audio:stop", {}, [ &sent ] ( const juce::var&, const int ) { sent.signal (); } );
+
+		sent.wait ( 1000 );
+	}
+
 	c64uReceiver.stop ();
 
 	shutdownAudio ();
