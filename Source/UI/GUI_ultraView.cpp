@@ -9,8 +9,10 @@
 
 //-----------------------------------------------------------------------------
 
+// AudioAppComponent only stores the reference here
 GUI_ultraView::GUI_ultraView ()
-	: mainScreen ( deviceManager )
+	: juce::AudioAppComponent ( ownedDeviceManager )
+	, mainScreen ( deviceManager )
 {
 	UI::setActionBroadCaster ( this );
 
@@ -43,16 +45,8 @@ GUI_ultraView::GUI_ultraView ()
 	loadTheme ();
 
 	curOutVol.set ( 1.0f );
-	setAudioChannels ( 0, 2 );
 
-	// Prefer the stream's native rate and a sane block size; the device may
-	// settle elsewhere, prepareToPlay adapts to what it actually gets
-	{
-		auto	setup = deviceManager.getAudioDeviceSetup ();
-		setup.sampleRate = internalSamplerate;
-		setup.bufferSize = 512;
-		deviceManager.setAudioDeviceSetup ( setup, false );
-	}
+	initAudio ();
 
 	//
 	// Setup C64u UDP receiver callback for live preview
@@ -114,7 +108,9 @@ GUI_ultraView::~GUI_ultraView ()
 
 	c64uReceiver.stop ();
 
+	// shutdownAudio () only detaches the callback from our own manager
 	shutdownAudio ();
+	deviceManager.closeAudioDevice ();
 }
 //-----------------------------------------------------------------------------
 

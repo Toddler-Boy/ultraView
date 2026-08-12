@@ -4,6 +4,23 @@
 
 //-----------------------------------------------------------------------------
 
+void GUI_ultraView::initAudio ()
+{
+	// Open the device ourselves, so sample-rate and block size are respected
+	{
+		juce::AudioDeviceManager::AudioDeviceSetup	preferred;
+		preferred.sampleRate = internalSamplerate;
+		preferred.bufferSize = internalSamplerate / 100;	// 10ms
+
+		if ( const auto error = deviceManager.initialise ( 0, 2, nullptr, true, {}, &preferred ); error.isNotEmpty () )
+			Z_WARN ( "Audio device init: " << error );
+	}
+
+	// Attach audio callback
+	setAudioChannels ( 0, 2 );
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ultraView::disableAudio ()
 {
 	if ( muted++ )

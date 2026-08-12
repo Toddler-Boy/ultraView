@@ -64,6 +64,10 @@ public:
 	void filesDropped ( const juce::StringArray& files, int x, int y ) override;
 
 private:
+	// Our own manager, so initAudio () can set rate and block size.
+	// Stays first, it has to outlive the device selector
+	juce::AudioDeviceManager	ownedDeviceManager;
+
 	gin::LayoutSupport	layout { *this };
 
 	// juce::ActionListener
@@ -118,12 +122,13 @@ private:
 	void c64_forceSystemMode ( const juce::String& mode );
 	void c64_forceJoystickSwapper ( const juce::String& mode );
 
-	// The C64u audio stream's rate; everything before the device runs at it
+	// The C64u audio stream's rate
 	static constexpr auto	internalSamplerate = 48000;
 
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;
 	SmoothedValue			curOutVol;
+	void initAudio ();
 	void disableAudio ();
 	void enableAudio ();
 
