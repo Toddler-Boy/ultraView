@@ -1,12 +1,9 @@
 #!/bin/bash -e
-handle_error() {
-    echo "An error occurred on line $1"
-    read -p "Press enter to continue"
-    exit 1
-}
+source "$(dirname "$0")/Source/ultra-shared/scripts/preamble.sh"
 
-trap 'handle_error $LINENO' ERR
+mkdir -p Builds/logs
+cmake --build --preset $TOOLCHAIN --config Development --parallel 2>&1 | tee Builds/logs/build_development.log
 
-[ "$(uname)" == "Darwin" ] && TOOLCHAIN="xcode" || TOOLCHAIN="vs"
-
-cmake --build --preset $TOOLCHAIN --config Development --parallel
+if grep -qiE 'warning|error' Builds/logs/build_development.log; then
+    read -p "Warnings in Builds/logs/build_development.log, press enter to close"
+fi

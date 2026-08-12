@@ -1,18 +1,14 @@
 #!/bin/bash -e
-handle_error() {
-    echo "An error occurred on line $1"
-    read -p "Press enter to continue"
-    exit 1
-}
+source "$(dirname "$0")/Source/ultra-shared/scripts/preamble.sh"
 
-trap 'handle_error $LINENO' ERR
+mkdir -p Builds/logs
 
-if [ "$(uname)" == "Darwin" ]; then                                                                                                                                      
-  TOOLCHAIN="xcode"                                                                                                                                                    
-elif [ "$(uname)" == "Linux" ]; then                                                                                                                                     
-  TOOLCHAIN="ninja-clang"
-else
-  TOOLCHAIN="vs"                                                                                                                                                       
-fi  
+# Force branch-tracking deps to fetch the latest tip
+rm -f Builds/*/CMakeFiles/fc-stamp/{juce,melatonin_inspector,melatonin_blur}/update.stamp
 
-cmake --preset $TOOLCHAIN -DBUILD_EXTRAS=OFF
+cmake --preset $TOOLCHAIN -DBUILD_EXTRAS=OFF 2>&1 | tee Builds/logs/configure.log
+
+# Skip git checkout lines quoting commit messages
+if grep -viE '^HEAD is now at' Builds/logs/configure.log | grep -qiE 'warning|error'; then
+    read -p "Warnings in Builds/logs/configure.log, press enter to close"
+fi
