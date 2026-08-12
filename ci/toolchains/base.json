@@ -54,7 +54,7 @@
 			"hidden": true,
 			"output": {
 				"labelSummary": true,
-				"outputLogFile": "${sourceDir}/logs/Testing.log",
+				"outputLogFile": "${sourceDir}/Builds/logs/Testing.log",
 				"outputOnFailure": true,
 				"shortProgress": true,
 				"verbosity": "verbose"
