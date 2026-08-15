@@ -218,7 +218,7 @@ void GUI_CRT::updateCRTPalette ( const VIC2_Render::settings& vic2Settings )
 	if (	vic2Settings.needsNewPalette ( curVicSettings )
 		 ||	yuvE_yuvO_yiq.empty () )
 	{
-		yuvE_yuvO_yiq = colo.generateYUV_YIQ ( vic2Settings.firstLuma );
+		yuvE_yuvO_yiq = colo.generateYUV_YIQ ( vic2Settings.firstLuma, vic2Settings.warmth );
 		overlay.setLumaChromaPalette ( yuvE_yuvO_yiq );
 
 		curVicSettings = vic2Settings;

@@ -33,6 +33,7 @@ crt:
       contrast:    crt/contrast
       saturation:  crt/saturation
       tint:        crt/tint
+      warmth:      crt/warmth
       overscan:    crt/overscan
 
     webcam:
