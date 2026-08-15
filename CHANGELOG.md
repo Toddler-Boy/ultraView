@@ -2,6 +2,11 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.2.0 (2026-08-15)
+
+- New Warmth slider: shifts the palette's colors warm or cold while pure greys stay untouched.
+- New Tint slider: tilts the whole picture like a CRT's white point, greys included.
+
 ## 1.1.6 (2026-08-08)
 
 - Closing ultraView now stops the C64 Ultimate's stream instead of leaving it running.
