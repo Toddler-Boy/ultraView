@@ -27,6 +27,7 @@
 	X(footer_released,	"footer/released-font",		13.0f,	550) \
 	X(settings_section,	"settings/section-font",	18.0f,	800) \
 	X(settings_entry,	"settings/entry-font",		14.0f,	700) \
+	X(settings_field,	"settings/field-font",		13.0f,	500) \
 	X(settings_help,	"settings/help-font",		12.0f,	600) \
 	X(settings_label,	"settings/label-font",		14.0f,	700) \
 	X(stil_text,		"stil/text-font",			13.1f,	500) \
