@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+#include "UI/ui-roles.h"
+
 //-----------------------------------------------------------------------------
 
 // Themed corner radii: enum token, "block/key" path in the theme file (blocks
@@ -58,11 +60,7 @@ namespace UI::corners
 			#undef X
 		};
 
-		for ( auto i = 0; i < int ( std::size ( names ) ); ++i )
-			if ( roleName == names[ i ] )
-				return Role ( i );
-
-		return count;
+		return Role ( UI::roleIndex ( names, int ( std::size ( names ) ), roleName ) );
 	}
 }
 //-----------------------------------------------------------------------------
