@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 
 GUI_ListBox::GUI_ListBox ()
-	: hover ( *this )
+	: hover ( *this ), smoothScroll ( *this )
 {
 	setName ( "listbox" );
 

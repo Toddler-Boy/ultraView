@@ -5,6 +5,7 @@
 #include "ultra-shared/Resources/Icons.h"
 #include "ultra-shared/Resources/Strings.h"
 #include "ultra-shared/UI/Components/GUI_ListBoxMouseMoveHover.h"
+#include "ultra-shared/UI/Components/GUI_ViewportSmoothScroll.h"
 
 //-----------------------------------------------------------------------------
 
@@ -55,6 +56,7 @@ public:
 	void changeListenerCallback ( juce::ChangeBroadcaster* source ) override;
 	int		hoverPosition = -1;
 	GUI_ListBoxMouseMoveHover	hover;
+	GUI_ViewportSmoothScroll	smoothScroll;
 
 protected:
 	std::vector<browserEntry*>	rowData;
