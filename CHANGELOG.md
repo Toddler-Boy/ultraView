@@ -2,6 +2,11 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.2.1 (2026-08-30)
+
+- Added smooth-scrolling to the browser.
+- The Tint slider now feels linear across its range.
+
 ## 1.2.0 (2026-08-15)
 
 - New Warmth slider: shifts the palette's colors warm or cold while pure greys stay untouched.
