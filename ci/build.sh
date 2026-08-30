@@ -82,20 +82,73 @@ ENTEOF
     echo "Skipping codesign — APPLICATION secret not set"
   fi
 
-  # Stage the drag-install image: the app plus an Applications link. Optional
-  # Finder styling (background bitmap, icon layout) comes from a hand-arranged
-  # window committed as Installer/macOS/dmg-style
+  # Stage the drag-install image: the app plus an Applications link, with the
+  # committed background picture tucked into a hidden .background folder
+  # (created here at build time only — hidden folders stay out of the repo)
   DMG_STAGE="$ROOT/ci/bin/dmg_root"
   rm -rf "$DMG_STAGE"
   mkdir -p "$DMG_STAGE"
   cp -R "$APP_PATH" "$DMG_STAGE/"
   ln -s /Applications "$DMG_STAGE/Applications"
 
-  if [ -d "$ROOT/Installer/macOS/dmg-style" ]; then
-    cp -R "$ROOT/Installer/macOS/dmg-style/." "$DMG_STAGE/"
+  mkdir "$DMG_STAGE/.background"
+  cp "$ROOT/Installer/macOS/background@2x.png" "$DMG_STAGE/.background/background.png"
+  # The bitmap is 1200x800 and must cover the whole 600x400pt window — any
+  # uncovered area takes Finder's default background, which goes dark gray in
+  # dark mode. 144 dpi is what tells Finder it's a @2x image, otherwise it
+  # renders at double size
+  sips -s dpiWidth 144 -s dpiHeight 144 "$DMG_STAGE/.background/background.png" > /dev/null
+
+  # Finder layout (background, icon positions) lives in the volume's .DS_Store,
+  # which only Finder itself can write — so build read-write first, style the
+  # mounted volume via AppleScript, then compress. HFS+ because APFS images
+  # don't mount on older macOS
+  RW_DMG="$ROOT/ci/bin/ultraView_rw.dmg"
+  hdiutil create -volname "ultraView" -srcfolder "$DMG_STAGE" -ov -format UDRW -fs HFS+ "$RW_DMG"
+  MOUNT_DEV=$(hdiutil attach -readwrite -noverify -noautoopen "$RW_DMG" | awk 'NR==1{print $1}')
+
+  # Finder can be flaky right after mount, especially on CI runners
+  STYLED=0
+  for attempt in 1 2 3; do
+    if osascript <<'OSAEOF'
+tell application "Finder"
+    tell disk "ultraView"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        -- 428 = 400pt of content under the 28pt title bar (bounds include it)
+        set the bounds of container window to {200, 120, 800, 548}
+        set viewOptions to the icon view options of container window
+        set arrangement of viewOptions to not arranged
+        set icon size of viewOptions to 100
+        set background picture of viewOptions to file ".background:background.png"
+        set position of item "ultraView.app" of container window to {150, 200}
+        set position of item "Applications" of container window to {450, 200}
+        close
+        open
+        update without registering applications
+        delay 2
+        close
+    end tell
+end tell
+OSAEOF
+    then STYLED=1; break; fi
+    echo "Finder styling attempt $attempt failed — retrying"
+    sleep 5
+  done
+  if [ "$STYLED" != "1" ]; then
+    echo "Could not style the DMG Finder window"
+    exit 1
   fi
 
-  hdiutil create -volname "ultraView" -srcfolder "$DMG_STAGE" -ov -format UDZO "$ROOT/ci/bin/ultraView_$ver.dmg"
+  sync
+  for attempt in 1 2 3 4 5; do
+    hdiutil detach "$MOUNT_DEV" && break || sleep 2
+  done
+
+  hdiutil convert "$RW_DMG" -format UDZO -o "$ROOT/ci/bin/ultraView_$ver.dmg" -ov
+  rm -f "$RW_DMG"
   rm -rf "$DMG_STAGE"
 
   # Sign the dmg
