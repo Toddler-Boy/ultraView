@@ -15,7 +15,7 @@ jobs:
     # first submissions from a new team can sit in Apple's queue for a while
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: true
       - name: Init Homebrew
