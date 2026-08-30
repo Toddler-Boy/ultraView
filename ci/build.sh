@@ -14,7 +14,7 @@ cd "$ROOT"
 
 ver=$(<"$ROOT/VERSION")
 ver=${ver%%*( )}
-echo "Bulding installer for ultraView $ver"
+echo "Building installer for ultraView $ver"
 
 BRANCH=${GITHUB_REF##*/}
 echo "$BRANCH"
@@ -32,7 +32,6 @@ if [ "$OS_NAME" = "Darwin" ]; then
   #
   # Bootstrap a temp keychain from base64-encoded p12 secrets when running in CI.
   # APPLICATION = base64 of Developer ID Application .p12
-  # INSTALLER   = base64 of Developer ID Installer .p12
   #
   if [ -n "${APPLICATION:-}" ] && [ "${RUNNER_ENVIRONMENT:-}" = "github-hosted" ]; then
     KC_PASS="$KEYCHAIN_PASSWORD"
