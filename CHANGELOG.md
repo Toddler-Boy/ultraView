@@ -2,6 +2,14 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.3.0 (2026-09-03)
+
+- ultraView now updates itself: the version badge next to the logo checks for a
+  newer release once a day, and a click installs it.
+- Windows ships as a single portable exe, the installer is gone.
+- The logo opens the About dialog, the extra button on the screen is gone.
+- Reset and Power off act on a plain click, no more holding the button down.
+
 ## 1.2.1 (2026-08-30)
 
 - Added smooth-scrolling to the browser.
