@@ -31,6 +31,11 @@ public:
 
 	void reloadOverlayProfile ()	{	overlay.reloadOverlayProfile ();	}
 
+	[[ nodiscard ]] GUI_VersionPill& versionPill ()	{	return browser.versionPill ();	}
+
+	// Draws the GL-rendered CRT into a software snapshot of top, which skips it
+	void paintIntoSnapshot ( juce::Image& snapshot, juce::Component& top );
+
 	// A file under the user Overlays / CRT Masks folders changed (relPath is
 	// relative to the user root); hot-reload live tweaks or rescan pick lists
 	void userCRTContentChanged ( const juce::String& relPath, gin::FileSystemWatcher::FileSystemEvent event );

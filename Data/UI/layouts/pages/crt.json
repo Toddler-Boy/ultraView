@@ -6,12 +6,10 @@
 	"components": [
 		{ "id": "browser", "x": "fullscreen", "y": 0, "w": 364, "b": "parB - bentoGap",
 			"components": [
-				{ "id": "badge", "x": "bentoGap", "y": 5, "r": "parW - bentoGap", "h": 32,
+				{ "id": "badge", "x": "bentoGap", "y": 5, "r": "parW - bentoGap", "h": 28,
 					"components": [
-						{ "id": "chickenlips", "x": 10, "cy": "parH2", "w": 20, "h": "parH2 + 3" },
-						{ "id": "logo", "x": "prevR + 8", "cy": "prevCY", "w": 130, "h": "parH2" },
-						{ "id": "64", "r": "parW - 12", "cy": "parH2", "w": 48, "h": "parH2" },
-						{ "id": "stripes", "x": "getR('logo') + 8", "cy": "parH2", "r": "prevX - 4", "h": "parH2 + 3" }
+						{ "id": "logo", "x": 10, "y": 0, "w": 111, "h": "parH" },
+						{ "id": "version", "x": "prevR + 10", "cy": "parH2", "w": 96, "h": 22 }
 					]
 				},
 				{ "id": "password", "x": "bentoGap", "y": "prevB + 10", "r": "parW - bentoGap", "h": 44,
@@ -36,7 +34,6 @@
 			"components": [
 				{ "id": "browser", "x": 0, "y": 0 },
 				{ "id": "open", "r": "parW", "y": 0 },
-				{ "id": "about", "r": "parW", "b": "parH" },
 				{ "id": "action-buttons", "b": "parH - 15", "cx": "parW2", "w": 500, "h": 30,
 					"components": [
 						{ "grid": "menu_button, pause, resume, reboot, poweroff", "bounds": "parent", "cols": 5, "colGap": 5 }

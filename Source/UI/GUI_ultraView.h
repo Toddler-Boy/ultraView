@@ -13,6 +13,7 @@
 #include "UI/GUI_Main.h"
 #include "ultra-shared/UI/GUI_About.h"
 
+#include "ultra-shared/App/AppUpdater.h"
 
 #include "ultra-shared/Resources/Icons.h"
 #include "Config/Preferences.h"
@@ -145,6 +146,8 @@ private:
 
 	GUI_Main		mainScreen;
 	GUI_About		aboutScreen;
+
+	AppUpdater		appUpdater { "https://toddler-boy.github.io/ultraView/api" };
 
 	gin::FileSystemWatcher	folderWatcher;
 

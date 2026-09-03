@@ -60,7 +60,8 @@
 	X(grid_big_authors,	"grid-big/authors-font",	10.8f,	500) \
 	X(settings_location, "settings/location-font",	14.0f,	500) \
 	X(dialog_title,		"dialog/title-font",		16.0f,	700) \
-	X(dialog_entry,		"dialog/entry-font",		15.0f,	500)
+	X(dialog_entry,		"dialog/entry-font",		15.0f,	500) \
+	X(badge,			"badge/font",				11.0f,	700)
 
 namespace UI::fonts
 {

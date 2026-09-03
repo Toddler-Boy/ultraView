@@ -24,6 +24,8 @@ public:
 
 	void refreshBrowserEntries ();
 
+	[[ nodiscard ]] GUI_VersionPill& versionPill ()	{	return badge.version;	}
+
 private:
 	void run () override;
 

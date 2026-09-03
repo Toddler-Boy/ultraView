@@ -1,0 +1,189 @@
+name: Build
+on:
+  push:
+    tags:
+      - "v*"
+    # Every push gets a fast macOS compile check — clang catches what MSVC
+    # lets slide (the Windows job skips branch pushes). Site/manifest commits
+    # are excluded; tag pushes ignore path filters, so releases are unaffected
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+  workflow_dispatch:
+
+# A newer run makes the current one pointless; tag runs have their own
+# group, so releases are never cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # A mistyped tag would publish a manifest disagreeing with the binaries;
+  # checked once, before either runner spends its minutes
+  check:
+    name: Check tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check tag matches VERSION
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          ver=$(tr -d ' \r\n' < VERSION)
+          tag="${GITHUB_REF#refs/tags/}"
+          if [ "v$ver" != "$tag" ]; then
+            echo "Tag $tag does not match VERSION file ($ver)"
+            exit 1
+          fi
+
+  windows:
+    name: Build Windows
+    needs: check
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: windows-2025-vs2026
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: "Run script"
+        run: ./ci/build.sh
+        shell: bash
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
+          AZURE_ACCOUNT_NAME: ${{ secrets.AZURE_ACCOUNT_NAME }}
+          AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
+
+      # archive: false serves the raw file instead of wrapping it in a zip;
+      # the artifact then carries the file's own name
+      - name: Upload exe
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultraView-windows
+          path: ci/bin/ultraView.exe
+          archive: false
+
+  macos:
+    name: Build macOS
+    needs: check
+    runs-on: macos-latest
+    # Must outlast the build plus notarytool's 100-minute wait budget;
+    # first submissions from a new team can sit in Apple's queue for a while
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Init Homebrew
+        run: |
+          eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(/usr/local/bin/brew shellenv)"
+          echo "PATH=$PATH" >> $GITHUB_ENV
+      - name: "Run script"
+        run: ./ci/build.sh
+        shell: bash
+        env:
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          DEV_APP_ID: ${{ secrets.DEV_APP_ID }}
+          APPLICATION: ${{ secrets.APPLICATION }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          APPLE_PASS: ${{ secrets.APPLE_PASS }}
+          APPLE_USER: ${{ secrets.APPLE_USER }}
+          # Only releases (v* tags) get notarized; a workflow_dispatch run
+          # still builds and signs the dmg
+          NOTARIZE: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '' }}
+          # Branch pushes are compile checks only — no dmg, signing or
+          # notarization; tag and manual runs do the full packaging
+          RELEASE: ${{ (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') && '1' || '' }}
+
+      - name: Upload dmg
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultraView-macos
+          path: ci/bin/ultraView.dmg
+          archive: false
+
+  # One release for both platforms, published only once both builds exist,
+  # and both update manifests in a single commit: the app never sees a
+  # manifest pointing at an asset that isn't there
+  release:
+    name: Publish release
+    needs: [windows, macos]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    # contents: write for the release upload and the manifest commit to main,
+    # actions: read for the artifact fetch
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+
+      # Raw (archive: false) artifacts go by their file names, and only the
+      # API's zip endpoint hands them over byte for byte: download-artifact
+      # and gh run download would try to unpack them
+      - name: Fetch the build artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ver=$(tr -d ' \r\n' < VERSION)
+          mkdir -p assets
+          for name in "ultraView.exe" "ultraView.dmg"; do
+            id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" -q ".artifacts[] | select(.name == \"$name\") | .id")
+            [ -n "$id" ] || { echo "Artifact $name not found"; exit 1; }
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/$id/zip" > "assets/$name"
+          done
+
+      - name: Publish release and manifests
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ver=$(tr -d ' \r\n' < VERSION)
+          tag="${GITHUB_REF#refs/tags/}"
+          exe="assets/ultraView.exe"
+          dmg="assets/ultraView.dmg"
+          ls -la assets
+          [ -f "$exe" ] && [ -f "$dmg" ] || { echo "Release assets missing"; exit 1; }
+
+          gh release view "$tag" > /dev/null 2>&1 || gh release create "$tag" --title "ultraView $ver" --generate-notes
+          gh release upload "$tag" "$exe" "$dmg" --clobber
+
+          manifest() {
+            mkdir -p docs/api
+            cat > "docs/api/latest-$1.json" <<EOF
+          {
+            "version": "$ver",
+            "url": "https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/$2",
+            "sha256": "$(sha256sum "$3" | cut -d' ' -f1)",
+            "bytes": $(stat -c %s "$3"),
+            "notes": "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
+          }
+          EOF
+          }
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # A push to main in the same moment is the only thing that can
+          # reject this, hence the short retry loop
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git checkout -B manifest origin/main
+            manifest windows "ultraView.exe" "$exe"
+            manifest macos "ultraView.dmg" "$dmg"
+            git add docs/api/latest-windows.json docs/api/latest-macos.json
+            git commit -m "Release $tag manifests" || true
+            git push origin manifest:main && exit 0
+            echo "Push rejected, retrying ($attempt)"
+            sleep $((attempt * 7))
+          done
+          echo "Could not push the manifests after 3 attempts"
+          exit 1

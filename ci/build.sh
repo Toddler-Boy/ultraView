@@ -1,20 +1,11 @@
-#!/bin/bash -e
-handle_error() {
-    echo "An error occurred on line $1"
-    read -p "Press enter to continue"
-    exit 1
-}
-
-trap 'handle_error $LINENO' ERR
+#!/bin/bash
+source "$(dirname "$0")/../Source/ultra-shared/scripts/preamble.sh"
 
 OS_NAME=$(uname)
+ROOT=$(pwd)
 
-ROOT=$(cd "$(dirname "$0")/.."; pwd)
-cd "$ROOT"
-
-ver=$(<"$ROOT/VERSION")
-ver=${ver%%*( )}
-echo "Building installer for ultraView $ver"
+ver=$(tr -d ' \r\n' < "$ROOT/VERSION")
+echo "Building ultraView $ver"
 
 BRANCH=${GITHUB_REF##*/}
 echo "$BRANCH"
@@ -23,8 +14,29 @@ cd "$ROOT/ci"
 rm -rf bin
 mkdir -p bin
 
+# Pre-seeded configure-check results harvested from a previous CMakeCache.txt.
+# Skips the slow try_compile probes (mainly libarchive's) on the fresh CI
+# Builds folder; a missing seed file just means a full probe run
+seed_args() {
+  SEED_ARGS=()
+  if [ -f "$ROOT/Tools/configure-seed-$1.cmake" ]; then
+    SEED_ARGS=(-C "$ROOT/Tools/configure-seed-$1.cmake")
+  fi
+}
+
 # Build mac version
 if [ "$OS_NAME" = "Darwin" ]; then
+  seed_args xcode
+
+  # Branch-push CI runs are compile checks only: arm64, unsigned, no dmg.
+  # RELEASE=1 (tag and manual workflow runs) does the full packaging
+  if [ "${RELEASE:-}" != "1" ]; then
+    cd "$ROOT"
+    cmake --preset xcode "${SEED_ARGS[@]}"
+    cmake --build --preset xcode --config Release --parallel
+    exit 0
+  fi
+
   if [ -z "${TEAM_ID:-}" ] || [ -z "${DEV_APP_ID:-}" ]; then
     echo "Skipping signing — TEAM_ID / DEV_APP_ID secrets not set"
   fi
@@ -50,8 +62,8 @@ if [ "$OS_NAME" = "Darwin" ]; then
   fi
 
   cd "$ROOT"
-  # CI releases are universal; local dev builds stay arm-only for speed
-  cmake --preset xcode -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+  # Releases are universal; compile checks above stay arm-only for speed
+  cmake --preset xcode "${SEED_ARGS[@]}" -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
   cmake --build --preset xcode --config Release --parallel
 
   APP_PATH="$ROOT/Builds/xcode/ultraView_artefacts/Release/ultraView.app"
@@ -146,13 +158,13 @@ OSAEOF
     hdiutil detach "$MOUNT_DEV" && break || sleep 2
   done
 
-  hdiutil convert "$RW_DMG" -format UDZO -o "$ROOT/ci/bin/ultraView_$ver.dmg" -ov
+  hdiutil convert "$RW_DMG" -format UDZO -o "$ROOT/ci/bin/ultraView.dmg" -ov
   rm -f "$RW_DMG"
   rm -rf "$DMG_STAGE"
 
   # Sign the dmg
   if [ -n "${APPLICATION:-}" ]; then
-    codesign -s "$DEV_APP_ID" --timestamp "$ROOT/ci/bin/ultraView_$ver.dmg"
+    codesign -s "$DEV_APP_ID" --timestamp "$ROOT/ci/bin/ultraView.dmg"
   else
     echo "Skipping dmg signing — APPLICATION secret not set"
   fi
@@ -164,7 +176,7 @@ OSAEOF
   elif [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
     # First submissions from a new team can sit in Apple's queue for well over
     # 30 minutes, so give notarytool a generous wait budget
-    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 100m "$ROOT/ci/bin/ultraView_$ver.dmg" 2>&1) || NOTARY_FAILED=1
+    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 100m "$ROOT/ci/bin/ultraView.dmg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
     SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { if (!id) id = \$2 } END { print id }")
     if [ "${NOTARY_FAILED:-0}" = "1" ]; then
@@ -176,7 +188,7 @@ OSAEOF
       fi
       exit 1
     fi
-    xcrun stapler staple "$ROOT/ci/bin/ultraView_$ver.dmg"
+    xcrun stapler staple "$ROOT/ci/bin/ultraView.dmg"
   else
     echo "Skipping notarization — APPLE_USER / APPLE_PASS not set"
   fi
@@ -185,7 +197,8 @@ fi
 # Build linux version
 if [ "$OS_NAME" = "Linux" ]; then
   cd "$ROOT"
-  cmake --preset ninja-clang
+  seed_args ninja-clang
+  cmake --preset ninja-clang "${SEED_ARGS[@]}"
   cmake --build --preset ninja-clang --config Release --parallel
 
   cd "$ROOT/Builds/ninja-clang"
@@ -197,10 +210,11 @@ fi
 # Build Win version
 if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == CYGWIN* ]]; then
   cd "$ROOT"
-  cmake --preset vs
+  seed_args vs
+  cmake --preset vs "${SEED_ARGS[@]}"
   cmake --build --preset vs --config Release --parallel
 
-  STAGE="$ROOT/Installer/win/stage"
+  STAGE="$ROOT/ci/bin/stage"
   rm -rf "$STAGE"
   mkdir -p "$STAGE"
   cp "$ROOT/Builds/vs/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
@@ -288,29 +302,7 @@ METAEOF
     echo "Skipping Windows binary signing — Azure secrets not set"
   fi
 
-  # Build installer with InnoSetup
-  cd "$ROOT/Installer/win"
-  ISCC="/c/Program Files (x86)/Inno Setup 6/ISCC.exe"
-  if [ ! -f "$ISCC" ]; then
-    ISCC="/c/Program Files/Inno Setup 6/ISCC.exe"
-  fi
-  "$ISCC" "$ROOT/Installer/win/ultraView.iss"
-
-  EXE_OUT="$ROOT/Installer/win/bin/ultraView_$ver.exe"
-
-  # Sign the installer
-  if [ "$WIN_SIGN" = "1" ]; then
-    sign_file "$EXE_OUT"
-  fi
-
-  cp "$EXE_OUT" "$ROOT/ci/bin/"
-
-  # Portable variant: the signed self-contained exe alone in a store-only zip
-  # (the zip is just transport — browsers dislike naked exe downloads)
-  ZIP_OUT="$ROOT/ci/bin/ultraView_${ver}_portable.zip"
-  if command -v 7z > /dev/null 2>&1; then
-    (cd "$STAGE" && 7z a -tzip -mx=0 "$ZIP_OUT" ultraView.exe)
-  else
-    powershell.exe -NoProfile -Command "Compress-Archive -Path '$(cygpath -w "$STAGE/ultraView.exe")' -DestinationPath '$(cygpath -w "$ZIP_OUT")' -CompressionLevel NoCompression"
-  fi
+  # The signed self-contained exe is the whole deliverable; no version in the
+  # name — downloads and the self-updater always see a plain ultraView.exe
+  cp "$STAGE/ultraView.exe" "$ROOT/ci/bin/"
 fi

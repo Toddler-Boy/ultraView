@@ -8,6 +8,7 @@
 #include "Config/Settings.h"
 #include "Globals/constants.h"
 
+#include "ultra-shared/App/AppUpdater.h"
 #include "ultra-shared/Helpers/PlatformHelper.h"
 
 //-----------------------------------------------------------------------------
@@ -207,4 +208,18 @@ private:
 };
 //-----------------------------------------------------------------------------
 
-START_JUCE_APPLICATION ( ultraViewApp )
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ( "-Wmissing-prototypes" )
+JUCE_CREATE_APPLICATION_DEFINE ( ultraViewApp )
+
+// An installed update relaunches once JUCE has released the instance lock
+JUCE_MAIN_FUNCTION
+{
+	juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
+
+	const auto	result = juce::JUCEApplicationBase::main ( JUCE_MAIN_FUNCTION_ARGS );
+
+	AppUpdater::relaunchIfInstalled ();
+
+	return result;
+}
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

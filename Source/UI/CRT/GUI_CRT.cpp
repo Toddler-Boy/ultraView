@@ -44,13 +44,6 @@ GUI_CRT::GUI_CRT ()
 		settingsPanel.autoFirstLuma = [ this ]		{	return lastFirstLuma;	};
 	}
 
-	//
-	// About
-	//
-	{
-		overlay.openAbout.onClick = []	{	UI::sendGlobalMessage ( "showAbout" );	};
-	}
-
 	startTimer ( 'NTSC', 100 );
 
 	addMouseListener ( this, true );
@@ -70,6 +63,21 @@ void GUI_CRT::timerCallback ( int timerID )
 			}
 			break;
 	}
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::paintIntoSnapshot ( juce::Image& snapshot, juce::Component& top )
+{
+	if ( ! isShowing () )
+		return;
+
+	const auto	frame = overlay.grabFrame ();
+
+	if ( ! frame.isValid () )
+		return;
+
+	juce::Graphics	g ( snapshot );
+	g.drawImage ( frame, top.getLocalArea ( &overlay, overlay.getLocalBounds () ).toFloat () );
 }
 //-----------------------------------------------------------------------------
 

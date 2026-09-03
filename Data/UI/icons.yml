@@ -25,8 +25,6 @@ crt:
   settings_open:  font-awesome/sliders-solid-full
   settings_close: font-awesome/sliders-solid-full
 
-  about_open:     font-awesome/info-solid-full
-
   settings:
     tv:
       brightness:  crt/brightness
@@ -44,6 +42,12 @@ crt:
 
 about:
   close: font-awesome/xmark-solid-full
+
+version-pill:
+  checking: font-awesome/circle-notch-solid-full
+  current:  font-awesome/circle-check-regular-full
+  outdated: tabler/alert-triangle
+  failed:   font-awesome/circle-xmark-regular-full
 
 # Factory vs user rows in the theme / overlay / mask pick lists
 theme-factory: font-awesome/dice-d6-solid-full

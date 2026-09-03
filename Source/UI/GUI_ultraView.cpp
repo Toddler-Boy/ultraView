@@ -42,6 +42,34 @@ GUI_ultraView::GUI_ultraView ()
 	setDataRoot ();
 	setUserRoot ();
 
+	appUpdater.onStateChanged = [ this ] ( const AppUpdater::State state )
+	{
+		mainScreen.crt.versionPill ().setState ( state );
+	};
+
+	appUpdater.onProgress = [ this ] ( const float progress )
+	{
+		mainScreen.crt.versionPill ().setProgress ( progress );
+	};
+
+	// The regular quit path, the swapped-in program relaunches after the exit
+	appUpdater.onInstalled = [ this ]
+	{
+		static_cast<juce::DocumentWindow*> ( getParentComponent () )->closeButtonPressed ();
+	};
+
+	mainScreen.crt.versionPill ().onClick = [ this ]
+	{
+		if ( AppUpdater::canInstall && appUpdater.updatePending () )
+			appUpdater.install ();
+		else
+			appUpdater.checkNow ();
+	};
+	mainScreen.crt.versionPill ().setState ( appUpdater.state () );
+
+	// Needs the loaded preferences
+	appUpdater.check ();
+
 	loadTheme ();
 
 	curOutVol.set ( 1.0f );

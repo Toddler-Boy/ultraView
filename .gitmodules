@@ -11,3 +11,6 @@
 [submodule "Source/ultra-shared"]
 	path = Source/ultra-shared
 	url = https://github.com/Toddler-Boy/ultra-shared.git
+[submodule "Source/std_lime"]
+	path = Source/std_lime
+	url = https://github.com/Toddler-Boy/std_lime

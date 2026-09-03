@@ -78,12 +78,20 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 	}
 	else if ( cmd == "showAbout" )
 	{
+		auto*	top = getTopLevelComponent ();
+		auto	snapshot = top->createComponentSnapshot ( top->getLocalBounds () );
+
+		mainScreen.crt.paintIntoSnapshot ( snapshot, *top );
+		aboutScreen.setBackground ( std::move ( snapshot ) );
+
 		mainScreen.setVisible ( false );
 		aboutScreen.setVisible ( true );
 	}
 	else if ( cmd == "closeAbout" )
 	{
 		aboutScreen.setVisible ( false );
+		aboutScreen.setBackground ( nullptr );
+
 		mainScreen.setVisible ( true );
 	}
 	else
