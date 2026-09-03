@@ -49,8 +49,8 @@ private:
 		GUI_IconButton		actionMenu { "menu_button", UI::colors::actionOk };
 		GUI_IconButton		actionPause { "pause", UI::colors::actionInfo };
 		GUI_IconButton		actionResume { "resume", UI::colors::actionInfo };
-		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning, 200 };
-		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger, 500 };
+		GUI_IconButton		actionReboot { "reboot", UI::colors::actionWarning };
+		GUI_IconButton		actionPower { "poweroff", UI::colors::actionDanger };
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_Overlay )
 };
