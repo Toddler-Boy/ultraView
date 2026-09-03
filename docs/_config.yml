@@ -1,0 +1,2 @@
+# The release manifests double as the page's data source
+data_dir: api

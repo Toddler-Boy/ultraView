@@ -1,0 +1,278 @@
+/* ultraView landing page */
+
+:root {
+  --bg: #efd9b8;
+  --surface: #f8e9d0;
+  --ink: #2e1a12;
+  --muted: #745a47;
+
+  /* Mirror of the two fills in ultraview.svg */
+  --logo-face: #ff0;
+  --logo-shadow: #f00;
+
+  --accent: var(--logo-shadow);
+  /* Button and hover color, a marigold instead of the logo's neon yellow */
+  --highlight: #f4b942;
+
+  /* Commodore rainbow, top to bottom */
+  --stripe-1: #cb001c;
+  --stripe-2: #ff6c00;
+  --stripe-3: #ffd000;
+  --stripe-4: #44bd38;
+  --stripe-5: #428eff;
+  --stripes: linear-gradient(to bottom,
+    var(--stripe-1) 0 20%,
+    var(--stripe-2) 20% 40%,
+    var(--stripe-3) 40% 60%,
+    var(--stripe-4) 60% 80%,
+    var(--stripe-5) 80% 100%);
+  --stripes-height: 15px;
+
+  --border: 2px solid var(--ink);
+  --radius: 14px;
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-accent: 6px 6px 0 var(--accent);
+
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "Cascadia Code", "Consolas", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Ink below the page's end, so the closing band runs to the viewport edge */
+  background: var(--ink);
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+}
+
+.container {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+h1, h2 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+/* Header */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+}
+
+.site-header::after {
+  content: "";
+  display: block;
+  height: var(--stripes-height);
+  background: var(--stripes);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 3.75rem;
+}
+
+.brand {
+  display: block;
+  line-height: 0;
+}
+
+.brand img {
+  height: 2.25rem;
+  width: auto;
+  transition: filter 0.15s;
+}
+
+.brand:hover img {
+  filter: hue-rotate(-30deg);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.nav-links a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: color 0.15s;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
+.nav-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-github svg {
+  display: block;
+}
+
+/* Hero */
+
+.hero {
+  padding: 6rem 1.5rem 5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  margin-bottom: 1.5rem;
+}
+
+.lead {
+  max-width: 40rem;
+  margin: 0 auto 2.25rem;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.65rem 1.5rem;
+  border: var(--border);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--ink);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.mac [data-os="macos"] {
+  order: -1;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.6rem 0.9rem 1.3rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--highlight);
+  text-align: left;
+}
+
+.btn-download:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.os-icon {
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  fill: currentColor;
+}
+
+.btn-label {
+  display: block;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.btn-meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.actions-note {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.actions-note a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Screenshot, a full-width dark band so the dark app window sits on its own ground */
+
+.screens {
+  padding: 5rem 0;
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.kicker {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.screens h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  margin-bottom: 2.5rem;
+}
+
+.shot {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .btn {
+    transition: none;
+  }
+}
