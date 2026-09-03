@@ -1,18 +1,21 @@
 /* ultraView landing page */
 
 :root {
-  --bg: #efd9b8;
-  --surface: #f8e9d0;
-  --ink: #2e1a12;
-  --muted: #745a47;
+  /* C64 boot screen: screen blue page, light-blue text, near-black blue ink */
+  --bg: #3e31a2;
+  --ink: #1a1350;
+  --text: #dcd8f5;
+  --muted: #a9a2e6;
 
-  /* Mirror of the two fills in ultraview.svg */
-  --logo-face: #ff0;
-  --logo-shadow: #f00;
+  /* Mirror of the two fills in ultraView_logo.svg */
+  --logo-face: #e4e9f4;
+  --logo-shadow: #25856b;
 
-  --accent: var(--logo-shadow);
-  /* Button and hover color, a marigold instead of the logo's neon yellow */
-  --highlight: #f4b942;
+  --accent: #f5d13f;
+  /* Button color, the same yellow as the accent */
+  --highlight: #f5d13f;
+  /* Link hover */
+  --hover: #e53935;
 
   /* Commodore rainbow, top to bottom */
   --stripe-1: #cb001c;
@@ -53,7 +56,7 @@ html {
 body {
   font-family: var(--font);
   background: var(--bg);
-  color: var(--ink);
+  color: var(--text);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -121,7 +124,7 @@ h1, h2 {
 }
 
 .nav-links a {
-  color: var(--ink);
+  color: var(--text);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.92rem;
@@ -129,7 +132,7 @@ h1, h2 {
 }
 
 .nav-links a:hover {
-  color: var(--accent);
+  color: var(--hover);
 }
 
 .nav-github {
@@ -237,6 +240,11 @@ h1, h2 {
 .actions-note a {
   color: var(--accent);
   font-weight: 600;
+  transition: color 0.15s;
+}
+
+.actions-note a:hover {
+  color: var(--hover);
 }
 
 /* Screenshot, a full-width dark band so the dark app window sits on its own ground */
@@ -244,7 +252,7 @@ h1, h2 {
 .screens {
   padding: 5rem 0;
   background: var(--ink);
-  color: var(--bg);
+  color: var(--text);
 }
 
 .kicker {
