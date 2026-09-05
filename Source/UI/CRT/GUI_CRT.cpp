@@ -154,6 +154,15 @@ void GUI_CRT::refreshBrowserEntries ()
 }
 //-----------------------------------------------------------------------------
 
+void GUI_CRT::focusSearch ()
+{
+	if ( ! browserVisible )
+		showBrowser ( true );
+
+	browser.focusSearch ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_CRT::showSettings ( const bool visible )
 {
 	// Cameras hot-plug (and OBS virtual ones come and go), refresh per open

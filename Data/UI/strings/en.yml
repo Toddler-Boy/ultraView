@@ -29,3 +29,30 @@ crt:
     browse:
       header: Browse CRT & PRG
       password: C64 Ultimate password (optional)
+
+# Keyboard shortcuts dialog; the labels are keyed by the verbs in
+# Data/UI/shortcuts.csv
+shortcuts:
+  title: Keyboard Shortcuts
+  hint:  Press {} to toggle this dialog.
+  or:    or
+
+  section:
+    machine:    Machine
+    view:       View
+    navigation: Navigation
+
+  machine:
+    toggleMenu:       Ultimate menu
+    togglePause:      Pause / resume
+    resetMachine:     Reset
+
+  view:
+    toggleBrowser:    Browser panel
+    toggleSettings:   CRT settings
+    toggleFullscreen: Fullscreen
+    toggleRasterTime: Raster time display
+
+  navigation:
+    focusSearch:      Search
+    showShortcuts:    Keyboard shortcuts

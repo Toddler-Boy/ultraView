@@ -1,0 +1,10 @@
+section,verb,keys
+machine,toggleMenu,Ctrl+M
+machine,togglePause,Ctrl+P
+machine,resetMachine,Ctrl+R
+view,toggleBrowser,Ctrl+B
+view,toggleSettings,Ctrl+,
+view,toggleFullscreen,F11|Alt+Enter
+view,toggleRasterTime,F12
+navigation,focusSearch,Ctrl+L|Ctrl+F
+navigation,showShortcuts,?|Ctrl+/

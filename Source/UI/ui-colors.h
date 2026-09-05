@@ -21,7 +21,9 @@
 	X(actionWarning,	"colors/action-warning",	juce::Colour ( 0xff'bb7700 )) \
 	X(actionDanger,		"colors/action-danger",		juce::Colour ( 0xff'cc0000 )) \
 	X(logo,				"colors/logo",				juce::Colour ( 0xff'ffff00 )) \
-	X(logoOutline,		"colors/logo-outline",		juce::Colour ( 0xff'ff0000 ))
+	X(logoOutline,		"colors/logo-outline",		juce::Colour ( 0xff'ff0000 )) \
+	X(keycapFill,		"keycap/fill",				juce::Colour ( 0x1f'ffffff )) \
+	X(keycapOutline,	"keycap/outline",			juce::Colour ( 0x40'ffffff ))
 
 namespace UI
 {

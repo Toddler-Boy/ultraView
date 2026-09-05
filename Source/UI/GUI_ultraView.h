@@ -8,16 +8,19 @@
 
 #include "Misc/FX_Helpers.h"
 
+#include "ultra-shared/UI/Components/GUI_FocusRing.h"
 #include "ultra-shared/UI/Components/GUI_TooltipWindow.h"
 
 #include "UI/GUI_Main.h"
 #include "ultra-shared/UI/GUI_About.h"
+#include "ultra-shared/UI/GUI_Shortcuts.h"
 
 #include "ultra-shared/App/AppUpdater.h"
 
 #include "ultra-shared/Resources/Icons.h"
 #include "Config/Preferences.h"
 #include "Config/Settings.h"
+#include "ultra-shared/Resources/Shortcuts.h"
 #include "ultra-shared/Resources/Strings.h"
 #include "ultra-shared/Resources/Theme.h"
 
@@ -35,6 +38,7 @@ class GUI_ultraView final
 	, private gin::FileSystemWatcher::Listener
 	, private juce::ActionListener
 	, private juce::Timer
+	, private juce::FocusChangeListener
 {
 public:
 	GUI_ultraView ();
@@ -76,6 +80,9 @@ private:
 
 	// gin::FileSystemWatcher::Listener
 	void fileChanged ( const juce::File& file, gin::FileSystemWatcher::FileSystemEvent event ) override;
+
+	// juce::FocusChangeListener: feeds the focus ring, logs in developer mode
+	void globalFocusChanged ( juce::Component* focused ) override;
 
 	// this
 	bool	browserIsVisible = false;
@@ -137,6 +144,7 @@ private:
 	juce::SharedResourcePointer<Icons>			icons;
 	juce::SharedResourcePointer<Preferences>	preferences;
 	juce::SharedResourcePointer<Settings>		settings;
+	juce::SharedResourcePointer<Shortcuts>		shortcuts;
 	juce::SharedResourcePointer<Strings>		strings;
 	juce::SharedResourcePointer<Theme>			theme;
 
@@ -146,6 +154,8 @@ private:
 
 	GUI_Main		mainScreen;
 	GUI_About		aboutScreen;
+	GUI_Shortcuts	shortcutsScreen;
+	GUI_FocusRing	focusRing;
 
 	AppUpdater		appUpdater { "https://toddler-boy.github.io/ultraView/api" };
 
@@ -182,6 +192,9 @@ private:
 
 	// Last loaded was an EasyFlash cartridge
 	bool	loadedEasyFlash = true;
+
+	// The last pause/resume this app sent, for the pause toggle key
+	bool	machinePaused = false;
 
 	juce::SharedResourcePointer<GUI_TooltipWindow>	tooltipWindow;
 	bool	showRasterTime = false;

@@ -2,10 +2,13 @@
 
 #include "ultra-shared/UI/GUI_LookAndFeel.h"
 
+#include "ultra-shared/Config/BuildInfo.h"
 #include "ultra-shared/Config/DataSource.h"
 #include "ultra-shared/Helpers/PlatformHelper.h"
 #include "Config/FilePaths.h"
 #include "Globals/constants.h"
+
+#include <typeinfo>
 
 //-----------------------------------------------------------------------------
 
@@ -21,7 +24,11 @@ GUI_ultraView::GUI_ultraView ()
 	mainScreen.layout.setConstant ( "fullscreen", 0 );
 	mainScreen.layout.setConstant ( "windowed", 1 );
 
+	// Fallback target for editors handing back the keyboard focus, not a tab stop itself
 	setWantsKeyboardFocus ( true );
+	setFocusContainerType ( FocusContainerType::keyboardFocusContainer );
+
+	juce::Desktop::getInstance ().addFocusChangeListener ( this );
 
 	tooltipWindow->setOpaque ( false );
 
@@ -34,6 +41,8 @@ GUI_ultraView::GUI_ultraView ()
 	// Add listener to main menu
 	addAndMakeVisible ( mainScreen );
 	addChildComponent ( aboutScreen );
+	addChildComponent ( shortcutsScreen );
+	addAndMakeVisible ( focusRing );
 
 	folderWatcher.coalesceEvents ( 50 );
 	folderWatcher.addListener ( this );
@@ -120,6 +129,8 @@ GUI_ultraView::GUI_ultraView ()
 
 GUI_ultraView::~GUI_ultraView ()
 {
+	juce::Desktop::getInstance ().removeFocusChangeListener ( this );
+
 	stopTimer ();
 	healWatchdog.stopTimer ();
 
@@ -205,6 +216,8 @@ void GUI_ultraView::resized ()
 {
 	mainScreen.setBounds ( getLocalBounds () );
 	aboutScreen.setBounds ( getLocalBounds () );
+	shortcutsScreen.setBounds ( getLocalBounds () );
+	focusRing.setBounds ( getLocalBounds () );
 
 	const auto	kioskMode = isFullscreen ();
 
@@ -218,6 +231,31 @@ void GUI_ultraView::mouseDoubleClick ( const juce::MouseEvent& evt )
 	// Double click on "CRT" toggles fullscreen
 	if ( evt.eventComponent->getName () == "CRT" )
 		toggleFullscreen ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraView::globalFocusChanged ( juce::Component* focused )
+{
+	focusRing.focusChanged ( focused );
+
+	if ( ! buildinfo::isDeveloperMode () )
+		return;
+
+	if ( ! focused )
+	{
+		Z_INFO ( "Focus: none" );
+		return;
+	}
+
+	// Class plus the path of component names down from the top level
+	juce::String	path;
+	for ( auto c = focused; c; c = c->getParentComponent () )
+	{
+		const auto	name = c->getName ().isNotEmpty () ? c->getName () : juce::String ( "?" );
+		path = path.isEmpty () ? name : name + "/" + path;
+	}
+
+	Z_INFO ( "Focus: " << typeid ( *focused ).name () << " at " << path << " (order " << focused->getExplicitFocusOrder () << ")" );
 }
 //-----------------------------------------------------------------------------
 

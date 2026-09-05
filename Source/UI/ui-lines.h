@@ -34,7 +34,8 @@
 	X(chip_states,		"chip-states/line",		1.5f) \
 	X(eq_curve,			"eq-curve/line",		1.5f) \
 	X(xy_pad,			"xy-pad/line",			1.0f) \
-	X(chip_divot,		"chips/divot-line",		1.5f)
+	X(chip_divot,		"chips/divot-line",		1.5f) \
+	X(keycap,			"keycap/line",			1.0f)
 
 namespace UI::lines
 {

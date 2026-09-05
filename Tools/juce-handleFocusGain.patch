@@ -1,0 +1,16 @@
+diff --git a/modules/juce_gui_basics/windows/juce_ComponentPeer.cpp b/modules/juce_gui_basics/windows/juce_ComponentPeer.cpp
+index 9f9be22e7..e792566ba 100644
+--- a/modules/juce_gui_basics/windows/juce_ComponentPeer.cpp
++++ b/modules/juce_gui_basics/windows/juce_ComponentPeer.cpp
+@@ -361,6 +361,11 @@ void ComponentPeer::handleMovedOrResized()
+ 
+ void ComponentPeer::handleFocusGain()
+ {
++    // Focus already sits inside this window (e.g. a mouse event processed before a
++    // deferred WM_SETFOCUS gave it to a child component), so leave it there.
++    if (component.isParentOf (Component::currentlyFocusedComponent))
++        return;
++
+     if (component.isParentOf (lastFocusedComponent)
+           && lastFocusedComponent->isShowing()
+           && lastFocusedComponent->getWantsKeyboardFocus())

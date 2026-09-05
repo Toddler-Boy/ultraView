@@ -169,6 +169,15 @@ void GUI_Browser::refreshBrowserEntries ()
 }
 //-----------------------------------------------------------------------------
 
+void GUI_Browser::focusSearch ()
+{
+	auto&	editor = searchBar.getTextEditor ();
+
+	editor.grabKeyboardFocus ();
+	editor.selectAll ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_Browser::run ()
 {
 	browserEntries.clear ();

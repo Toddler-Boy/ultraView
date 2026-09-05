@@ -61,7 +61,11 @@
 	X(settings_location, "settings/location-font",	14.0f,	500) \
 	X(dialog_title,		"dialog/title-font",		16.0f,	700) \
 	X(dialog_entry,		"dialog/entry-font",		15.0f,	500) \
-	X(badge,			"badge/font",				11.0f,	700)
+	X(badge,			"badge/font",				11.0f,	700) \
+	X(keycap,			"keycap/font",				11.5f,	700) \
+	X(shortcuts_title,	"shortcuts/title-font",		28.0f,	800) \
+	X(shortcuts_section, "shortcuts/section-font",	18.0f,	800) \
+	X(shortcuts_hint,	"shortcuts/hint-font",		12.0f,	500)
 
 namespace UI::fonts
 {

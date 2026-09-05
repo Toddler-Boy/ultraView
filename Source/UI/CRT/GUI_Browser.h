@@ -24,6 +24,9 @@ public:
 
 	void refreshBrowserEntries ();
 
+	// Keyboard into the search field, its text selected
+	void focusSearch ();
+
 	[[ nodiscard ]] GUI_VersionPill& versionPill ()	{	return badge.version;	}
 
 private:

@@ -70,6 +70,11 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 
 		if ( params[ 0 ] == "reboot" || params[ 0 ] == "poweroff" )
 			loadedEasyFlash = false;
+
+		if ( params[ 0 ] == "pause" )
+			machinePaused = true;
+		else if ( params[ 0 ] == "resume" || params[ 0 ] == "reboot" || params[ 0 ] == "poweroff" )
+			machinePaused = false;
 	}
 	else if ( cmd == "browser" )
 	{
@@ -93,6 +98,63 @@ void GUI_ultraView::actionListenerCallback ( const juce::String& message )
 		aboutScreen.setBackground ( nullptr );
 
 		mainScreen.setVisible ( true );
+	}
+	else if ( cmd == "showShortcuts" )
+	{
+		// The shortcut key toggles: showing while shown closes
+		if ( shortcutsScreen.isVisible () )
+			return actionListenerCallback ( "closeShortcuts" );
+
+		auto*	top = getTopLevelComponent ();
+		auto	snapshot = top->createComponentSnapshot ( top->getLocalBounds () );
+
+		mainScreen.crt.paintIntoSnapshot ( snapshot, *top );
+		shortcutsScreen.setBackground ( std::move ( snapshot ) );
+
+		mainScreen.setVisible ( false );
+		shortcutsScreen.setVisible ( true );
+	}
+	else if ( cmd == "closeShortcuts" )
+	{
+		shortcutsScreen.setVisible ( false );
+		shortcutsScreen.setBackground ( nullptr );
+
+		mainScreen.setVisible ( true );
+	}
+	// The keyboard verbs (Data/UI/shortcuts.csv binds keys to these)
+	else if ( cmd == "toggleFullscreen" )
+	{
+		if ( mainScreen.crt.isVisible () )
+			toggleFullscreen ();
+	}
+	else if ( cmd == "toggleRasterTime" )
+	{
+		showRasterTime = ! showRasterTime;
+		mainScreen.crt.showRasterTime ( showRasterTime );
+	}
+	else if ( cmd == "focusSearch" )
+	{
+		mainScreen.crt.focusSearch ();
+	}
+	else if ( cmd == "toggleBrowser" )
+	{
+		mainScreen.crt.showBrowser ( ! mainScreen.crt.isBrowserVisible () );
+	}
+	else if ( cmd == "toggleSettings" )
+	{
+		mainScreen.crt.showSettings ( ! mainScreen.crt.areSettingsVisible () );
+	}
+	else if ( cmd == "togglePause" )
+	{
+		actionListenerCallback ( machinePaused ? "c64action resume" : "c64action pause" );
+	}
+	else if ( cmd == "resetMachine" )
+	{
+		actionListenerCallback ( "c64action reboot" );
+	}
+	else if ( cmd == "toggleMenu" )
+	{
+		actionListenerCallback ( "c64action menu_button" );
 	}
 	else
 	{

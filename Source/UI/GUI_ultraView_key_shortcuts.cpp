@@ -3,22 +3,42 @@
 
 //-----------------------------------------------------------------------------
 
+// The user-facing keys are data (Data/UI/shortcuts.csv, verb per key) and go
+// through actionListenerCallback like any other message. The modal Escape and
+// the hidden developer combos stay ahead of the lookup, they are not in the
+// list by design.
+
 bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 {
-	if ( key == juce::KeyPress ( juce::KeyPress::F12Key, juce::ModifierKeys::noModifiers, 0 ) )
+	// Any key arms the focus ring
+	focusRing.keyboardUsed ();
+
+	// Tab with the focus on this component itself steps into the children
+	if ( key.isKeyCode ( juce::KeyPress::tabKey ) && hasKeyboardFocus ( false ) )
 	{
-		showRasterTime = ! showRasterTime;
-		mainScreen.crt.showRasterTime ( showRasterTime );
+		if ( auto traverser = createKeyboardFocusTraverser () )
+		{
+			if ( const auto all = traverser->getAllComponents ( this ); ! all.empty () )
+				( key.getModifiers ().isShiftDown () ? all.back () : all.front () )->grabKeyboardFocus ();
+		}
+
+		return true;
 	}
-	else if ( (		key == juce::KeyPress ( juce::KeyPress::returnKey, juce::ModifierKeys::altModifier, 0 )
-				||	key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::noModifiers, 0 )
-			 )
-				&&	mainScreen.crt.isVisible () )
+
+	if ( key == juce::KeyPress ( juce::KeyPress::escapeKey, juce::ModifierKeys::noModifiers, 0 ) )
 	{
-		toggleFullscreen ();
+		if ( aboutScreen.isVisible () )
+			actionListenerCallback ( "closeAbout" );
+		else if ( shortcutsScreen.isVisible () )
+			actionListenerCallback ( "closeShortcuts" );
+		else
+			return false;
+
+		return true;
 	}
+
 #if ULTRA_INSPECTOR
-	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::ctrlModifier, 0 ) )
+	if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::ctrlModifier, 0 ) )
 	{
 		// Toggle inspector
 		if ( ! inspector )
@@ -34,8 +54,9 @@ bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 			inspector = nullptr;
 		}
 	}
+	else
 #endif
-	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::shiftModifier, 0 ) )
+	if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::shiftModifier, 0 ) )
 	{
 		auto&	laf = static_cast<GUI_LookAndFeel&> ( getLookAndFeel () );
 
@@ -48,6 +69,10 @@ bool GUI_ultraView::keyPressed ( const juce::KeyPress& key )
 
 		auto& lw = lime::Logger::getInstance ()->getLoggingWindow ( opts );
 		lw.setVisible ( ! lw.isVisible () );
+	}
+	else if ( const auto verb = shortcuts->find ( key ); verb.isNotEmpty () )
+	{
+		actionListenerCallback ( verb );
 	}
 	else
 		return false;

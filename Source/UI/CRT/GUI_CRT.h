@@ -47,6 +47,9 @@ public:
 	void showBrowser ( const bool visible );
 	void refreshBrowserEntries ();
 
+	// Opens the browser when needed and puts the keyboard into its search field
+	void focusSearch ();
+
 	bool areSettingsVisible () const	{ return settingsVisible;	}
 	void showSettings ( const bool visible );
 	void setBackgroundColour ( const juce::Colour& bckCol );

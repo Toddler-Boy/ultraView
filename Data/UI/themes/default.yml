@@ -20,3 +20,20 @@ colors:
   action-info: "#46b"
   action-warning: "#b70"
   action-danger: "#c00"
+
+keycap:
+  font: 11 600
+  corner: 6
+  line: 1
+  padding: 7
+  height: 26
+  gap: 5
+  fill: "#fff1"
+  outline: "#fff4"
+
+shortcuts:
+  title-font: 32 700
+  section-font: 24 700
+  hint-font: 15 500
+  row-height: 34
+  header-height: 60
