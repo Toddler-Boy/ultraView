@@ -73,8 +73,8 @@ set (JUCE_BUILD_EXTRAS OFF)
 set (JUCE_BUILD_EXAMPLES OFF)
 
 # Soft pin on develop: the fixes land there months before a tagged release.
-# PATCH_COMMAND re-runs after every update, so the patched file is reset first.
-# Drop the patch (and this hook) once the fix has landed upstream.
+# The patch step resets the patched file before each apply. Drop the patch
+# and this hook once the fix has landed upstream.
 FetchContent_Declare (JUCE
 					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
 					GIT_TAG origin/develop
