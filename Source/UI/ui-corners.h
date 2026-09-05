@@ -38,7 +38,9 @@
 	X(footer_thumbnail,	"footer/thumbnail-corner",	3.0f) \
 	X(browser_list_row,	"browser/row-corner",		3.0f) \
 	X(browser_thumbnail, "browser/thumbnail-corner", 3.0f) \
-	X(badge,			"badge/corner",				1000.0f)
+	X(badge,			"badge/corner",				1000.0f) \
+	X(keycap,			"keycap/corner",			5.0f) \
+	X(focus_ring,		"focus-ring/corner",		6.0f)
 
 namespace UI::corners
 {
