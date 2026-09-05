@@ -1,2 +1,3 @@
 * text=auto
 *.jucer text eol=crlf
+*.patch -text
