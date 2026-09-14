@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ultraView
+Comment=C64 Ultimate stream viewer
+Exec=ultraView
+Icon=ultraView
+Categories=AudioVideo;Video;Player;
+Terminal=false

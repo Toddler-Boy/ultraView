@@ -9,6 +9,7 @@
 #include "Globals/constants.h"
 
 #include "ultra-shared/App/AppUpdater.h"
+#include "ultra-shared/Config/DataSource.h"
 #include "ultra-shared/Helpers/PlatformHelper.h"
 
 //-----------------------------------------------------------------------------
@@ -82,7 +83,7 @@ public:
 	{
 	public:
 		MainWindow ( juce::String name, juce::LookAndFeel& laf )
-			: juce::DocumentWindow ( name, juce::Colours::black, juce::DocumentWindow::allButtons )
+			: juce::DocumentWindow ( name, juce::Colours::black, juce::DocumentWindow::allButtons, false )
 		{
 			juce::LookAndFeel::setDefaultLookAndFeel ( &laf );
 			juce::Desktop::setScreenSaverEnabled ( false );
@@ -97,6 +98,10 @@ public:
 
 			setResizable ( true, false );
 			setWantsKeyboardFocus ( false );
+
+			// The hidden peer exists before the state restore (a saved maximised
+			// state needs one) and shows only after it, at its final bounds
+			addToDesktop ();
 
 			// Restore state
 			{
@@ -128,6 +133,16 @@ public:
 
 			setVisible ( true );
 			bringWindowToForeground ( getWindowHandle () );
+
+			#if JUCE_LINUX
+				// JUCE embeds no icon on Linux, task bars and docks take it
+				// from the window; 256 px covers every dock size
+				if ( auto peer = getPeer () )
+				{
+					const auto	png = datasource::loadData ( "UI/png/about-icon.png" );
+					peer->setIcon ( juce::ImageFileFormat::loadFrom ( png.getData (), png.getSize () ).rescaled ( 256, 256 ) );
+				}
+			#endif
 		}
 
 		~MainWindow () override

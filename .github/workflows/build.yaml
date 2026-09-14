@@ -3,9 +3,10 @@ on:
   push:
     tags:
       - "v*"
-    # Every push gets a fast macOS compile check — clang catches what MSVC
-    # lets slide (the Windows job skips branch pushes). Site/manifest commits
-    # are excluded; tag pushes ignore path filters, so releases are unaffected
+    # Every push gets the macOS and Linux builds, clang catches what MSVC
+    # lets slide (the Windows job skips branch pushes). Site/manifest
+    # commits are excluded; tag pushes ignore path filters, so releases are
+    # unaffected
     branches:
       - main
     paths-ignore:
@@ -19,14 +20,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # A mistyped tag would publish a manifest disagreeing with the binaries;
-  # checked once, before either runner spends its minutes
+  # A mistyped tag would publish a manifest disagreeing with the binaries,
+  # a missing changelog section an empty release page; both checked once,
+  # before either runner spends its minutes
   check:
     name: Check tag
     runs-on: ubuntu-latest
+    # actions: write for cancelling the compile check
+    permissions:
+      contents: read
+      actions: write
     steps:
       - uses: actions/checkout@v7
-      - name: Check tag matches VERSION
+
+      # The tag run builds this commit in full, its main compile check
+      # would only burn a runner
+      - name: Cancel the compile check for this commit
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run list --workflow Build --branch main --commit "$GITHUB_SHA" \
+            --json databaseId,status \
+            -q '.[] | select(.status == "in_progress" or .status == "queued") | .databaseId' \
+            | xargs -r -n1 gh run cancel
+
+      - name: Check tag matches VERSION and CHANGELOG
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
         run: |
@@ -34,6 +54,10 @@ jobs:
           tag="${GITHUB_REF#refs/tags/}"
           if [ "v$ver" != "$tag" ]; then
             echo "Tag $tag does not match VERSION file ($ver)"
+            exit 1
+          fi
+          if ! grep -q "^## $ver\( \|$\)" CHANGELOG.md; then
+            echo "CHANGELOG.md has no section for $ver"
             exit 1
           fi
 
@@ -109,12 +133,47 @@ jobs:
           path: ci/bin/ultraView.dmg
           archive: false
 
-  # One release for both platforms, published only once both builds exist,
-  # and both update manifests in a single commit: the app never sees a
+  # The prebuilt image (ci/linux/Dockerfile in the ultraSID repo, built by its
+  # linux_image.yaml) carries the toolchain on Ubuntu 22.04, the AppImage's
+  # glibc floor; both apps build in the same image. Every push builds, the
+  # second clang check next to the mac one; only tag and manual runs keep the
+  # AppImage
+  linux:
+    name: Build Linux
+    needs: check
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/toddler-boy/ultrasid-linux:22.04
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+      packages: read
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: "Run script"
+        run: ./ci/build.sh
+        shell: bash
+
+      - name: Upload AppImage
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ultraView-linux
+          path: ci/bin/ultraView.AppImage
+          archive: false
+
+  # One release for all platforms, published only once every build exists,
+  # and all update manifests in a single commit: the app never sees a
   # manifest pointing at an asset that isn't there
   release:
     name: Publish release
-    needs: [windows, macos]
+    needs: [windows, macos, linux]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     # contents: write for the release upload and the manifest commit to main,
@@ -135,7 +194,7 @@ jobs:
         run: |
           ver=$(tr -d ' \r\n' < VERSION)
           mkdir -p assets
-          for name in "ultraView.exe" "ultraView.dmg"; do
+          for name in "ultraView.exe" "ultraView.dmg" "ultraView.AppImage"; do
             id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" -q ".artifacts[] | select(.name == \"$name\") | .id")
             [ -n "$id" ] || { echo "Artifact $name not found"; exit 1; }
             gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/$id/zip" > "assets/$name"
@@ -150,11 +209,15 @@ jobs:
           tag="${GITHUB_REF#refs/tags/}"
           exe="assets/ultraView.exe"
           dmg="assets/ultraView.dmg"
+          appimage="assets/ultraView.AppImage"
           ls -la assets
-          [ -f "$exe" ] && [ -f "$dmg" ] || { echo "Release assets missing"; exit 1; }
+          [ -f "$exe" ] && [ -f "$dmg" ] && [ -f "$appimage" ] || { echo "Release assets missing"; exit 1; }
 
-          gh release view "$tag" > /dev/null 2>&1 || gh release create "$tag" --title "ultraView $ver" --generate-notes
-          gh release upload "$tag" "$exe" "$dmg" --clobber
+          # Release notes = this version's CHANGELOG section; the generated
+          # notes only add the compare link underneath
+          awk -v ver="$ver" '/^## /{p = ($2 == ver)} p && !/^## /' CHANGELOG.md > notes.md
+          gh release view "$tag" > /dev/null 2>&1 || gh release create "$tag" --title "ultraView $ver" --notes-file notes.md --generate-notes
+          gh release upload "$tag" "$exe" "$dmg" "$appimage" --clobber
 
           manifest() {
             mkdir -p docs/api
@@ -179,7 +242,8 @@ jobs:
             git checkout -B manifest origin/main
             manifest windows "ultraView.exe" "$exe"
             manifest macos "ultraView.dmg" "$dmg"
-            git add docs/api/latest-windows.json docs/api/latest-macos.json
+            manifest linux "ultraView.AppImage" "$appimage"
+            git add docs/api/latest-windows.json docs/api/latest-macos.json docs/api/latest-linux.json
             git commit -m "Release $tag manifests" || true
             git push origin manifest:main && exit 0
             echo "Push rejected, retrying ($attempt)"
