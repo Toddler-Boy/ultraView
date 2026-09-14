@@ -2,6 +2,11 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.3.1 (2026-09-14)
+
+- Windows: a click on the title bar brings the window to the front right away, and
+  keyboard shortcuts work without a further click inside.
+
 ## 1.3.0 (2026-09-03)
 
 - ultraView now updates itself: the version badge next to the logo checks for a
