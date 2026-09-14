@@ -69,7 +69,7 @@ GUI_ultraView::GUI_ultraView ()
 
 	mainScreen.crt.versionPill ().onClick = [ this ]
 	{
-		if ( AppUpdater::canInstall && appUpdater.updatePending () )
+		if ( AppUpdater::canInstall () && appUpdater.updatePending () )
 			appUpdater.install ();
 		else
 			appUpdater.checkNow ();

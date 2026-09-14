@@ -73,15 +73,17 @@ set (JUCE_BUILD_EXTRAS OFF)
 set (JUCE_BUILD_EXAMPLES OFF)
 
 # Soft pin on develop: the fixes land there months before a tagged release.
-# The patch step resets the patched file before each apply. Drop the patch
-# and this hook once the fix has landed upstream.
+# The Windows peer patch: title-bar clicks go straight to DefWindowProc (since
+# 8.0.2 JUCE defers them to the first mouse move, so a plain click activates
+# the window without raising it), and owned top-level windows keep screen
+# coordinates instead of being offset like child peers.
 FetchContent_Declare (JUCE
 					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
 					GIT_TAG origin/develop
 					GIT_SHALLOW TRUE
 					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE
-					PATCH_COMMAND git checkout -- modules/juce_gui_basics/windows/juce_ComponentPeer.cpp
-					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-handleFocusGain.patch)
+					PATCH_COMMAND git checkout -- modules/juce_gui_basics/native/juce_Windowing_windows.cpp
+					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-windowing.patch)
 FetchContent_MakeAvailable (JUCE)
 
 set_property (DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/JUCE" APPEND PROPERTY LABELS JUCE)

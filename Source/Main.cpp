@@ -149,6 +149,24 @@ public:
 			setBorderColor ();
 		}
 
+		void broughtToFront () override
+		{
+			juce::DocumentWindow::broughtToFront ();
+
+			// A title-bar activation leaves JUCE's focus empty until a click
+			// inside (it defers the update to that click): restore it once
+			// the activation is through, so keys work right away
+			juce::MessageManager::callAsync ( [ safe = juce::Component::SafePointer<MainWindow> ( this ) ]
+			{
+				if ( safe == nullptr || juce::Component::getCurrentlyFocusedComponent () != nullptr || ! juce::Process::isForegroundProcess () )
+					return;
+
+				if ( auto peer = safe->getPeer () )
+					if ( auto last = peer->getLastFocusedSubcomponent () )
+						last->grabKeyboardFocus ();
+			} );
+		}
+
 		void closeButtonPressed () override
 		{
 			auto	content = dynamic_cast<GUI_ultraView*> ( getContentComponent () );
