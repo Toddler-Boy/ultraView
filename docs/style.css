@@ -189,7 +189,8 @@ h1, h2 {
   box-shadow: 2px 2px 0 var(--ink);
 }
 
-.mac [data-os="macos"] {
+.mac [data-os="macos"],
+.linux [data-os="linux"] {
   order: -1;
 }
 

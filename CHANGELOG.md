@@ -2,6 +2,11 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.4.0 (2026-09-14)
+
+- Linux version, as an AppImage for Ubuntu 22.04 or later (and other distributions
+  from that era on). Same features, same self-update as Windows and macOS.
+
 ## 1.3.1 (2026-09-14)
 
 - Windows: a click on the title bar brings the window to the front right away, and

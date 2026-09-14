@@ -14,6 +14,10 @@ Open source C64 ultimate stream viewer deluxe.
 
 Requires CMake 4.3+ and a C++23 compiler. Run `./config_cmake.sh` then open the project in your IDE.
 
+Linux ships as an AppImage for Ubuntu 22.04 or later. CI builds it in the
+`ghcr.io/toddler-boy/ultrasid-linux:22.04` image shared with ultraSID (the
+Dockerfile lives in the ultraSID repo); no secrets involved.
+
 ## CI Secrets
 
 The following GitHub Actions secrets are required for code signing and notarization:
