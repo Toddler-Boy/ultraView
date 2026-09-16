@@ -77,13 +77,16 @@ set (JUCE_BUILD_EXAMPLES OFF)
 # 8.0.2 JUCE defers them to the first mouse move, so a plain click activates
 # the window without raising it), and owned top-level windows keep screen
 # coordinates instead of being offset like child peers.
+# The audio-formats patch: the bundled ogg/opus headers move before namespace
+# juce (clang-cl in C++20 mode declares std::nullptr_t on every <stddef.h>).
 FetchContent_Declare (JUCE
 					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
 					GIT_TAG origin/develop
 					GIT_SHALLOW TRUE
 					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE
-					PATCH_COMMAND git checkout -- modules/juce_gui_basics/native/juce_Windowing_windows.cpp
-					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-windowing.patch)
+					PATCH_COMMAND git checkout -- modules/juce_gui_basics/native/juce_Windowing_windows.cpp modules/juce_audio_formats/codecs/juce_OggVorbisAudioFormat.cpp modules/juce_audio_formats/codecs/juce_OpusAudioFormat.cpp
+					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-windowing.patch
+					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-audio-formats.patch)
 FetchContent_MakeAvailable (JUCE)
 
 set_property (DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/JUCE" APPEND PROPERTY LABELS JUCE)

@@ -1,0 +1,70 @@
+diff --git a/modules/juce_audio_formats/codecs/juce_OggVorbisAudioFormat.cpp b/modules/juce_audio_formats/codecs/juce_OggVorbisAudioFormat.cpp
+index ee69c3691..66f1508dd 100644
+--- a/modules/juce_audio_formats/codecs/juce_OggVorbisAudioFormat.cpp
++++ b/modules/juce_audio_formats/codecs/juce_OggVorbisAudioFormat.cpp
+@@ -32,15 +32,14 @@
+   ==============================================================================
+ */
+ 
+-namespace juce
+-{
+-
+ #if JUCE_USE_OGGVORBIS
+ 
+ #if JUCE_MAC && ! defined (__MACOSX__)
+  #define __MACOSX__ 1
+ #endif
+ 
++// At global scope: ogg.h includes <stddef.h>, and clang-cl in C++20 mode declares
++// std::nullptr_t on every include of it (a nested juce::std inside the namespace)
+ #if JUCE_INCLUDE_OGGVORBIS_CODE || ! defined (JUCE_INCLUDE_OGGVORBIS_CODE)
+  extern "C"
+  {
+@@ -53,6 +52,13 @@ namespace juce
+  }
+ #endif
+ 
++#endif
++
++namespace juce
++{
++
++#if JUCE_USE_OGGVORBIS
++
+ namespace OggVorbisNamespace
+ {
+ #if JUCE_INCLUDE_OGGVORBIS_CODE || ! defined (JUCE_INCLUDE_OGGVORBIS_CODE)
+diff --git a/modules/juce_audio_formats/codecs/juce_OpusAudioFormat.cpp b/modules/juce_audio_formats/codecs/juce_OpusAudioFormat.cpp
+index 6f688bfe6..ba60d7add 100644
+--- a/modules/juce_audio_formats/codecs/juce_OpusAudioFormat.cpp
++++ b/modules/juce_audio_formats/codecs/juce_OpusAudioFormat.cpp
+@@ -34,13 +34,12 @@
+ 
+ #include <juce_core/detail/juce_FunctionPointerDestructor.h>
+ 
+-namespace juce
+-{
+-
+ #if JUCE_USE_OPUS
+ 
+ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wlanguage-extension-token")
+ 
++// At global scope: ogg.h and opusenc.h include <stddef.h>, and clang-cl in C++20
++// mode declares std::nullptr_t on every include of it (a juce::std inside the namespace)
+ #if JUCE_INCLUDE_OPUS_CODE || ! defined (JUCE_INCLUDE_OPUS_CODE)
+  extern "C"
+  {
+@@ -59,6 +58,13 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wlanguage-extension-token")
+ 
+ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+ 
++#endif
++
++namespace juce
++{
++
++#if JUCE_USE_OPUS
++
+ //==============================================================================
+ static const char* const opusFormatName = "Opus file";
+ 
