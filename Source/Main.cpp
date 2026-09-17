@@ -70,6 +70,11 @@ public:
 
 	void shutdown () override
 	{
+		// The OpenGL teardown takes a third of a second, hide the window first.
+		// The peer, as setVisible () runs the context's detach before it hides
+		if ( auto peer = mainWindow->getPeer () )
+			peer->setVisible ( false );
+
 		mainWindow = nullptr;
 	}
 	//-----------------------------------------------------------------------------

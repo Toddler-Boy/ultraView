@@ -114,6 +114,9 @@ private:
 	std::atomic<bool>	netProbing = false;
 	std::atomic<int>	probeFailures = 0;
 
+	// The C64u accepted a stream start: there is something to stop at shutdown
+	std::atomic<bool>	streamsStarted = false;
+
 	// Stream targets as the C64u reported them; a receiver still silent when
 	// the watchdog fires gets retargeted to this machine (healStreams)
 	juce::String		videoStreamTarget, audioStreamTarget;

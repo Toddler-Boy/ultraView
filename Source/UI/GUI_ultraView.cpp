@@ -135,7 +135,9 @@ GUI_ultraView::~GUI_ultraView ()
 	healWatchdog.stopTimer ();
 
 	// The C64u has no way to notice the listener is gone and would stream at
-	// this machine forever; wait briefly so the stops leave before teardown
+	// this machine forever; wait briefly so the stops leave before teardown.
+	// A silent C64u is gone or blocked, the wait would run its full second
+	if ( streamsStarted && netReceiving )
 	{
 		juce::WaitableEvent	sent;
 

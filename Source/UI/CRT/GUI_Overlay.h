@@ -17,6 +17,7 @@ class GUI_Overlay final
 {
 public:
 	GUI_Overlay ();
+	~GUI_Overlay () override;
 
 	// lime::CRTEmulation
 	void newOpenGLContextCreated () override;

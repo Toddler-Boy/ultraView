@@ -106,6 +106,7 @@ void GUI_ultraView::reconnectTick ()
 
 		if ( httpCode < 200 || httpCode >= 300 )
 		{
+			streamsStarted = false;
 			++probeFailures;
 			return;
 		}
@@ -169,8 +170,10 @@ void GUI_ultraView::setupNetworking ()
 		}
 
 		network.put ( "v1/streams/video:start", { "ip", videoAddress } );
-		network.put ( "v1/streams/audio:start", { "ip", audioAddress }, [ this, videoAddress, audioAddress ] ( const juce::var&, const int )
+		network.put ( "v1/streams/audio:start", { "ip", audioAddress }, [ this, videoAddress, audioAddress ] ( const juce::var&, const int startCode )
 		{
+			streamsStarted = startCode >= 200 && startCode < 300;
+
 			juce::MessageManager::callAsync ( [ this, videoAddress, audioAddress ]
 			{
 				videoStreamTarget = videoAddress;

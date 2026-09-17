@@ -93,6 +93,12 @@ GUI_Overlay::GUI_Overlay ()
 }
 //-----------------------------------------------------------------------------
 
+GUI_Overlay::~GUI_Overlay ()
+{
+	shutdownGL ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_Overlay::newOpenGLContextCreated ()
 {
 	CRTEmulation::newOpenGLContextCreated ();
