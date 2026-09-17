@@ -2,6 +2,10 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.4.1 (2026-09-17)
+
+- Internal improvements and a faster shutdown.
+
 ## 1.4.0 (2026-09-14)
 
 - Linux version, as an AppImage for Ubuntu 22.04 or later (and other distributions
