@@ -73,17 +73,11 @@ set (JUCE_BUILD_EXTRAS OFF)
 set (JUCE_BUILD_EXAMPLES OFF)
 
 # Soft pin on develop: the fixes land there months before a tagged release.
-# The Windows peer patch: title-bar clicks go straight to DefWindowProc (since
-# 8.0.2 JUCE defers them to the first mouse move, so a plain click activates
-# the window without raising it), and owned top-level windows keep screen
-# coordinates instead of being offset like child peers.
 FetchContent_Declare (JUCE
 					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
 					GIT_TAG origin/develop
 					GIT_SHALLOW TRUE
-					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE
-					PATCH_COMMAND git checkout -- modules/juce_gui_basics/native/juce_Windowing_windows.cpp
-					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-windowing.patch)
+					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE)
 FetchContent_MakeAvailable (JUCE)
 
 set_property (DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/JUCE" APPEND PROPERTY LABELS JUCE)
@@ -236,7 +230,6 @@ target_link_libraries (ultraView PRIVATE
 						juce::juce_audio_basics
 						juce::juce_audio_devices
 						juce::juce_audio_formats
-						juce::juce_audio_plugin_client
 						juce::juce_audio_processors
 						juce::juce_audio_utils
 						juce::juce_core
@@ -272,6 +265,8 @@ target_compile_definitions (ultraView PRIVATE
 								JUCE_USE_LAME_AUDIO_FORMAT=0
 								JUCE_USE_WINDOWS_MEDIA_FORMAT=0
 								JUCE_USE_CAMERA=0
+								JUCE_USE_WEBP=0
+								JUCE_DIRECTSOUND=0
 								JUCE_DONT_ASSERT_ON_GLSL_COMPILE_ERROR=1
 								DONT_SET_USING_JUCE_NAMESPACE=1
 								_CRT_SECURE_NO_WARNINGS
