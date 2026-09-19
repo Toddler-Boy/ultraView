@@ -2,6 +2,10 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.4.2 (2026-09-19)
+
+- Fixed the menus showing up black on macOS.
+
 ## 1.4.1 (2026-09-17)
 
 - Internal improvements and a faster shutdown.
