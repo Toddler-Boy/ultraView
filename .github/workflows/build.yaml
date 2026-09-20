@@ -89,6 +89,7 @@ jobs:
         with:
           name: ultraView-windows
           path: ${{ env.OUT }}/ultraView.exe
+          if-no-files-found: error
           archive: false
 
   macos:
@@ -131,6 +132,7 @@ jobs:
         with:
           name: ultraView-macos
           path: ${{ env.OUT }}/ultraView.dmg
+          if-no-files-found: error
           archive: false
 
   # The prebuilt image (ci/linux/Dockerfile in the ultraSID repo, built by its
@@ -166,6 +168,7 @@ jobs:
         with:
           name: ultraView-linux
           path: ${{ env.OUT }}/ultraView.AppImage
+          if-no-files-found: error
           archive: false
 
   # One release for all platforms, published only once every build exists,
