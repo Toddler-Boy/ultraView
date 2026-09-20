@@ -14,6 +14,6 @@ if [ "$TOOLCHAIN" = "xcode" ]; then
 fi
 
 # Skip git checkout lines quoting commit messages
-if grep -viE '^HEAD is now at' Builds/logs/configure.log | grep -qiE 'warning|error'; then
+if grep -viE '^HEAD is now at' Builds/logs/configure.log | grep -qiE 'CMake Warning|CMake Error|warning:|error:'; then
     read -p "Warnings in Builds/logs/configure.log, press enter to close"
 fi
