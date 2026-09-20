@@ -2,6 +2,11 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.4.3 (2026-09-20)
+
+- Fixed the menus showing up black on macOS, the previous fix did not reach the
+  release build.
+
 ## 1.4.2 (2026-09-19)
 
 - Fixed the menus showing up black on macOS.
