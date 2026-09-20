@@ -206,10 +206,12 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 target_sources (ultraView PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
 
-# The About screen's icon is the canonical app icon, synced from icons/ so it
-# ships in the pak without a second committed copy drifting out of date
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
-				${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/png/about-icon.png COPYONLY)
+# The About screen's icon is the canonical app icon, synced from icons/ on the
+# machine that edits the tree; the mac and the Linux box build it read-only
+if (CMAKE_HOST_WIN32)
+	configure_file (${CMAKE_CURRENT_SOURCE_DIR}/icons/windows_big.png
+					${CMAKE_CURRENT_SOURCE_DIR}/Data/UI/png/about-icon.png COPYONLY)
+endif ()
 
 target_include_directories (ultraView PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${boost_regex_SOURCE_DIR}/include)
 
