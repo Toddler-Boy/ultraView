@@ -10,9 +10,13 @@ echo "Building ultraView $ver"
 BRANCH=${GITHUB_REF##*/}
 echo "$BRANCH"
 
-cd "$ROOT/ci"
-rm -rf bin
-mkdir -p bin
+# Everything the build writes lands beside the build tree (the source tree is
+# read-only on the mac and the Linux box); the workflow reads OUT for its uploads
+OUT="$BUILD_DIR/bin"
+rm -rf "$OUT"
+mkdir -p "$OUT"
+[ -n "${GITHUB_ENV:-}" ] && echo "OUT=$OUT" >> "$GITHUB_ENV"
+XCODE_DIR="$BUILD_DIR-xcode"
 
 # Pre-seeded configure-check results harvested from a previous CMakeCache.txt.
 # Skips the slow try_compile probes (mainly libarchive's) on the fresh CI
@@ -32,8 +36,8 @@ if [ "$OS_NAME" = "Darwin" ]; then
   # RELEASE=1 (tag and manual workflow runs) does the full packaging
   if [ "${RELEASE:-}" != "1" ]; then
     cd "$ROOT"
-    cmake --preset xcode "${SEED_ARGS[@]}"
-    cmake --build --preset xcode --config Release --parallel
+    cmake --preset xcode "${SEED_ARGS[@]}" -B "$XCODE_DIR"
+    cmake --build "$XCODE_DIR" --config Release --parallel
     exit 0
   fi
 
@@ -63,13 +67,13 @@ if [ "$OS_NAME" = "Darwin" ]; then
 
   cd "$ROOT"
   # Releases are universal; compile checks above stay arm-only for speed
-  cmake --preset xcode "${SEED_ARGS[@]}" -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
-  cmake --build --preset xcode --config Release --parallel
+  cmake --preset xcode "${SEED_ARGS[@]}" -B "$XCODE_DIR" -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+  cmake --build "$XCODE_DIR" --config Release --parallel
 
-  APP_PATH="$ROOT/Builds/xcode/ultraView_artefacts/Release/ultraView.app"
+  APP_PATH="$XCODE_DIR/ultraView_artefacts/Release/ultraView.app"
 
   # Generate entitlements for Hardened Runtime (Camera and Network Client)
-  ENTITLEMENTS="$ROOT/ci/bin/entitlements.plist"
+  ENTITLEMENTS="$OUT/entitlements.plist"
   cat > "$ENTITLEMENTS" <<ENTEOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -96,7 +100,7 @@ ENTEOF
   # Stage the drag-install image: the app plus an Applications link, with the
   # committed background picture tucked into a hidden .background folder
   # (created here at build time only — hidden folders stay out of the repo)
-  DMG_STAGE="$ROOT/ci/bin/dmg_root"
+  DMG_STAGE="$OUT/dmg_root"
   rm -rf "$DMG_STAGE"
   mkdir -p "$DMG_STAGE"
   cp -R "$APP_PATH" "$DMG_STAGE/"
@@ -114,7 +118,7 @@ ENTEOF
   # which only Finder itself can write — so build read-write first, style the
   # mounted volume via AppleScript, then compress. HFS+ because APFS images
   # don't mount on older macOS
-  RW_DMG="$ROOT/ci/bin/ultraView_rw.dmg"
+  RW_DMG="$OUT/ultraView_rw.dmg"
   hdiutil create -volname "ultraView" -srcfolder "$DMG_STAGE" -ov -format UDRW -fs HFS+ "$RW_DMG"
   MOUNT_DEV=$(hdiutil attach -readwrite -noverify -noautoopen "$RW_DMG" | awk 'NR==1{print $1}')
 
@@ -158,13 +162,13 @@ OSAEOF
     hdiutil detach "$MOUNT_DEV" && break || sleep 2
   done
 
-  hdiutil convert "$RW_DMG" -format UDZO -o "$ROOT/ci/bin/ultraView.dmg" -ov
+  hdiutil convert "$RW_DMG" -format UDZO -o "$OUT/ultraView.dmg" -ov
   rm -f "$RW_DMG"
   rm -rf "$DMG_STAGE"
 
   # Sign the dmg
   if [ -n "${APPLICATION:-}" ]; then
-    codesign -s "$DEV_APP_ID" --timestamp "$ROOT/ci/bin/ultraView.dmg"
+    codesign -s "$DEV_APP_ID" --timestamp "$OUT/ultraView.dmg"
   else
     echo "Skipping dmg signing — APPLICATION secret not set"
   fi
@@ -176,7 +180,7 @@ OSAEOF
   elif [ -n "${APPLE_USER:-}" ] && [ -n "${APPLE_PASS:-}" ]; then
     # First submissions from a new team can sit in Apple's queue for well over
     # 30 minutes, so give notarytool a generous wait budget
-    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 100m "$ROOT/ci/bin/ultraView.dmg" 2>&1) || NOTARY_FAILED=1
+    SUBMISSION_OUTPUT=$(xcrun notarytool submit --verbose --apple-id "$APPLE_USER" --password "$APPLE_PASS" --team-id "$TEAM_ID" --wait --timeout 100m "$OUT/ultraView.dmg" 2>&1) || NOTARY_FAILED=1
     echo "$SUBMISSION_OUTPUT"
     SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | awk "/^  id:/ { if (!id) id = \$2 } END { print id }")
     if [ "${NOTARY_FAILED:-0}" = "1" ]; then
@@ -188,7 +192,7 @@ OSAEOF
       fi
       exit 1
     fi
-    xcrun stapler staple "$ROOT/ci/bin/ultraView.dmg"
+    xcrun stapler staple "$OUT/ultraView.dmg"
   else
     echo "Skipping notarization — APPLE_USER / APPLE_PASS not set"
   fi
@@ -235,15 +239,15 @@ build_pak() {
 if [ "$OS_NAME" = "Linux" ]; then
   cd "$ROOT"
   seed_args ninja-clang
-  cmake --preset ninja-clang "${SEED_ARGS[@]}"
-  cmake --build --preset ninja-clang --config Release --parallel
+  cmake --preset ninja-clang "${SEED_ARGS[@]}" -B "$BUILD_DIR"
+  cmake --build "$BUILD_DIR" --config Release --parallel
 
-  STAGE="$ROOT/ci/bin/stage"
+  STAGE="$OUT/stage"
   rm -rf "$STAGE"
   mkdir -p "$STAGE"
 
   # Strip first: any later ELF rewrite would drop the appended pak
-  strip -o "$STAGE/ultraView" "$ROOT/Builds/ninja-clang/ultraView_artefacts/Release/ultraView"
+  strip -o "$STAGE/ultraView" "$BUILD_DIR/ultraView_artefacts/Release/ultraView"
 
   # The pak rides appended to the binary (zip is end-anchored, ELF loaders
   # ignore trailing bytes), making it fully self-contained
@@ -255,7 +259,7 @@ if [ "$OS_NAME" = "Linux" ]; then
   # appimagetool onto the vendored static runtime (libfuse3 built in; the
   # tool would otherwise fetch an unpinned one). extract-and-run: the tool is
   # an AppImage itself
-  TOOLS="$ROOT/Builds/tools"
+  TOOLS="$BUILD_DIR/tools"
   APPIMAGETOOL="$TOOLS/appimagetool-x86_64.AppImage"
   APPIMAGETOOL_SHA256=ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
   mkdir -p "$TOOLS"
@@ -272,7 +276,8 @@ if [ "$OS_NAME" = "Linux" ]; then
   cp "$ROOT/ci/ultraView.desktop" "$APPDIR/"
   cp "$ROOT/icons/windows_big.png" "$APPDIR/ultraView.png"
 
-  ARCH=x86_64 "$APPIMAGETOOL" --appimage-extract-and-run --runtime-file "$ROOT/ci/runtime-x86_64" "$APPDIR" "$ROOT/ci/bin/ultraView.AppImage"
+  ARCH=x86_64 "$APPIMAGETOOL" --appimage-extract-and-run --runtime-file "$ROOT/ci/runtime-x86_64" "$APPDIR" "$OUT/ultraView.AppImage"
+  rm -rf "$STAGE"
 fi
 
 # Build Win version
@@ -282,10 +287,10 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   cmake --preset vs "${SEED_ARGS[@]}"
   cmake --build --preset vs --config Release --parallel
 
-  STAGE="$ROOT/ci/bin/stage"
+  STAGE="$OUT/stage"
   rm -rf "$STAGE"
   mkdir -p "$STAGE"
-  cp "$ROOT/Builds/vs/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
+  cp "$BUILD_DIR/ultraView_artefacts/Release/ultraView.exe" "$STAGE/"
 
   # The pak rides appended to the exe (zip is end-anchored, so the file stays
   # both a valid PE and a valid zip), making the exe fully self-contained.
@@ -342,5 +347,6 @@ METAEOF
 
   # The signed self-contained exe is the whole deliverable; no version in the
   # name, downloads and the self-updater always see a plain ultraView.exe
-  cp "$STAGE/ultraView.exe" "$ROOT/ci/bin/"
+  cp "$STAGE/ultraView.exe" "$OUT/"
+  rm -rf "$STAGE"
 fi
