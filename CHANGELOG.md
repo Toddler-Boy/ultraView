@@ -2,6 +2,10 @@
 
 Headline changes only. Small fixes and internal work are not listed.
 
+## 1.4.4 (2026-09-22)
+
+- Fixed the menu shadow covering the menu on Linux (Wayland).
+
 ## 1.4.3 (2026-09-20)
 
 - Fixed the menus showing up black on macOS, the previous fix did not reach the
