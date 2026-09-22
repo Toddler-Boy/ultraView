@@ -1,7 +1,7 @@
 {
-  "version": "1.4.3",
-  "url": "https://github.com/Toddler-Boy/ultraView/releases/download/v1.4.3/ultraView.AppImage",
-  "sha256": "0da6aa502326a7a77f64370b01ab2673baa827f1ac7e8a3ed9c4dc8bc0dfa1c8",
-  "bytes": 15428088,
-  "notes": "https://github.com/Toddler-Boy/ultraView/releases/tag/v1.4.3"
+  "version": "1.4.4",
+  "url": "https://github.com/Toddler-Boy/ultraView/releases/download/v1.4.4/ultraView.AppImage",
+  "sha256": "f67a9b6cd74920bc230c859870c922f3fb6b121fb9139e9f2f251f97084329d2",
+  "bytes": 15419896,
+  "notes": "https://github.com/Toddler-Boy/ultraView/releases/tag/v1.4.4"
 }
